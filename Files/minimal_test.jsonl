@@ -1,0 +1,900 @@
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_48"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_541"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_399"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_96"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_409"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_371"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_370"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_233"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_97"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_53"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_410"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_22"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_42"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_439"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_526"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_6"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_428"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_282"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_535"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_334"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_313"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_268"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_420"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_310"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_391"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_8"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_321"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_245"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_529"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_502"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_100"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_240"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_421"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_479"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_593"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_333"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_446"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_372"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_447"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_436"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_519"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_115"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_76"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_141"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_556"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_63"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_26"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_390"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_223"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_518"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_88"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_97"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_29"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_465"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_366"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_572"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_326"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_316"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_189"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_379"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_495"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_377"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_388"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_88"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_450"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_111"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_419"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_117"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_482"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_309"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_314"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_485"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_416"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_149"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_334"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_40"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_23"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_564"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_108"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_193"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_524"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_15"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_10"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_162"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_141"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_71"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_420"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_300"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_168"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_348"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_190"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_149"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_177"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_405"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_365"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_32"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_83"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_353"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_463"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_83"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_490"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_388"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_316"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_506"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_537"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_394"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_289"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_262"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_13"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_235"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_355"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_298"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_199"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_468"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_595"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_197"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_92"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_484"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_109"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_211"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_240"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_398"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_53"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_568"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_208"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_360"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_208"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_245"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_412"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_74"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_242"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_567"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_53"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_166"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_406"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_567"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_551"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_264"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_415"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_548"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_103"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_395"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_226"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_564"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_35"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_473"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_164"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_444"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_336"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_436"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_379"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_118"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_70"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_234"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_189"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_338"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_50"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_22"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_424"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_249"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_74"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_544"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_155"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_210"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_540"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_134"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_148"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_141"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_446"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_174"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_163"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_174"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_21"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_299"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_45"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_585"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_420"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_337"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_279"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_434"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_154"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_48"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_289"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_166"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_433"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_580"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_254"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_329"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_562"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_36"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_466"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_426"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_420"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_158"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_252"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_70"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_266"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_453"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_479"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_505"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_364"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_277"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_124"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_533"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_281"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_61"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_331"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_1"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_288"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_182"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_511"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_511"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_465"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_87"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_222"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_423"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_48"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_227"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_220"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_510"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_297"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_445"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_228"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_396"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_312"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_353"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_185"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_237"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_304"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_570"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_435"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_597"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_399"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_6"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_141"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_273"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_209"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_432"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_194"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_46"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_481"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_48"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_307"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_116"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_516"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_160"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_584"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_190"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_441"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_494"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_510"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_406"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_216"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_245"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_310"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_339"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_398"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_526"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_552"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_51"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_137"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_94"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_35"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_468"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_60"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_224"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_219"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_351"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_425"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_120"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_540"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_34"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_3"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_449"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_159"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_334"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_369"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_70"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_471"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_423"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_225"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_323"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_86"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_288"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_103"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_52"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_55"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_495"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_535"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_218"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_25"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_199"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_77"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_378"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_151"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_206"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_492"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_139"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_394"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_241"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_366"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_411"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_205"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_43"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_240"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_592"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_482"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_273"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_45"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_574"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_8"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_198"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_273"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_449"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_145"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_392"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_515"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_359"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_395"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_130"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_596"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_207"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_292"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_509"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_378"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_200"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_7"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_431"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_377"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_142"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_124"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_165"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_345"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_272"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_385"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_22"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_524"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_94"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_597"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_190"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_276"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_587"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_550"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_22"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_176"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_209"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_239"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_563"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_393"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_551"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_521"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_521"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_550"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_89"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_3"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_288"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_326"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_65"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_462"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_242"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_225"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_105"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_47"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_444"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_371"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_442"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_341"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_22"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_296"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_272"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_345"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_153"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_133"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_554"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_60"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_420"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_207"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_171"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_304"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_304"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_41"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_573"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_533"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_583"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_414"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_210"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_59"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_13"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_572"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_363"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_286"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_357"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_523"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_155"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_347"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_589"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_166"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_574"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_280"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_431"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_559"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_87"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_288"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_313"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_374"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_556"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_262"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_339"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_344"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_226"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_312"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_548"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_274"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_573"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_455"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_476"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_486"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_568"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_482"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_289"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_264"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_382"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_6"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_193"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_26"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_64"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_100"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_464"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_170"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_434"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_22"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_255"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_317"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_133"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_285"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_104"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_443"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_232"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_87"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_372"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_321"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_269"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_203"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_377"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_250"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_131"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_139"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_66"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_284"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_305"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_386"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_497"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_242"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_63"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_244"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_520"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_531"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_326"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_587"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_125"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_342"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_444"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_520"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_13"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_326"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_571"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_24"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_295"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_269"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_21"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_16"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_413"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_79"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_394"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_503"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_319"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_19"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_421"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_345"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_419"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_471"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_332"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_29"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_361"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_466"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_339"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_396"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_156"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_416"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_257"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_415"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_540"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_362"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_395"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_467"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_408"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_525"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_154"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_508"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_431"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_561"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_449"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_276"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_345"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_551"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_500"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_248"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_34"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_52"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_343"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_71"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_64"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_133"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_557"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_210"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_78"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_250"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_589"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_92"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_534"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_27"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_201"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_563"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_459"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_485"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_295"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_544"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_546"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_204"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_0"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_219"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_412"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_288"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_154"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_76"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_594"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_190"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_145"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_57"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_487"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_385"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_472"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_242"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_375"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_155"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_173"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_86"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_473"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_336"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_191"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_82"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_430"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_581"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_585"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_434"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_71"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_273"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_325"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_70"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_542"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_216"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_466"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_382"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_307"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_126"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_131"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_556"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_74"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_561"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_322"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_56"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_560"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_465"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_89"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_150"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_519"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_305"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_585"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_410"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_468"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_169"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_499"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_241"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_544"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_479"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_583"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_30"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_355"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_68"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_386"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_22"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_352"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_465"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_536"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_127"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_372"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_198"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_17"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_104"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_148"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_480"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_285"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_551"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_343"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_378"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_329"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_162"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_136"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_164"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_120"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_228"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_542"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_414"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_202"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_308"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_30"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_17"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_246"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_189"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_357"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_303"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_587"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_548"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_75"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_193"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_358"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_369"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_236"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_295"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_379"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_298"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_496"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_206"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_493"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_553"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_116"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_443"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_225"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_367"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_469"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_502"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_531"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_598"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_194"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_172"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_359"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_334"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_274"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_190"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_272"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_520"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_477"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_483"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_390"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_555"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_376"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_80"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_481"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_149"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_11"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_580"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_306"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_257"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_552"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_75"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_482"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_369"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_581"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_58"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_4"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_20"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_85"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_337"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_19"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_172"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_369"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_524"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_40"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_230"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_391"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_98"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_39"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_588"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_59"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_575"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_102"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_268"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_153"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_447"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_251"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_217"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_535"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_466"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_169"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_122"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_371"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_152"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_303"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_293"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_4"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_451"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_430"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_163"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_566"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_381"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_101"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_545"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_447"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_173"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_474"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_161"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_119"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_573"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_316"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_159"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_402"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_255"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_106"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_4"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_144"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_218"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_123"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_63"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_462"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_429"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_188"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_431"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_434"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_44"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_322"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_271"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_558"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_263"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_500"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_357"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_26"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_116"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_95"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_561"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_4"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_313"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_386"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_450"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_385"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_198"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_184"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_338"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_172"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_94"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_332"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_259"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_134"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_234"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_81"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_126"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_152"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_520"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_85"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_458"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_174"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_110"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_340"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_52"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_298"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_385"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_144"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_442"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_574"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_533"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_596"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_565"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_271"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_580"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_509"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_588"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_352"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_215"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_398"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_220"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_593"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_369"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_570"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_158"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_466"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_241"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_489"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_569"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_541"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_177"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_481"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_446"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_528"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_542"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_393"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_286"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_184"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_262"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_76"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_458"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_256"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_208"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_599"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_362"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_237"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_442"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_411"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_108"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_186"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_138"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_205"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_175"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_201"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_401"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_190"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_584"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_508"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_199"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_349"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_387"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_90"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_516"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_510"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_32"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_132"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_588"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_407"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_114"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_477"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_113"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_227"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_107"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_53"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_570"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_66"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_17"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_375"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_569"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_371"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_375"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_529"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_562"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_266"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_349"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_1"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_322"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_45"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_100"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_422"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_192"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_163"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_355"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_366"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_145"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_417"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_540"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_192"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_112"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_159"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_237"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_357"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_563"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_73"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_476"}
+{"func": "void unsafe_copy(char *src) { char dst[50]; sprintf(dst, src); }", "target": 1, "idx": "vuln_4_387"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_462"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_319"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_107"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_53"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_478"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_27"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_79"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_5"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_436"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_264"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_345"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_523"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_465"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_428"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_397"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_217"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_131"}
+{"func": "void safe_print(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_1_539"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_105"}
+{"func": "char* use_after_free() { char *p = malloc(100); free(p); return p; }", "target": 1, "idx": "vuln_2_591"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_167"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_244"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_260"}
+{"func": "void safe_copy(char *input) { char buf[100]; if(input) strncpy(buf, input, 99); buf[99]=0; }", "target": 0, "idx": "safe_0_456"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_37"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_112"}
+{"func": "char* safe_malloc() { char *p = malloc(100); if(p) memset(p, 0, 100); return p; }", "target": 0, "idx": "safe_2_267"}
+{"func": "void safe_format(char *msg) { if(msg) printf(\"%s\", msg); }", "target": 0, "idx": "safe_4_143"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_239"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_543"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_28"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_206"}
+{"func": "int null_deref(char *ptr) { return *ptr; }", "target": 1, "idx": "vuln_3_453"}
+{"func": "void overflow(char *input) { char buf[10]; strcpy(buf, input); }", "target": 1, "idx": "vuln_0_204"}
+{"func": "void format_bug(char *msg) { printf(msg); }", "target": 1, "idx": "vuln_1_312"}
+{"func": "int safe_deref(char *ptr) { return ptr ? *ptr : -1; }", "target": 0, "idx": "safe_3_438"}
