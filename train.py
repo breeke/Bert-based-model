@@ -16,7 +16,7 @@ except ImportError:
 from tqdm import tqdm
 import numpy as np
 import logging
-from dataset import TextDataset
+from dataset import TextDataset, collate_fn_dynamic_padding
 from model import Model
 
 logging.basicConfig(level=logging.INFO)
@@ -24,10 +24,11 @@ logger = logging.getLogger(__name__)
 
 def train(args, train_dataset, model, tokenizer):
     """Training loop"""
-    # Setup data loader
+    # Setup data loader with dynamic padding
     train_sampler = RandomSampler(train_dataset)
-    train_dataloader = DataLoader(train_dataset, sampler=train_sampler, 
-                                  batch_size=args.train_batch_size)
+    train_dataloader = DataLoader(train_dataset, sampler=train_sampler,
+                                  batch_size=args.train_batch_size,
+                                  collate_fn=collate_fn_dynamic_padding)
     
     # Setup optimizer
     no_decay = ['bias', 'LayerNorm.weight']
@@ -95,8 +96,9 @@ def evaluate(args, model, tokenizer):
     """Evaluation function"""
     eval_dataset = TextDataset(tokenizer, args, args.eval_data_file)
     eval_sampler = SequentialSampler(eval_dataset)
-    eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, 
-                                 batch_size=args.eval_batch_size)
+    eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler,
+                                 batch_size=args.eval_batch_size,
+                                 collate_fn=collate_fn_dynamic_padding)
     
     model.eval()
     predictions = []
@@ -123,8 +125,9 @@ def test(args, model, tokenizer):
     """Test function - saves predictions"""
     test_dataset = TextDataset(tokenizer, args, args.test_data_file)
     test_sampler = SequentialSampler(test_dataset)
-    test_dataloader = DataLoader(test_dataset, sampler=test_sampler, 
-                                batch_size=args.eval_batch_size)
+    test_dataloader = DataLoader(test_dataset, sampler=test_sampler,
+                                batch_size=args.eval_batch_size,
+                                collate_fn=collate_fn_dynamic_padding)
     
     model.eval()
     predictions = []
