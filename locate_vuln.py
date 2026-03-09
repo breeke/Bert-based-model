@@ -143,6 +143,15 @@ def classify_line(line: str) -> list:
     return matched
 
 
+def pattern_scan_all_lines(lines: list) -> dict:
+    """Scan every line with patterns, return {category: [line_numbers]} regardless of model score."""
+    categories = {}
+    for i, line in enumerate(lines):
+        for cat in classify_line(line):
+            categories.setdefault(cat, []).append(i + 1)
+    return categories
+
+
 def classify_flagged_lines(lines: list, flagged_indices: list) -> dict:
     """
     Return {category: [line_numbers]} for all flagged lines.
@@ -174,48 +183,56 @@ def analyse_file(filepath: str, model, tokenizer, args, threshold: float, window
     print(f"{'='*65}")
 
     full_prob = score_code(code, model, tokenizer, args)
-    verdict = "VULNERABLE" if full_prob > threshold else "NOT VULNERABLE"
-    print(f"\nOverall probability : {full_prob:.4f}")
-    print(f"Verdict             : {verdict}  (threshold={threshold})")
+    model_verdict = "VULNERABLE" if full_prob > threshold else "NOT VULNERABLE"
+    print(f"\nModel probability   : {full_prob:.4f}")
+    print(f"Model verdict       : {model_verdict}  (threshold={threshold})")
 
-    if full_prob <= threshold:
-        print("\nNo vulnerability detected — skipping line-level analysis.")
-        return full_prob, [], lines, {}
+    # Warn if model looks undertrained
+    undertrained = full_prob < 0.01
+    if undertrained:
+        print(f"\n  [!] Model score is near zero — the model may need more training.")
+        print(f"      Falling back to pattern-based analysis for line detection.")
 
-    print(f"\nRunning sliding-window analysis (window={window} lines)...")
-    scores = sliding_window_scores(lines, model, tokenizer, args, window)
+    # --- Always run pattern scan ---
+    pattern_cats = pattern_scan_all_lines(lines)
 
-    flag_threshold = max(threshold, full_prob * 0.60)
-    flagged = [(i, s) for i, s in enumerate(scores) if s > flag_threshold]
-
-    print(f"\n{'─'*65}")
-    print(f"{'Line':>5}  {'Score':>7}  Code")
-    print(f"{'─'*65}")
-
-    for i, line in enumerate(lines):
-        score = scores[i]
-        marker = "  <-- VULN" if score > flag_threshold else ""
-        print(f"{i+1:>5}  {score:.4f}  {line.rstrip()[:75]}{marker}")
-
-    print(f"{'─'*65}")
-
-    flagged_indices = [i for i, _ in flagged]
-
-    if flagged:
-        print(f"\nTop suspicious lines:")
-        top = sorted(flagged, key=lambda x: x[1], reverse=True)[:5]
-        for lineno, score in top:
-            print(f"  Line {lineno+1:>4} (score={score:.4f}): {lines[lineno].strip()[:75]}")
-
-        # Pattern-based classification
-        category_map = classify_flagged_lines(lines, flagged_indices)
-        if category_map:
-            print(f"\nDetected vulnerability categories:")
-            for cat, line_nums in category_map.items():
-                print(f"  [{cat}]  at line(s): {line_nums}")
+    if pattern_cats:
+        print(f"\nPattern-based findings (independent of model):")
+        for cat, line_nums in sorted(pattern_cats.items()):
+            for ln in line_nums:
+                print(f"  Line {ln:>4}  [{cat}]:  {lines[ln-1].strip()[:75]}")
     else:
-        print("\nNo individual lines exceeded the flag threshold.")
-        category_map = {}
+        print("\nPattern scan: no known vulnerability patterns found.")
+
+    # --- Model sliding-window (only if model signal is meaningful) ---
+    flagged_indices = []
+    if not undertrained:
+        print(f"\nRunning model sliding-window analysis (window={window} lines)...")
+        scores = sliding_window_scores(lines, model, tokenizer, args, window)
+        flag_threshold = max(threshold, full_prob * 0.60)
+        flagged = [(i, s) for i, s in enumerate(scores) if s > flag_threshold]
+        flagged_indices = [i for i, _ in flagged]
+
+        print(f"\n{'─'*65}")
+        print(f"{'Line':>5}  {'Score':>7}  Code")
+        print(f"{'─'*65}")
+        for i, line in enumerate(lines):
+            score = scores[i]
+            marker = "  <-- VULN" if score > flag_threshold else ""
+            print(f"{i+1:>5}  {score:.4f}  {line.rstrip()[:75]}{marker}")
+        print(f"{'─'*65}")
+
+        if flagged:
+            print(f"\nTop suspicious lines (model):")
+            top = sorted(flagged, key=lambda x: x[1], reverse=True)[:5]
+            for lineno, score in top:
+                print(f"  Line {lineno+1:>4} (score={score:.4f}): {lines[lineno].strip()[:75]}")
+
+    # Merge: use model-flagged categories if available, else fall back to pattern
+    if flagged_indices:
+        category_map = classify_flagged_lines(lines, flagged_indices)
+    else:
+        category_map = pattern_cats
 
     return full_prob, flagged_indices, lines, category_map
 
