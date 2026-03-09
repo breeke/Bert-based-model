@@ -16,6 +16,10 @@ except ImportError:
 from tqdm import tqdm
 import numpy as np
 import logging
+from sklearn.metrics import (
+    accuracy_score, precision_score, recall_score,
+    f1_score, roc_auc_score, confusion_matrix
+)
 from dataset import TextDataset, collate_fn_dynamic_padding
 from model import Model
 
@@ -55,12 +59,12 @@ def train(args, train_dataset, model, tokenizer):
     logger.info(f"  Total optimization steps = {total_steps}")
     
     global_step = 0
-    best_acc = 0
-    
+    best_score = 0
+
     for epoch in range(args.num_epochs):
         epoch_loss = 0
         progress_bar = tqdm(train_dataloader, desc=f"Epoch {epoch+1}")
-        
+
         for step, batch in enumerate(progress_bar):
             inputs = batch[0].to(args.device)
             labels = batch[1].to(args.device)
@@ -83,14 +87,13 @@ def train(args, train_dataset, model, tokenizer):
         
         # Evaluate after each epoch
         if args.eval_data_file:
-            eval_acc = evaluate(args, model, tokenizer)
-            if eval_acc > best_acc:
-                best_acc = eval_acc
-                # Save best model
+            eval_f1 = evaluate(args, model, tokenizer)
+            if eval_f1 > best_score:
+                best_score = eval_f1
                 os.makedirs(args.output_dir, exist_ok=True)
                 model_path = os.path.join(args.output_dir, 'best_model.bin')
                 torch.save(model.state_dict(), model_path)
-                logger.info(f"New best model saved with accuracy: {best_acc:.4f}")
+                logger.info(f"New best model saved with F1: {best_score:.4f}")
 
 def evaluate(args, model, tokenizer):
     """Evaluation function"""
@@ -115,11 +118,37 @@ def evaluate(args, model, tokenizer):
             predictions.extend(preds.flatten())
             labels.extend(batch_labels.cpu().numpy())
     
-    accuracy = np.mean(np.array(predictions) == np.array(labels))
-    logger.info(f"Evaluation accuracy: {accuracy:.4f}")
-    
+    preds_arr  = np.array(predictions)
+    labels_arr = np.array(labels)
+
+    accuracy  = accuracy_score(labels_arr, preds_arr)
+    precision = precision_score(labels_arr, preds_arr, zero_division=0)
+    recall    = recall_score(labels_arr, preds_arr, zero_division=0)
+    f1        = f1_score(labels_arr, preds_arr, zero_division=0)
+    try:
+        auc = roc_auc_score(labels_arr, preds_arr)
+    except ValueError:
+        auc = float('nan')  # only 1 class present in batch
+
+    tn, fp, fn, tp = confusion_matrix(labels_arr, preds_arr, labels=[0, 1]).ravel()
+    fpr = fp / (fp + tn) if (fp + tn) > 0 else 0.0  # False Positive Rate
+    fnr = fn / (fn + tp) if (fn + tp) > 0 else 0.0  # False Negative Rate (missed vulns)
+
+    logger.info("\n" + "="*50)
+    logger.info("Evaluation Metrics")
+    logger.info("="*50)
+    logger.info(f"  Accuracy          : {accuracy:.4f}")
+    logger.info(f"  Precision         : {precision:.4f}")
+    logger.info(f"  Recall            : {recall:.4f}")
+    logger.info(f"  F1 Score          : {f1:.4f}")
+    logger.info(f"  AUC-ROC           : {auc:.4f}")
+    logger.info(f"  False Positive Rate: {fpr:.4f}  ({fp} FP / {fp+tn} neg)")
+    logger.info(f"  False Negative Rate: {fnr:.4f}  ({fn} FN / {fn+tp} vuln)  ← missed vulns")
+    logger.info(f"  Confusion Matrix  : TP={tp}  FP={fp}  TN={tn}  FN={fn}")
+    logger.info("="*50 + "\n")
+
     model.train()
-    return accuracy
+    return f1  # use F1 as the best-model criterion (better than accuracy for imbalanced data)
 
 def test(args, model, tokenizer):
     """Test function - saves predictions"""
