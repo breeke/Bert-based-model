@@ -34,8 +34,9 @@ class Model(nn.Module):
         pad_token_id = self.tokenizer.pad_token_id if self.tokenizer.pad_token_id else 1
         attention_mask = input_ids.ne(pad_token_id)
         
-        # FIXED: Access the base RoBERTa model correctly
-        outputs = self.encoder.roberta(input_ids, attention_mask=attention_mask)
+        # Support both CodeBERT (encoder.roberta) and UniXcoder (encoder is the RoBERTa model directly)
+        roberta_fn = getattr(self.encoder, 'roberta', self.encoder)
+        outputs = roberta_fn(input_ids, attention_mask=attention_mask)
         
         # Get the sequence output (hidden states)
         sequence_output = outputs.last_hidden_state

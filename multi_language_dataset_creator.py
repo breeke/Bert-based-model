@@ -1,26 +1,35 @@
 """
-Multi-Language Dataset Creator for CodeBERT Vulnerability Detection
-===================================================================
-Generates a unified dataset of C and Python code samples with realistic
-vulnerability patterns and their safe counterparts.
+Multi-Language Dataset Creator for CodeBERT/UniXcoder Vulnerability Detection
+==============================================================================
+Generates a unified dataset of C, Python, Java, JavaScript, and Go code samples
+with realistic vulnerability patterns and their safe counterparts.
 
 Vulnerability categories covered:
-  C:      buffer overflow, format string, use-after-free, double free,
-          integer overflow, null deref, command injection, off-by-one,
-          uninitialized vars, race conditions, heap overflow, stack overflow,
-          hardcoded credentials (CWE-798), path traversal (CWE-22),
-          insecure file permissions (CWE-732), weak crypto (CWE-327),
-          SQL injection (CWE-89)
-  Python: SQL injection, command injection, path traversal, deserialization,
-          eval/exec injection, SSRF, hardcoded credentials, weak crypto,
-          XXE, insecure file permissions, TOCTOU race, ReDoS,
-          format string / template injection (CWE-134)
+  C:          buffer overflow, format string, use-after-free, double free,
+              integer overflow, null deref, command injection, off-by-one,
+              uninitialized vars, race conditions, heap overflow,
+              hardcoded credentials (CWE-798), path traversal (CWE-22),
+              insecure file permissions (CWE-732), weak crypto (CWE-327),
+              SQL injection (CWE-89)
+  Python:     SQL injection, command injection, path traversal, deserialization,
+              eval/exec injection, SSRF, hardcoded credentials, weak crypto,
+              XXE, insecure file permissions, TOCTOU race, ReDoS,
+              format string / template injection (CWE-134)
+  Java:       SQL injection, command injection, path traversal, weak crypto,
+              format string, TOCTOU race, insecure permissions,
+              hardcoded credentials
+  JavaScript: SQL injection, command injection, path traversal, weak crypto,
+              template injection, TOCTOU race, insecure permissions,
+              hardcoded credentials
+  Go:         SQL injection, command injection, path traversal, weak crypto,
+              format string, TOCTOU race, insecure permissions,
+              hardcoded credentials
 
-Cross-language CWEs (appear in both C and Python):
+Cross-language CWEs (all 5 languages):
   CWE-78  command injection, CWE-367 TOCTOU race,
   CWE-798 hardcoded credentials, CWE-22 path traversal,
   CWE-732 insecure file permissions, CWE-327 weak crypto,
-  CWE-89  SQL injection, CWE-134 format string
+  CWE-89  SQL injection, CWE-134 format/template injection
 """
 
 import json
@@ -2015,6 +2024,1175 @@ PYTHON_SAFE = [
 
 
 # ---------------------------------------------------------------------------
+# JAVA VULNERABLE PATTERNS  (target = 1)
+# ---------------------------------------------------------------------------
+JAVA_VULNERABLE = [
+    # ---- SQL Injection (CWE-89) ----
+    {
+        "func": """String getUser(Connection conn, String username) throws SQLException {
+    Statement stmt = conn.createStatement();
+    ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE name='" + username + "'");
+    return rs.next() ? rs.getString("name") : null;
+}""",
+        "cwe": ["CWE-89"], "language": "java", "category": "sql_injection"
+    },
+    {
+        "func": """void deleteRecord(Connection conn, String id) throws SQLException {
+    Statement stmt = conn.createStatement();
+    stmt.execute("DELETE FROM records WHERE id=" + id);
+}""",
+        "cwe": ["CWE-89"], "language": "java", "category": "sql_injection"
+    },
+    {
+        "func": """boolean login(Connection conn, String user, String pass) throws SQLException {
+    String sql = String.format(
+        "SELECT id FROM accounts WHERE user='%s' AND pass='%s'", user, pass);
+    Statement stmt = conn.createStatement();
+    return stmt.executeQuery(sql).next();
+}""",
+        "cwe": ["CWE-89"], "language": "java", "category": "sql_injection"
+    },
+    {
+        "func": """List<String> searchProducts(Connection conn, String keyword) throws SQLException {
+    Statement stmt = conn.createStatement();
+    ResultSet rs = stmt.executeQuery(
+        "SELECT name FROM products WHERE name LIKE '%" + keyword + "%'");
+    List<String> results = new ArrayList<>();
+    while (rs.next()) results.add(rs.getString("name"));
+    return results;
+}""",
+        "cwe": ["CWE-89"], "language": "java", "category": "sql_injection"
+    },
+
+    # ---- Command Injection (CWE-78) ----
+    {
+        "func": """void checkHost(String hostname) throws Exception {
+    Runtime.getRuntime().exec("ping -c 1 " + hostname);
+}""",
+        "cwe": ["CWE-78"], "language": "java", "category": "command_injection"
+    },
+    {
+        "func": """String runDiagnostic(String target) throws Exception {
+    Process p = Runtime.getRuntime().exec(
+        new String[]{"sh", "-c", "nmap -sV " + target});
+    return new String(p.getInputStream().readAllBytes());
+}""",
+        "cwe": ["CWE-78"], "language": "java", "category": "command_injection"
+    },
+    {
+        "func": """void compressFile(String filename) throws Exception {
+    ProcessBuilder pb = new ProcessBuilder("sh", "-c", "gzip " + filename);
+    pb.start().waitFor();
+}""",
+        "cwe": ["CWE-78"], "language": "java", "category": "command_injection"
+    },
+
+    # ---- Path Traversal (CWE-22) ----
+    {
+        "func": """byte[] serveFile(String filename) throws IOException {
+    File f = new File("/var/www/files/" + filename);
+    return Files.readAllBytes(f.toPath());
+}""",
+        "cwe": ["CWE-22"], "language": "java", "category": "path_traversal"
+    },
+    {
+        "func": """String loadConfig(String name) throws IOException {
+    Path path = Paths.get("/etc/app/" + name + ".conf");
+    return Files.readString(path);
+}""",
+        "cwe": ["CWE-22"], "language": "java", "category": "path_traversal"
+    },
+    {
+        "func": """void deleteLog(String logname) throws IOException {
+    new File("/var/log/app/" + logname).delete();
+}""",
+        "cwe": ["CWE-22"], "language": "java", "category": "path_traversal"
+    },
+
+    # ---- Weak Cryptography (CWE-327) ----
+    {
+        "func": """String hashPassword(String password) throws Exception {
+    MessageDigest md = MessageDigest.getInstance("MD5");
+    byte[] digest = md.digest(password.getBytes());
+    return Base64.getEncoder().encodeToString(digest);
+}""",
+        "cwe": ["CWE-327"], "language": "java", "category": "weak_crypto"
+    },
+    {
+        "func": """String generateToken(long userId) throws Exception {
+    MessageDigest sha = MessageDigest.getInstance("SHA-1");
+    byte[] digest = sha.digest(String.valueOf(userId).getBytes());
+    return Base64.getEncoder().encodeToString(digest);
+}""",
+        "cwe": ["CWE-327"], "language": "java", "category": "weak_crypto"
+    },
+    {
+        "func": """byte[] encryptData(byte[] key, byte[] data) throws Exception {
+    Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+    SecretKeySpec keySpec = new SecretKeySpec(key, "DES");
+    cipher.init(Cipher.ENCRYPT_MODE, keySpec);
+    return cipher.doFinal(data);
+}""",
+        "cwe": ["CWE-327"], "language": "java", "category": "weak_crypto"
+    },
+
+    # ---- Format String / Template Injection (CWE-134) ----
+    {
+        "func": """String renderMessage(String template, Object... args) {
+    return MessageFormat.format(template, args);
+}""",
+        "cwe": ["CWE-134"], "language": "java", "category": "format_string"
+    },
+    {
+        "func": """void logRequest(String format, Object... args) {
+    System.out.printf(format, args);
+}""",
+        "cwe": ["CWE-134"], "language": "java", "category": "format_string"
+    },
+    {
+        "func": """String buildQuery(String table, String column, String value) {
+    return String.format("SELECT %s FROM %s WHERE id=%s", column, table, value);
+}""",
+        "cwe": ["CWE-134"], "language": "java", "category": "format_string"
+    },
+
+    # ---- TOCTOU Race Condition (CWE-367) ----
+    {
+        "func": """boolean writeIfNotExists(String path, String data) throws IOException {
+    File f = new File(path);
+    if (!f.exists()) {
+        Files.writeString(f.toPath(), data);
+        return true;
+    }
+    return false;
+}""",
+        "cwe": ["CWE-367"], "language": "java", "category": "race_condition"
+    },
+    {
+        "func": """void processUpload(String filepath) throws IOException {
+    File f = new File(filepath);
+    if (f.length() < MAX_SIZE) {
+        byte[] data = Files.readAllBytes(f.toPath());
+        process(data);
+    }
+}""",
+        "cwe": ["CWE-367"], "language": "java", "category": "race_condition"
+    },
+
+    # ---- Insecure File Permissions (CWE-732) ----
+    {
+        "func": """void createTempFile(String name) throws IOException {
+    File f = new File(name);
+    f.createNewFile();
+    f.setReadable(true, false);
+    f.setWritable(true, false);
+}""",
+        "cwe": ["CWE-732"], "language": "java", "category": "insecure_permissions"
+    },
+    {
+        "func": """void saveConfig(String path, String content) throws IOException {
+    Files.writeString(Paths.get(path), content);
+    new File(path).setReadable(true, false);
+    new File(path).setWritable(true, false);
+}""",
+        "cwe": ["CWE-732"], "language": "java", "category": "insecure_permissions"
+    },
+
+    # ---- Hardcoded Credentials (CWE-798) ----
+    {
+        "func": """Connection getConnection() throws SQLException {
+    return DriverManager.getConnection(
+        "jdbc:mysql://db.internal/prod", "root", "rootpassword123");
+}""",
+        "cwe": ["CWE-798"], "language": "java", "category": "hardcoded_credentials"
+    },
+    {
+        "func": """boolean verifyUser(String username, String password) {
+    return username.equals("admin") && password.equals("admin123!");
+}""",
+        "cwe": ["CWE-798"], "language": "java", "category": "hardcoded_credentials"
+    },
+    {
+        "func": """String getApiToken() {
+    final String API_KEY = "sk-1234567890abcdef";
+    return "Bearer " + API_KEY;
+}""",
+        "cwe": ["CWE-798"], "language": "java", "category": "hardcoded_credentials"
+    },
+]
+
+# ---------------------------------------------------------------------------
+# JAVA SAFE PATTERNS  (target = 0)
+# ---------------------------------------------------------------------------
+JAVA_SAFE = [
+    # ---- Safe SQL ----
+    {
+        "func": """String getUser(Connection conn, String username) throws SQLException {
+    PreparedStatement ps = conn.prepareStatement(
+        "SELECT * FROM users WHERE name=?");
+    ps.setString(1, username);
+    ResultSet rs = ps.executeQuery();
+    return rs.next() ? rs.getString("name") : null;
+}""",
+        "cwe": [], "language": "java", "category": "sql_safe"
+    },
+    {
+        "func": """void deleteRecord(Connection conn, int id) throws SQLException {
+    PreparedStatement ps = conn.prepareStatement(
+        "DELETE FROM records WHERE id=?");
+    ps.setInt(1, id);
+    ps.execute();
+}""",
+        "cwe": [], "language": "java", "category": "sql_safe"
+    },
+    {
+        "func": """boolean login(Connection conn, String user, String pass) throws SQLException {
+    PreparedStatement ps = conn.prepareStatement(
+        "SELECT id FROM accounts WHERE user=? AND pass=?");
+    ps.setString(1, user);
+    ps.setString(2, pass);
+    return ps.executeQuery().next();
+}""",
+        "cwe": [], "language": "java", "category": "sql_safe"
+    },
+
+    # ---- Safe Commands ----
+    {
+        "func": """void checkHost(String hostname) throws Exception {
+    if (!hostname.matches("[a-zA-Z0-9.\\\\-]+"))
+        throw new IllegalArgumentException("Invalid hostname");
+    ProcessBuilder pb = new ProcessBuilder("ping", "-c", "1", hostname);
+    pb.start().waitFor();
+}""",
+        "cwe": [], "language": "java", "category": "command_safe"
+    },
+    {
+        "func": """String runDiagnostic(String target) throws Exception {
+    if (!target.matches("[a-zA-Z0-9.\\\\-]+"))
+        throw new IllegalArgumentException("Invalid target");
+    Process p = new ProcessBuilder("nmap", "-sV", target).start();
+    return new String(p.getInputStream().readAllBytes());
+}""",
+        "cwe": [], "language": "java", "category": "command_safe"
+    },
+
+    # ---- Safe Paths ----
+    {
+        "func": """byte[] serveFile(String filename) throws IOException {
+    Path base = Paths.get("/var/www/files/").toRealPath();
+    Path full = base.resolve(filename).normalize();
+    if (!full.startsWith(base))
+        throw new SecurityException("Path traversal detected");
+    return Files.readAllBytes(full);
+}""",
+        "cwe": [], "language": "java", "category": "path_safe"
+    },
+    {
+        "func": """String loadConfig(String name) throws IOException {
+    if (!name.matches("[a-zA-Z0-9_\\\\-]+"))
+        throw new IllegalArgumentException("Invalid config name");
+    return Files.readString(Paths.get("/etc/app/" + name + ".conf"));
+}""",
+        "cwe": [], "language": "java", "category": "path_safe"
+    },
+
+    # ---- Safe Cryptography ----
+    {
+        "func": """String hashPassword(String password) throws Exception {
+    byte[] salt = new byte[16];
+    new SecureRandom().nextBytes(salt);
+    MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+    sha256.update(salt);
+    byte[] digest = sha256.digest(password.getBytes(StandardCharsets.UTF_8));
+    return Base64.getEncoder().encodeToString(digest);
+}""",
+        "cwe": [], "language": "java", "category": "crypto_safe"
+    },
+    {
+        "func": """String generateToken(long userId) {
+    return UUID.randomUUID().toString().replace("-", "");
+}""",
+        "cwe": [], "language": "java", "category": "crypto_safe"
+    },
+    {
+        "func": """byte[] encryptData(byte[] key, byte[] data) throws Exception {
+    byte[] iv = new byte[12];
+    new SecureRandom().nextBytes(iv);
+    Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+    cipher.init(Cipher.ENCRYPT_MODE,
+        new SecretKeySpec(key, "AES"), new GCMParameterSpec(128, iv));
+    return cipher.doFinal(data);
+}""",
+        "cwe": [], "language": "java", "category": "crypto_safe"
+    },
+
+    # ---- Safe Format ----
+    {
+        "func": """String renderMessage(String templateName, String username) {
+    Map<String, String> templates = Map.of(
+        "welcome", "Hello {0}!",
+        "bye",     "Goodbye {0}.");
+    String tmpl = templates.get(templateName);
+    if (tmpl == null) throw new IllegalArgumentException("Unknown template");
+    return MessageFormat.format(tmpl, username);
+}""",
+        "cwe": [], "language": "java", "category": "format_safe"
+    },
+    {
+        "func": """void logRequest(String method, String path) {
+    System.out.printf("%s %s%n", method, path);
+}""",
+        "cwe": [], "language": "java", "category": "format_safe"
+    },
+
+    # ---- Safe File Ops (no TOCTOU) ----
+    {
+        "func": """boolean writeIfNotExists(String path, String data) throws IOException {
+    try {
+        Files.writeString(Paths.get(path), data, StandardOpenOption.CREATE_NEW);
+        return true;
+    } catch (FileAlreadyExistsException e) {
+        return false;
+    }
+}""",
+        "cwe": [], "language": "java", "category": "file_safe"
+    },
+    {
+        "func": """void processUpload(String filepath) throws IOException {
+    try (InputStream is = Files.newInputStream(Paths.get(filepath))) {
+        byte[] data = is.readNBytes(MAX_SIZE);
+        if (data.length >= MAX_SIZE) throw new IOException("File too large");
+        process(data);
+    }
+}""",
+        "cwe": [], "language": "java", "category": "file_safe"
+    },
+
+    # ---- Safe Permissions ----
+    {
+        "func": """void createTempFile(String name) throws IOException {
+    File f = new File(name);
+    f.createNewFile();
+    f.setReadable(true, true);
+    f.setWritable(true, true);
+}""",
+        "cwe": [], "language": "java", "category": "permissions_safe"
+    },
+    {
+        "func": """void saveConfig(String path, String content) throws IOException {
+    Path p = Paths.get(path);
+    Files.writeString(p, content);
+    Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rw-------");
+    Files.setPosixFilePermissions(p, perms);
+}""",
+        "cwe": [], "language": "java", "category": "permissions_safe"
+    },
+
+    # ---- Safe Credentials ----
+    {
+        "func": """Connection getConnection() throws SQLException {
+    String url  = System.getenv("DB_URL");
+    String user = System.getenv("DB_USER");
+    String pass = System.getenv("DB_PASS");
+    if (url == null || user == null || pass == null)
+        throw new IllegalStateException("DB env vars not set");
+    return DriverManager.getConnection(url, user, pass);
+}""",
+        "cwe": [], "language": "java", "category": "credentials_safe"
+    },
+    {
+        "func": """boolean verifyUser(String username, String password) {
+    String storedHash = getUserHash(username);
+    if (storedHash == null) return false;
+    return BCrypt.checkpw(password, storedHash);
+}""",
+        "cwe": [], "language": "java", "category": "credentials_safe"
+    },
+]
+
+# ---------------------------------------------------------------------------
+# JAVASCRIPT VULNERABLE PATTERNS  (target = 1)
+# ---------------------------------------------------------------------------
+JS_VULNERABLE = [
+    # ---- SQL Injection (CWE-89) ----
+    {
+        "func": """async function getUser(db, username) {
+    const result = await db.query(
+        "SELECT * FROM users WHERE name='" + username + "'");
+    return result.rows[0];
+}""",
+        "cwe": ["CWE-89"], "language": "javascript", "category": "sql_injection"
+    },
+    {
+        "func": """async function deleteRecord(db, id) {
+    await db.query(`DELETE FROM records WHERE id=${id}`);
+}""",
+        "cwe": ["CWE-89"], "language": "javascript", "category": "sql_injection"
+    },
+    {
+        "func": """async function login(db, user, pass) {
+    const sql = `SELECT id FROM accounts WHERE user='${user}' AND pass='${pass}'`;
+    const result = await db.query(sql);
+    return result.rows.length > 0;
+}""",
+        "cwe": ["CWE-89"], "language": "javascript", "category": "sql_injection"
+    },
+    {
+        "func": """async function searchProducts(db, keyword) {
+    const rows = await db.query(
+        "SELECT name FROM products WHERE name LIKE '%" + keyword + "%'");
+    return rows;
+}""",
+        "cwe": ["CWE-89"], "language": "javascript", "category": "sql_injection"
+    },
+
+    # ---- Command Injection (CWE-78) ----
+    {
+        "func": """function pingHost(host) {
+    const { exec } = require('child_process');
+    exec('ping -c 1 ' + host);
+}""",
+        "cwe": ["CWE-78"], "language": "javascript", "category": "command_injection"
+    },
+    {
+        "func": """async function runDiagnostic(target) {
+    const { exec } = require('child_process');
+    return new Promise((resolve) =>
+        exec(`nmap -sV ${target}`, (_, out) => resolve(out)));
+}""",
+        "cwe": ["CWE-78"], "language": "javascript", "category": "command_injection"
+    },
+    {
+        "func": """function compressFile(filename) {
+    const { execSync } = require('child_process');
+    execSync(`gzip ${filename}`);
+}""",
+        "cwe": ["CWE-78"], "language": "javascript", "category": "command_injection"
+    },
+
+    # ---- Path Traversal (CWE-22) ----
+    {
+        "func": """function readFile(filename) {
+    const fs = require('fs');
+    return fs.readFileSync('/var/www/uploads/' + filename, 'utf8');
+}""",
+        "cwe": ["CWE-22"], "language": "javascript", "category": "path_traversal"
+    },
+    {
+        "func": """function serveStatic(req, res) {
+    const fs   = require('fs');
+    const path = require('path');
+    const filePath = path.join('/static', req.query.file);
+    res.send(fs.readFileSync(filePath));
+}""",
+        "cwe": ["CWE-22"], "language": "javascript", "category": "path_traversal"
+    },
+    {
+        "func": """async function downloadAttachment(name) {
+    const fs = require('fs').promises;
+    return fs.readFile('/data/attachments/' + name);
+}""",
+        "cwe": ["CWE-22"], "language": "javascript", "category": "path_traversal"
+    },
+
+    # ---- Weak Cryptography (CWE-327) ----
+    {
+        "func": """function hashPassword(password) {
+    const crypto = require('crypto');
+    return crypto.createHash('md5').update(password).digest('hex');
+}""",
+        "cwe": ["CWE-327"], "language": "javascript", "category": "weak_crypto"
+    },
+    {
+        "func": """function generateToken(userId) {
+    const crypto = require('crypto');
+    return crypto.createHash('sha1').update(String(userId)).digest('hex');
+}""",
+        "cwe": ["CWE-327"], "language": "javascript", "category": "weak_crypto"
+    },
+    {
+        "func": """function createSessionId() {
+    return Math.random().toString(36).substr(2, 16);
+}""",
+        "cwe": ["CWE-327"], "language": "javascript", "category": "weak_crypto"
+    },
+
+    # ---- Template Injection (CWE-134) ----
+    {
+        "func": """function renderTemplate(template, data) {
+    return new Function('data', `return \`${template}\``)(data);
+}""",
+        "cwe": ["CWE-134"], "language": "javascript", "category": "template_injection"
+    },
+    {
+        "func": """function buildQuery(table, column, value) {
+    return `SELECT ${column} FROM ${table} WHERE id=${value}`;
+}""",
+        "cwe": ["CWE-134"], "language": "javascript", "category": "template_injection"
+    },
+    {
+        "func": """function logRequest(format, ...args) {
+    const util = require('util');
+    console.log(util.format(format, ...args));
+}""",
+        "cwe": ["CWE-134"], "language": "javascript", "category": "template_injection"
+    },
+
+    # ---- TOCTOU Race Condition (CWE-367) ----
+    {
+        "func": """function writeIfNotExists(filepath, data) {
+    const fs = require('fs');
+    if (!fs.existsSync(filepath)) {
+        fs.writeFileSync(filepath, data);
+        return true;
+    }
+    return false;
+}""",
+        "cwe": ["CWE-367"], "language": "javascript", "category": "race_condition"
+    },
+    {
+        "func": """async function processUpload(filepath) {
+    const fs   = require('fs').promises;
+    const stat = await fs.stat(filepath);
+    if (stat.size < MAX_SIZE) {
+        const data = await fs.readFile(filepath);
+        return process(data);
+    }
+}""",
+        "cwe": ["CWE-367"], "language": "javascript", "category": "race_condition"
+    },
+
+    # ---- Insecure File Permissions (CWE-732) ----
+    {
+        "func": """function createTempFile(name) {
+    const fs = require('fs');
+    fs.writeFileSync(name, '');
+    fs.chmodSync(name, 0o777);
+}""",
+        "cwe": ["CWE-732"], "language": "javascript", "category": "insecure_permissions"
+    },
+    {
+        "func": """function saveCredentials(path, creds) {
+    const fs = require('fs');
+    fs.writeFileSync(path, creds);
+    fs.chmodSync(path, 0o644);
+}""",
+        "cwe": ["CWE-732"], "language": "javascript", "category": "insecure_permissions"
+    },
+
+    # ---- Hardcoded Credentials (CWE-798) ----
+    {
+        "func": """function connectDatabase() {
+    const mysql = require('mysql2');
+    return mysql.createConnection({
+        host:     'db.internal',
+        user:     'admin',
+        password: 'SuperSecret123!',
+        database: 'production'
+    });
+}""",
+        "cwe": ["CWE-798"], "language": "javascript", "category": "hardcoded_credentials"
+    },
+    {
+        "func": """function getApiClient() {
+    const API_KEY = 'sk-1234567890abcdef';
+    return { headers: { 'Authorization': `Bearer ${API_KEY}` } };
+}""",
+        "cwe": ["CWE-798"], "language": "javascript", "category": "hardcoded_credentials"
+    },
+    {
+        "func": """function verifyToken(token) {
+    const jwt = require('jsonwebtoken');
+    return jwt.verify(token, 'hardcoded_jwt_secret_key');
+}""",
+        "cwe": ["CWE-798"], "language": "javascript", "category": "hardcoded_credentials"
+    },
+]
+
+# ---------------------------------------------------------------------------
+# JAVASCRIPT SAFE PATTERNS  (target = 0)
+# ---------------------------------------------------------------------------
+JS_SAFE = [
+    # ---- Safe SQL ----
+    {
+        "func": """async function getUser(db, username) {
+    const result = await db.query(
+        "SELECT * FROM users WHERE name=$1", [username]);
+    return result.rows[0];
+}""",
+        "cwe": [], "language": "javascript", "category": "sql_safe"
+    },
+    {
+        "func": """async function deleteRecord(db, id) {
+    await db.query("DELETE FROM records WHERE id=$1", [id]);
+}""",
+        "cwe": [], "language": "javascript", "category": "sql_safe"
+    },
+    {
+        "func": """async function login(db, user, pass) {
+    const result = await db.query(
+        "SELECT id FROM accounts WHERE user=$1 AND pass=$2", [user, pass]);
+    return result.rows.length > 0;
+}""",
+        "cwe": [], "language": "javascript", "category": "sql_safe"
+    },
+
+    # ---- Safe Commands ----
+    {
+        "func": """function pingHost(host) {
+    if (!/^[a-zA-Z0-9.\\-]+$/.test(host))
+        throw new Error('Invalid hostname');
+    const { spawn } = require('child_process');
+    spawn('ping', ['-c', '1', host]);
+}""",
+        "cwe": [], "language": "javascript", "category": "command_safe"
+    },
+    {
+        "func": """async function runDiagnostic(target) {
+    if (!/^[a-zA-Z0-9.\\-]+$/.test(target))
+        throw new Error('Invalid target');
+    const { spawn } = require('child_process');
+    const p = spawn('nmap', ['-sV', target]);
+    return new Promise((resolve) => {
+        let out = '';
+        p.stdout.on('data', (d) => { out += d; });
+        p.on('close', () => resolve(out));
+    });
+}""",
+        "cwe": [], "language": "javascript", "category": "command_safe"
+    },
+
+    # ---- Safe Paths ----
+    {
+        "func": """function readFile(filename) {
+    const fs   = require('fs');
+    const path = require('path');
+    const base     = path.resolve('/var/www/uploads/');
+    const fullPath = path.resolve(base, filename);
+    if (!fullPath.startsWith(base + path.sep))
+        throw new Error('Path traversal detected');
+    return fs.readFileSync(fullPath, 'utf8');
+}""",
+        "cwe": [], "language": "javascript", "category": "path_safe"
+    },
+    {
+        "func": """function serveStatic(req, res) {
+    const fs   = require('fs');
+    const path = require('path');
+    const base     = path.resolve('/static');
+    const fullPath = path.resolve(base, req.query.file || '');
+    if (!fullPath.startsWith(base + path.sep)) {
+        res.status(403).send('Forbidden');
+        return;
+    }
+    res.send(fs.readFileSync(fullPath));
+}""",
+        "cwe": [], "language": "javascript", "category": "path_safe"
+    },
+
+    # ---- Safe Cryptography ----
+    {
+        "func": """async function hashPassword(password) {
+    const bcrypt = require('bcrypt');
+    return bcrypt.hash(password, 12);
+}""",
+        "cwe": [], "language": "javascript", "category": "crypto_safe"
+    },
+    {
+        "func": """function generateToken(userId) {
+    const crypto = require('crypto');
+    return crypto.randomBytes(32).toString('hex');
+}""",
+        "cwe": [], "language": "javascript", "category": "crypto_safe"
+    },
+    {
+        "func": """function createSessionId() {
+    const crypto = require('crypto');
+    return crypto.randomUUID();
+}""",
+        "cwe": [], "language": "javascript", "category": "crypto_safe"
+    },
+
+    # ---- Safe Templates ----
+    {
+        "func": """function renderTemplate(templateName, data) {
+    const templates = {
+        welcome: 'Hello, {name}!',
+        bye:     'Goodbye, {name}!'
+    };
+    const tmpl = templates[templateName];
+    if (!tmpl) throw new Error('Unknown template');
+    return tmpl.replace('{name}', String(data.name || ''));
+}""",
+        "cwe": [], "language": "javascript", "category": "template_safe"
+    },
+    {
+        "func": """function buildQuery(table, column, value, db) {
+    const ALLOWED_TABLES   = new Set(['users', 'products']);
+    const ALLOWED_COLUMNS  = new Set(['id', 'name']);
+    if (!ALLOWED_TABLES.has(table) || !ALLOWED_COLUMNS.has(column))
+        throw new Error('Invalid table or column');
+    return db.query(`SELECT ${column} FROM ${table} WHERE id=$1`, [value]);
+}""",
+        "cwe": [], "language": "javascript", "category": "template_safe"
+    },
+
+    # ---- Safe File Ops ----
+    {
+        "func": """function writeIfNotExists(filepath, data) {
+    const fs = require('fs');
+    try {
+        fs.writeFileSync(filepath, data, { flag: 'wx' });
+        return true;
+    } catch (e) {
+        if (e.code === 'EEXIST') return false;
+        throw e;
+    }
+}""",
+        "cwe": [], "language": "javascript", "category": "file_safe"
+    },
+    {
+        "func": """async function processUpload(filepath) {
+    const fs = require('fs').promises;
+    const fd = await fs.open(filepath, 'r');
+    try {
+        const buf = Buffer.alloc(MAX_SIZE);
+        const { bytesRead } = await fd.read(buf, 0, MAX_SIZE);
+        if (bytesRead >= MAX_SIZE) throw new Error('File too large');
+        return process(buf.slice(0, bytesRead));
+    } finally {
+        await fd.close();
+    }
+}""",
+        "cwe": [], "language": "javascript", "category": "file_safe"
+    },
+
+    # ---- Safe Permissions ----
+    {
+        "func": """function createTempFile(name) {
+    const fs = require('fs');
+    fs.writeFileSync(name, '', { mode: 0o600 });
+}""",
+        "cwe": [], "language": "javascript", "category": "permissions_safe"
+    },
+    {
+        "func": """function saveCredentials(path, creds) {
+    const fs = require('fs');
+    fs.writeFileSync(path, creds, { mode: 0o600 });
+}""",
+        "cwe": [], "language": "javascript", "category": "permissions_safe"
+    },
+
+    # ---- Safe Credentials ----
+    {
+        "func": """function connectDatabase() {
+    const mysql = require('mysql2');
+    return mysql.createConnection({
+        host:     process.env.DB_HOST,
+        user:     process.env.DB_USER,
+        password: process.env.DB_PASS,
+        database: process.env.DB_NAME
+    });
+}""",
+        "cwe": [], "language": "javascript", "category": "credentials_safe"
+    },
+    {
+        "func": """function getApiClient() {
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) throw new Error('API_KEY not configured');
+    return { headers: { 'Authorization': `Bearer ${apiKey}` } };
+}""",
+        "cwe": [], "language": "javascript", "category": "credentials_safe"
+    },
+]
+
+# ---------------------------------------------------------------------------
+# GO VULNERABLE PATTERNS  (target = 1)
+# ---------------------------------------------------------------------------
+GO_VULNERABLE = [
+    # ---- SQL Injection (CWE-89) ----
+    {
+        "func": """func getUser(db *sql.DB, username string) (string, error) {
+    query := "SELECT name FROM users WHERE name='" + username + "'"
+    row := db.QueryRow(query)
+    var name string
+    err := row.Scan(&name)
+    return name, err
+}""",
+        "cwe": ["CWE-89"], "language": "go", "category": "sql_injection"
+    },
+    {
+        "func": """func deleteRecord(db *sql.DB, id string) error {
+    _, err := db.Exec("DELETE FROM records WHERE id=" + id)
+    return err
+}""",
+        "cwe": ["CWE-89"], "language": "go", "category": "sql_injection"
+    },
+    {
+        "func": """func login(db *sql.DB, user, pass string) bool {
+    query := fmt.Sprintf(
+        "SELECT id FROM accounts WHERE user='%s' AND pass='%s'", user, pass)
+    row := db.QueryRow(query)
+    var id int
+    return row.Scan(&id) == nil
+}""",
+        "cwe": ["CWE-89"], "language": "go", "category": "sql_injection"
+    },
+    {
+        "func": """func searchProducts(db *sql.DB, keyword string) (*sql.Rows, error) {
+    return db.Query(
+        "SELECT name FROM products WHERE name LIKE '%" + keyword + "%'")
+}""",
+        "cwe": ["CWE-89"], "language": "go", "category": "sql_injection"
+    },
+
+    # ---- Command Injection (CWE-78) ----
+    {
+        "func": """func checkHost(hostname string) error {
+    cmd := exec.Command("sh", "-c", "ping -c 1 "+hostname)
+    return cmd.Run()
+}""",
+        "cwe": ["CWE-78"], "language": "go", "category": "command_injection"
+    },
+    {
+        "func": """func runDiagnostic(target string) (string, error) {
+    out, err := exec.Command("sh", "-c", "nmap -sV "+target).Output()
+    return string(out), err
+}""",
+        "cwe": ["CWE-78"], "language": "go", "category": "command_injection"
+    },
+    {
+        "func": """func compressFile(filename string) error {
+    cmd := exec.Command("bash", "-c", "gzip "+filename)
+    return cmd.Run()
+}""",
+        "cwe": ["CWE-78"], "language": "go", "category": "command_injection"
+    },
+
+    # ---- Path Traversal (CWE-22) ----
+    {
+        "func": """func serveFile(filename string) ([]byte, error) {
+    path := "/var/www/files/" + filename
+    return os.ReadFile(path)
+}""",
+        "cwe": ["CWE-22"], "language": "go", "category": "path_traversal"
+    },
+    {
+        "func": """func loadConfig(name string) ([]byte, error) {
+    filepath := fmt.Sprintf("/etc/app/%s.conf", name)
+    return os.ReadFile(filepath)
+}""",
+        "cwe": ["CWE-22"], "language": "go", "category": "path_traversal"
+    },
+    {
+        "func": """func deleteLog(logname string) error {
+    return os.Remove("/var/log/app/" + logname)
+}""",
+        "cwe": ["CWE-22"], "language": "go", "category": "path_traversal"
+    },
+
+    # ---- Weak Cryptography (CWE-327) ----
+    {
+        "func": """func hashPassword(password string) string {
+    h := md5.New()
+    io.WriteString(h, password)
+    return fmt.Sprintf("%x", h.Sum(nil))
+}""",
+        "cwe": ["CWE-327"], "language": "go", "category": "weak_crypto"
+    },
+    {
+        "func": """func generateToken(userID int64) string {
+    h := sha1.New()
+    io.WriteString(h, strconv.FormatInt(userID, 10))
+    return fmt.Sprintf("%x", h.Sum(nil))
+}""",
+        "cwe": ["CWE-327"], "language": "go", "category": "weak_crypto"
+    },
+    {
+        "func": """func createSessionID() string {
+    return fmt.Sprintf("%d", rand.Int63())
+}""",
+        "cwe": ["CWE-327"], "language": "go", "category": "weak_crypto"
+    },
+
+    # ---- Format String (CWE-134) ----
+    {
+        "func": """func logRequest(format string, args ...interface{}) {
+    fmt.Printf(format, args...)
+}""",
+        "cwe": ["CWE-134"], "language": "go", "category": "format_string"
+    },
+    {
+        "func": """func renderMessage(template string, name string) string {
+    return fmt.Sprintf(template, name)
+}""",
+        "cwe": ["CWE-134"], "language": "go", "category": "format_string"
+    },
+
+    # ---- TOCTOU Race Condition (CWE-367) ----
+    {
+        "func": """func writeIfNotExists(path, data string) error {
+    if _, err := os.Stat(path); os.IsNotExist(err) {
+        return os.WriteFile(path, []byte(data), 0644)
+    }
+    return nil
+}""",
+        "cwe": ["CWE-367"], "language": "go", "category": "race_condition"
+    },
+    {
+        "func": """func processUpload(filepath string) error {
+    info, err := os.Stat(filepath)
+    if err != nil {
+        return err
+    }
+    if info.Size() < maxSize {
+        data, _ := os.ReadFile(filepath)
+        return process(data)
+    }
+    return nil
+}""",
+        "cwe": ["CWE-367"], "language": "go", "category": "race_condition"
+    },
+
+    # ---- Insecure File Permissions (CWE-732) ----
+    {
+        "func": """func createTempFile(name string) error {
+    f, err := os.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0777)
+    if err != nil {
+        return err
+    }
+    return f.Close()
+}""",
+        "cwe": ["CWE-732"], "language": "go", "category": "insecure_permissions"
+    },
+    {
+        "func": """func saveCredentials(path, creds string) error {
+    return os.WriteFile(path, []byte(creds), 0666)
+}""",
+        "cwe": ["CWE-732"], "language": "go", "category": "insecure_permissions"
+    },
+
+    # ---- Hardcoded Credentials (CWE-798) ----
+    {
+        "func": """func connectDB() *sql.DB {
+    db, _ := sql.Open("mysql", "root:rootpassword123@tcp(db.internal)/prod")
+    return db
+}""",
+        "cwe": ["CWE-798"], "language": "go", "category": "hardcoded_credentials"
+    },
+    {
+        "func": """func verifyToken(token string) bool {
+    const secret = "hardcoded_jwt_secret_key"
+    return validateJWT(token, secret)
+}""",
+        "cwe": ["CWE-798"], "language": "go", "category": "hardcoded_credentials"
+    },
+    {
+        "func": """func getAPIKey() string {
+    const apiKey = "sk-1234567890abcdef"
+    return apiKey
+}""",
+        "cwe": ["CWE-798"], "language": "go", "category": "hardcoded_credentials"
+    },
+]
+
+# ---------------------------------------------------------------------------
+# GO SAFE PATTERNS  (target = 0)
+# ---------------------------------------------------------------------------
+GO_SAFE = [
+    # ---- Safe SQL ----
+    {
+        "func": """func getUser(db *sql.DB, username string) (string, error) {
+    row := db.QueryRow("SELECT name FROM users WHERE name=?", username)
+    var name string
+    err := row.Scan(&name)
+    return name, err
+}""",
+        "cwe": [], "language": "go", "category": "sql_safe"
+    },
+    {
+        "func": """func deleteRecord(db *sql.DB, id int) error {
+    _, err := db.Exec("DELETE FROM records WHERE id=?", id)
+    return err
+}""",
+        "cwe": [], "language": "go", "category": "sql_safe"
+    },
+    {
+        "func": """func login(db *sql.DB, user, pass string) bool {
+    row := db.QueryRow(
+        "SELECT id FROM accounts WHERE user=? AND pass=?", user, pass)
+    var id int
+    return row.Scan(&id) == nil
+}""",
+        "cwe": [], "language": "go", "category": "sql_safe"
+    },
+
+    # ---- Safe Commands ----
+    {
+        "func": """func checkHost(hostname string) error {
+    matched, _ := regexp.MatchString(`^[a-zA-Z0-9.\-]+$`, hostname)
+    if !matched {
+        return fmt.Errorf("invalid hostname")
+    }
+    return exec.Command("ping", "-c", "1", hostname).Run()
+}""",
+        "cwe": [], "language": "go", "category": "command_safe"
+    },
+    {
+        "func": """func runDiagnostic(target string) (string, error) {
+    matched, _ := regexp.MatchString(`^[a-zA-Z0-9.\-]+$`, target)
+    if !matched {
+        return "", fmt.Errorf("invalid target")
+    }
+    out, err := exec.Command("nmap", "-sV", target).Output()
+    return string(out), err
+}""",
+        "cwe": [], "language": "go", "category": "command_safe"
+    },
+
+    # ---- Safe Paths ----
+    {
+        "func": """func serveFile(filename string) ([]byte, error) {
+    base, _ := filepath.Abs("/var/www/files/")
+    full, err := filepath.Abs(filepath.Join(base, filename))
+    if err != nil || !strings.HasPrefix(full, base+string(os.PathSeparator)) {
+        return nil, fmt.Errorf("invalid path")
+    }
+    return os.ReadFile(full)
+}""",
+        "cwe": [], "language": "go", "category": "path_safe"
+    },
+    {
+        "func": """func loadConfig(name string) ([]byte, error) {
+    matched, _ := regexp.MatchString(`^[a-zA-Z0-9_\-]+$`, name)
+    if !matched {
+        return nil, fmt.Errorf("invalid config name")
+    }
+    return os.ReadFile("/etc/app/" + name + ".conf")
+}""",
+        "cwe": [], "language": "go", "category": "path_safe"
+    },
+
+    # ---- Safe Cryptography ----
+    {
+        "func": """func hashPassword(password string) (string, error) {
+    hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+    return string(hash), err
+}""",
+        "cwe": [], "language": "go", "category": "crypto_safe"
+    },
+    {
+        "func": """func generateToken(userID int64) string {
+    b := make([]byte, 32)
+    cryptorand.Read(b)
+    return base64.URLEncoding.EncodeToString(b)
+}""",
+        "cwe": [], "language": "go", "category": "crypto_safe"
+    },
+    {
+        "func": """func createSessionID() string {
+    b := make([]byte, 16)
+    cryptorand.Read(b)
+    return fmt.Sprintf("%x", b)
+}""",
+        "cwe": [], "language": "go", "category": "crypto_safe"
+    },
+
+    # ---- Safe Format ----
+    {
+        "func": """func logRequest(method, path string) {
+    fmt.Printf("%s %s\\n", method, path)
+}""",
+        "cwe": [], "language": "go", "category": "format_safe"
+    },
+    {
+        "func": """func renderMessage(templateName, name string) (string, error) {
+    templates := map[string]string{
+        "welcome": "Hello, %s!",
+        "bye":     "Goodbye, %s!",
+    }
+    tmpl, ok := templates[templateName]
+    if !ok {
+        return "", fmt.Errorf("unknown template")
+    }
+    return fmt.Sprintf(tmpl, name), nil
+}""",
+        "cwe": [], "language": "go", "category": "format_safe"
+    },
+
+    # ---- Safe File Ops ----
+    {
+        "func": """func writeIfNotExists(path, data string) error {
+    f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
+    if err != nil {
+        return err
+    }
+    _, err = f.WriteString(data)
+    f.Close()
+    return err
+}""",
+        "cwe": [], "language": "go", "category": "file_safe"
+    },
+    {
+        "func": """func processUpload(filepath string) error {
+    f, err := os.Open(filepath)
+    if err != nil {
+        return err
+    }
+    defer f.Close()
+    data := make([]byte, maxSize)
+    n, _ := f.Read(data)
+    if n >= maxSize {
+        return fmt.Errorf("file too large")
+    }
+    return process(data[:n])
+}""",
+        "cwe": [], "language": "go", "category": "file_safe"
+    },
+
+    # ---- Safe Permissions ----
+    {
+        "func": """func createTempFile(name string) error {
+    f, err := os.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+    if err != nil {
+        return err
+    }
+    return f.Close()
+}""",
+        "cwe": [], "language": "go", "category": "permissions_safe"
+    },
+    {
+        "func": """func saveCredentials(path, creds string) error {
+    return os.WriteFile(path, []byte(creds), 0600)
+}""",
+        "cwe": [], "language": "go", "category": "permissions_safe"
+    },
+
+    # ---- Safe Credentials ----
+    {
+        "func": """func connectDB() (*sql.DB, error) {
+    dsn := os.Getenv("DB_DSN")
+    if dsn == "" {
+        return nil, fmt.Errorf("DB_DSN not set")
+    }
+    return sql.Open("mysql", dsn)
+}""",
+        "cwe": [], "language": "go", "category": "credentials_safe"
+    },
+    {
+        "func": """func verifyToken(token string) (bool, error) {
+    secret := os.Getenv("JWT_SECRET")
+    if secret == "" {
+        return false, fmt.Errorf("JWT_SECRET not configured")
+    }
+    return validateJWT(token, secret), nil
+}""",
+        "cwe": [], "language": "go", "category": "credentials_safe"
+    },
+]
+
+
+# ---------------------------------------------------------------------------
 # VARIATION ENGINE — adds realistic diversity to each sample
 # ---------------------------------------------------------------------------
 
@@ -2057,13 +3235,54 @@ PY_COMMENTS = [
     "",
 ]
 
+JAVA_COMMENTS = [
+    "",
+    "    // process the data\n",
+    "    // handle input\n",
+    "    // TODO: review this\n",
+    "    /* security: needs audit */\n",
+    "",
+    "    // legacy code path\n",
+    "",
+]
+
+JS_COMMENTS = [
+    "",
+    "    // process the data\n",
+    "    // handle input\n",
+    "    // TODO: review this\n",
+    "    /* security: needs audit */\n",
+    "",
+    "    // legacy code\n",
+    "",
+]
+
+GO_COMMENTS = [
+    "",
+    "\t// process the data\n",
+    "\t// handle input\n",
+    "\t// TODO: review this\n",
+    "\t// security: needs audit\n",
+    "",
+    "\t// legacy code path\n",
+    "",
+]
+
+_COMMENT_POOLS = {
+    "c":          C_COMMENTS,
+    "python":     PY_COMMENTS,
+    "java":       JAVA_COMMENTS,
+    "javascript": JS_COMMENTS,
+    "go":         GO_COMMENTS,
+}
+
 def make_variation(func_str, language, rng):
     """Apply lightweight random variation to make each copy unique."""
     code = func_str
 
     # 30% chance — prepend a language-appropriate comment
     if rng.random() < 0.3:
-        comments = C_COMMENTS if language == "c" else PY_COMMENTS
+        comments = _COMMENT_POOLS.get(language, PY_COMMENTS)
         comment = rng.choice(comments)
         if comment:
             lines = code.split("\n")
@@ -2104,18 +3323,27 @@ def generate_dataset(
     rng = random.Random(seed)
 
     logger.info("=" * 70)
-    logger.info("Multi-Language Dataset Creator — C & Python")
+    logger.info("Multi-Language Dataset Creator — C, Python, Java, JavaScript, Go")
     logger.info("=" * 70)
 
     # ---- Collect base patterns ----
-    all_vuln_c      = [(p, "c") for p in C_VULNERABLE]
-    all_safe_c      = [(p, "c") for p in C_SAFE]
-    all_vuln_python = [(p, "python") for p in PYTHON_VULNERABLE]
-    all_safe_python = [(p, "python") for p in PYTHON_SAFE]
+    all_vuln_c      = [(p, "c")          for p in C_VULNERABLE]
+    all_safe_c      = [(p, "c")          for p in C_SAFE]
+    all_vuln_python = [(p, "python")     for p in PYTHON_VULNERABLE]
+    all_safe_python = [(p, "python")     for p in PYTHON_SAFE]
+    all_vuln_java   = [(p, "java")       for p in JAVA_VULNERABLE]
+    all_safe_java   = [(p, "java")       for p in JAVA_SAFE]
+    all_vuln_js     = [(p, "javascript") for p in JS_VULNERABLE]
+    all_safe_js     = [(p, "javascript") for p in JS_SAFE]
+    all_vuln_go     = [(p, "go")         for p in GO_VULNERABLE]
+    all_safe_go     = [(p, "go")         for p in GO_SAFE]
 
-    logger.info(f"Base C patterns        : {len(C_VULNERABLE)} vulnerable, {len(C_SAFE)} safe")
-    logger.info(f"Base Python patterns   : {len(PYTHON_VULNERABLE)} vulnerable, {len(PYTHON_SAFE)} safe")
-    logger.info(f"Copies per pattern     : {copies_per_pattern}")
+    logger.info(f"Base C patterns          : {len(C_VULNERABLE)} vulnerable, {len(C_SAFE)} safe")
+    logger.info(f"Base Python patterns     : {len(PYTHON_VULNERABLE)} vulnerable, {len(PYTHON_SAFE)} safe")
+    logger.info(f"Base Java patterns       : {len(JAVA_VULNERABLE)} vulnerable, {len(JAVA_SAFE)} safe")
+    logger.info(f"Base JavaScript patterns : {len(JS_VULNERABLE)} vulnerable, {len(JS_SAFE)} safe")
+    logger.info(f"Base Go patterns         : {len(GO_VULNERABLE)} vulnerable, {len(GO_SAFE)} safe")
+    logger.info(f"Copies per pattern       : {copies_per_pattern}")
 
     # ---- Expand with variations ----
     samples = []
@@ -2143,16 +3371,29 @@ def generate_dataset(
     logger.info("Expanding patterns with variations …")
 
     n_vc = expand(all_vuln_c, 1, "c_vuln")
-    logger.info(f"  C   vulnerable samples generated : {n_vc}")
-
+    logger.info(f"  C          vulnerable : {n_vc}")
     n_sc = expand(all_safe_c, 0, "c_safe")
-    logger.info(f"  C   safe samples generated       : {n_sc}")
+    logger.info(f"  C          safe       : {n_sc}")
 
     n_vp = expand(all_vuln_python, 1, "py_vuln")
-    logger.info(f"  Python vulnerable samples generated : {n_vp}")
-
+    logger.info(f"  Python     vulnerable : {n_vp}")
     n_sp = expand(all_safe_python, 0, "py_safe")
-    logger.info(f"  Python safe samples generated       : {n_sp}")
+    logger.info(f"  Python     safe       : {n_sp}")
+
+    n_vj = expand(all_vuln_java, 1, "java_vuln")
+    logger.info(f"  Java       vulnerable : {n_vj}")
+    n_sj = expand(all_safe_java, 0, "java_safe")
+    logger.info(f"  Java       safe       : {n_sj}")
+
+    n_vjs = expand(all_vuln_js, 1, "js_vuln")
+    logger.info(f"  JavaScript vulnerable : {n_vjs}")
+    n_sjs = expand(all_safe_js, 0, "js_safe")
+    logger.info(f"  JavaScript safe       : {n_sjs}")
+
+    n_vg = expand(all_vuln_go, 1, "go_vuln")
+    logger.info(f"  Go         vulnerable : {n_vg}")
+    n_sg = expand(all_safe_go, 0, "go_safe")
+    logger.info(f"  Go         safe       : {n_sg}")
 
     total = len(samples)
     logger.info(f"\n  Total samples: {total}")
@@ -2194,18 +3435,14 @@ def generate_dataset(
     for filename, data in splits.items():
         vuln_count = sum(1 for d in data if d["target"] == 1)
         safe_count = len(data) - vuln_count
-        c_count    = sum(1 for d in data if d["language"] == "c")
-        py_count   = sum(1 for d in data if d["language"] == "python")
-
-        # Category breakdown
-        cat_counter = Counter(d["idx"].rsplit("_", 1)[0] for d in data)
+        lang_counter = Counter(d["language"] for d in data)
 
         logger.info(f"\n--- {filename} ---")
         logger.info(f"  Total       : {len(data)}")
         logger.info(f"  Vulnerable  : {vuln_count} ({vuln_count/len(data)*100:.1f}%)")
         logger.info(f"  Safe        : {safe_count} ({safe_count/len(data)*100:.1f}%)")
-        logger.info(f"  C samples   : {c_count} ({c_count/len(data)*100:.1f}%)")
-        logger.info(f"  Python      : {py_count} ({py_count/len(data)*100:.1f}%)")
+        for lang, cnt in sorted(lang_counter.items()):
+            logger.info(f"  {lang:<12}: {cnt} ({cnt/len(data)*100:.1f}%)")
 
         # CWE distribution
         cwe_counter = Counter()
