@@ -3,23 +3,47 @@
 # ============================================================================
 import argparse
 import os
-import torch
-from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
-from transformers import (
-    RobertaConfig, RobertaForSequenceClassification, RobertaTokenizer,
-    get_linear_schedule_with_warmup
-)
-try:
-    from transformers import AdamW
-except ImportError:
-    from torch.optim import AdamW
-from tqdm import tqdm
-import numpy as np
+import sys
 import logging
-from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score,
-    f1_score, roc_auc_score, confusion_matrix
-)
+
+# Validate required dependencies before proceeding
+_missing = []
+try:
+    import torch
+    from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
+except ImportError:
+    _missing.append("torch")
+try:
+    from transformers import (
+        RobertaConfig, RobertaForSequenceClassification, RobertaTokenizer,
+        get_linear_schedule_with_warmup
+    )
+    try:
+        from transformers import AdamW
+    except ImportError:
+        from torch.optim import AdamW
+except ImportError:
+    _missing.append("transformers")
+try:
+    from tqdm import tqdm
+except ImportError:
+    _missing.append("tqdm")
+try:
+    import numpy as np
+except ImportError:
+    _missing.append("numpy")
+try:
+    from sklearn.metrics import (
+        accuracy_score, precision_score, recall_score,
+        f1_score, roc_auc_score, confusion_matrix
+    )
+except ImportError:
+    _missing.append("scikit-learn")
+
+if _missing:
+    print(f"ERROR: Missing required packages: {', '.join(_missing)}", file=sys.stderr)
+    print("Install them with:  pip install -r requirements.txt", file=sys.stderr)
+    sys.exit(1)
 from dataset import TextDataset, collate_fn_dynamic_padding
 from model import Model
 

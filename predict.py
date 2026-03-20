@@ -1,7 +1,22 @@
 import argparse
-import torch
+import sys
 import json
-from transformers import RobertaConfig, RobertaForSequenceClassification, RobertaTokenizer
+
+_missing = []
+try:
+    import torch
+except ImportError:
+    _missing.append("torch")
+try:
+    from transformers import RobertaConfig, RobertaForSequenceClassification, RobertaTokenizer
+except ImportError:
+    _missing.append("transformers")
+
+if _missing:
+    print(f"ERROR: Missing required packages: {', '.join(_missing)}", file=sys.stderr)
+    print("Install them with:  pip install -r requirements.txt", file=sys.stderr)
+    sys.exit(1)
+
 from model import Model
 from dataset import convert_examples_to_features
 

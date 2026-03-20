@@ -4,7 +4,17 @@ Test script to verify dataset improvements
 """
 import sys
 import logging
-from transformers import RobertaTokenizer
+
+_missing = []
+try:
+    from transformers import RobertaTokenizer
+except ImportError:
+    _missing.append("transformers")
+
+if _missing:
+    print(f"ERROR: Missing required packages: {', '.join(_missing)}", file=sys.stderr)
+    print("Install them with:  pip install -r requirements.txt", file=sys.stderr)
+    sys.exit(1)
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
