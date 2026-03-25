@@ -90,10 +90,12 @@ def get_probabilities(model, tokenizer, data_file, device, block_size=400):
     """Run inference and return (probs, labels, examples) arrays."""
 
     class _Args:
-        block_size = block_size
         dropout_probability = 0.1
 
-    dataset = TextDataset(tokenizer, _Args(), data_file)
+    _args = _Args()
+    _args.block_size = block_size
+
+    dataset = TextDataset(tokenizer, _args, data_file)
     loader = DataLoader(dataset, sampler=SequentialSampler(dataset),
                         batch_size=16, collate_fn=collate_fn_dynamic_padding)
 
