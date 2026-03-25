@@ -131,29 +131,39 @@ def metrics_at_threshold(probs, labels, threshold=0.5):
 # ══════════════════════════════════════════════════════════════════════════════
 
 def per_cwe_f1(probs, labels, examples, threshold=0.5):
-    """Return dict of CWE -> F1."""
+    """Return dict of CWE -> F1 (vulnerable samples only — detection rate per CWE)."""
     preds = (probs >= threshold).astype(int)
     cwe_data = defaultdict(lambda: {"preds": [], "labels": []})
 
     for i, ex in enumerate(examples):
-        raw_cwe = getattr(ex, "cwe", None) or "unknown"
-        # cwe field may be a list or a string
+        raw_cwe = getattr(ex, "cwe", None)
+
+        # Safe samples (label=0) often have no CWE — skip them here.
+        # We measure per-CWE detection rate on vulnerable samples only.
+        if not raw_cwe or raw_cwe in ("unknown", "none", ""):
+            continue
+
+        # cwe field may be a list or a JSON string
         if isinstance(raw_cwe, list):
-            cwes = raw_cwe
+            cwes = [c for c in raw_cwe if c]
         else:
             try:
-                cwes = json.loads(raw_cwe.replace("'", '"'))
+                parsed = json.loads(str(raw_cwe).replace("'", '"'))
+                cwes = parsed if isinstance(parsed, list) else [str(parsed)]
             except Exception:
-                cwes = [raw_cwe]
+                cwes = [str(raw_cwe)]
+
         for cwe in cwes:
             cwe_data[cwe]["preds"].append(preds[i])
             cwe_data[cwe]["labels"].append(labels[i])
 
     results = {}
     for cwe, data in cwe_data.items():
-        if len(set(data["labels"])) < 2:
-            continue  # skip if only one class
-        results[cwe] = f1_score(data["labels"], data["preds"], zero_division=0)
+        if not data["labels"]:
+            continue
+        # Use recall so we measure "what % of this CWE type did the model catch"
+        results[cwe] = recall_score(data["labels"], data["preds"], zero_division=0)
+
     return dict(sorted(results.items(), key=lambda x: x[1], reverse=True))
 
 
@@ -214,7 +224,7 @@ def plot_per_cwe_f1(cwe_f1_dict, title, save_path, highlight_shared=True):
     fig, ax = plt.subplots(figsize=(8, max(4, len(cwes) * 0.4)))
     bars = ax.barh(cwes, f1s, color=colors)
     ax.set_xlim(0, 1.0)
-    ax.set_xlabel("F1 Score")
+    ax.set_xlabel("Recall (Detection Rate)")
     ax.set_title(title)
     ax.xaxis.set_major_formatter(mticker.FormatStrFormatter("%.2f"))
 
