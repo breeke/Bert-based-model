@@ -121,6 +121,41 @@ C_VULNERABLE = [
         "cwe": ["CWE-120"], "language": "c", "category": "buffer_overflow"
     },
 
+    # ---- Buffer Overflow — harder patterns ----
+    {
+        "func": """int handle_packet(struct packet *pkt, char *out, size_t out_len) {
+    int header_len = pkt->header_size;
+    int body_len   = pkt->body_size;
+    if (header_len < 0 || body_len < 0)
+        return -1;
+    memcpy(out, pkt->header, header_len);
+    memcpy(out + header_len, pkt->body, body_len);
+    return header_len + body_len;
+}""",
+        "cwe": ["CWE-120"], "language": "c", "category": "buffer_overflow"
+    },
+    {
+        "func": """void build_response(const char *status, const char *body) {
+    char response[512];
+    int  n;
+    n  = snprintf(response, sizeof(response), "HTTP/1.1 %s\\r\\n", status);
+    n += snprintf(response + n, sizeof(response), "Content-Length: %zu\\r\\n\\r\\n", strlen(body));
+    strcpy(response + n, body);
+    send_raw(response, strlen(response));
+}""",
+        "cwe": ["CWE-120"], "language": "c", "category": "buffer_overflow"
+    },
+    {
+        "func": """char *normalise_path(const char *base, const char *rel) {
+    static char resolved[256];
+    strncpy(resolved, base, sizeof(resolved));
+    strncat(resolved, "/", sizeof(resolved) - strlen(resolved) - 1);
+    strncat(resolved, rel,  strlen(rel));
+    return resolved;
+}""",
+        "cwe": ["CWE-120"], "language": "c", "category": "buffer_overflow"
+    },
+
     # ---- Format String (CWE-134) ----
     {
         "func": """void log_error(char *user_msg) {
@@ -352,6 +387,28 @@ C_VULNERABLE = [
     char cmd[256];
     sprintf(cmd, "mkdir -p /home/%s", username);
     system(cmd);
+}""",
+        "cwe": ["CWE-78"], "language": "c", "category": "command_injection"
+    },
+
+    # ---- Command Injection — harder patterns ----
+    {
+        "func": """int run_converter(const char *input_file, const char *fmt) {
+    char cmd[512];
+    int  rc;
+    snprintf(cmd, sizeof(cmd), "convert %s -format %s /tmp/out.bin", input_file, fmt);
+    rc = system(cmd);
+    return (rc == 0) ? 0 : -1;
+}""",
+        "cwe": ["CWE-78"], "language": "c", "category": "command_injection"
+    },
+    {
+        "func": """void archive_logs(const char *date_str) {
+    char path[256];
+    char cmd[512];
+    snprintf(path, sizeof(path), "/var/log/app-%s.log", date_str);
+    snprintf(cmd,  sizeof(cmd),  "tar czf /backup/logs.tgz %s", path);
+    popen(cmd, "r");
 }""",
         "cwe": ["CWE-78"], "language": "c", "category": "command_injection"
     },
@@ -612,6 +669,32 @@ C_VULNERABLE = [
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(db, buf, -1, &stmt, NULL);
     return sqlite3_step(stmt) == SQLITE_ROW;
+}""",
+        "cwe": ["CWE-89"], "language": "c", "category": "sql_injection"
+    },
+    # ---- SQL Injection — harder patterns ----
+    {
+        "func": """int search_products(sqlite3 *db, const char *category, int limit) {
+    char query[512];
+    const char *base = "SELECT id, name, price FROM products WHERE category='";
+    char limit_str[16];
+    snprintf(limit_str, sizeof(limit_str), "%d", limit);
+    strncpy(query, base, sizeof(query));
+    strncat(query, category, sizeof(query) - strlen(query) - 1);
+    strncat(query, "' LIMIT ", sizeof(query) - strlen(query) - 1);
+    strncat(query, limit_str, sizeof(query) - strlen(query) - 1);
+    return sqlite3_exec(db, query, NULL, NULL, NULL);
+}""",
+        "cwe": ["CWE-89"], "language": "c", "category": "sql_injection"
+    },
+    {
+        "func": """void update_profile(sqlite3 *db, int uid, const char *bio) {
+    char stmt[768];
+    int  n = snprintf(stmt, sizeof(stmt),
+                      "UPDATE users SET bio='%s', updated_at=datetime('now') "
+                      "WHERE id=%d", bio, uid);
+    if (n > 0 && n < (int)sizeof(stmt))
+        sqlite3_exec(db, stmt, NULL, NULL, NULL);
 }""",
         "cwe": ["CWE-89"], "language": "c", "category": "sql_injection"
     },
@@ -1235,6 +1318,37 @@ PYTHON_VULNERABLE = [
     return db.execute(query).fetchall()""",
         "cwe": ["CWE-89"], "language": "python", "category": "sql_injection"
     },
+    # ---- SQL Injection — harder patterns ----
+    {
+        "func": """def get_report(start_date, end_date, department):
+    filters = []
+    if department:
+        filters.append(f"department = '{department}'")
+    filters.append(f"created_at BETWEEN '{start_date}' AND '{end_date}'")
+    where = " AND ".join(filters)
+    sql = f"SELECT * FROM events WHERE {where} ORDER BY created_at DESC"
+    return db.execute(sql).fetchall()""",
+        "cwe": ["CWE-89"], "language": "python", "category": "sql_injection"
+    },
+    {
+        "func": """def bulk_update_status(ids, new_status):
+    id_list = ", ".join(ids)
+    query = f"UPDATE tasks SET status = '{new_status}' WHERE id IN ({id_list})"
+    cursor.execute(query)
+    db.commit()
+    return cursor.rowcount""",
+        "cwe": ["CWE-89"], "language": "python", "category": "sql_injection"
+    },
+    {
+        "func": """def find_users(search_term, sort_col, sort_dir):
+    allowed_dirs = ("ASC", "DESC")
+    direction = sort_dir if sort_dir in allowed_dirs else "ASC"
+    sql = ("SELECT id, name, email FROM users "
+           f"WHERE name LIKE '%{search_term}%' "
+           f"ORDER BY {sort_col} {direction}")
+    return conn.execute(sql).fetchall()""",
+        "cwe": ["CWE-89"], "language": "python", "category": "sql_injection"
+    },
 
     # ---- Command Injection (CWE-78) ----
     {
@@ -1270,6 +1384,35 @@ PYTHON_VULNERABLE = [
     import subprocess
     result = subprocess.check_output("ls -la " + directory, shell=True)
     return result.decode()""",
+        "cwe": ["CWE-78"], "language": "python", "category": "command_injection"
+    },
+
+    # ---- Command Injection — harder patterns ----
+    {
+        "func": """def export_report(report_id, output_format, destination):
+    import subprocess
+    report_path = f"/reports/{report_id}.json"
+    cmd = f"report-cli render {report_path} --format {output_format} --out {destination}"
+    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    return result.returncode == 0""",
+        "cwe": ["CWE-78"], "language": "python", "category": "command_injection"
+    },
+    {
+        "func": """def send_notification(user_email, subject, body_file):
+    import os
+    cmd = f'mail -s "{subject}" {user_email} < {body_file}'
+    os.system(cmd)""",
+        "cwe": ["CWE-78"], "language": "python", "category": "command_injection"
+    },
+    {
+        "func": """def resize_image(source, width, height):
+    import subprocess
+    out_path = source.replace(".jpg", f"_{width}x{height}.jpg")
+    subprocess.call(
+        f"convert {source} -resize {width}x{height} {out_path}",
+        shell=True
+    )
+    return out_path""",
         "cwe": ["CWE-78"], "language": "python", "category": "command_injection"
     },
 
@@ -3215,56 +3358,63 @@ PY_VAR_NAMES = {
 # Comment pools
 C_COMMENTS = [
     "",
-    "    /* process the data */\n",
-    "    /* handle input */\n",
-    "    // TODO: review this\n",
-    "    /* security: needs audit */\n",
+    "    /* initialise local state */\n",
+    "    /* update internal counters */\n",
+    "    /* flush pending writes */\n",
+    "    /* propagate to caller */\n",
     "",
-    "    // legacy code path\n",
+    "    /* apply configuration */\n",
+    "    /* normalise output */\n",
+    "",
+    "    /* retry on transient error */\n",
     "",
 ]
 
 PY_COMMENTS = [
     "",
-    "    # process the data\n",
-    "    # handle input\n",
-    "    # TODO: review this\n",
-    "    # security: needs audit\n",
+    "    # initialise local state\n",
+    "    # update internal counters\n",
+    "    # propagate to caller\n",
+    "    # apply configuration\n",
     "",
-    "    # legacy code path\n",
+    "    # normalise output\n",
+    "    # retry on transient error\n",
     "",
 ]
 
 JAVA_COMMENTS = [
     "",
-    "    // process the data\n",
-    "    // handle input\n",
-    "    // TODO: review this\n",
-    "    /* security: needs audit */\n",
+    "    // initialise local state\n",
+    "    // update internal counters\n",
+    "    // flush pending writes\n",
+    "    // propagate to caller\n",
     "",
-    "    // legacy code path\n",
+    "    // apply configuration\n",
+    "    // normalise output\n",
     "",
 ]
 
 JS_COMMENTS = [
     "",
-    "    // process the data\n",
-    "    // handle input\n",
-    "    // TODO: review this\n",
-    "    /* security: needs audit */\n",
+    "    // initialise local state\n",
+    "    // update internal counters\n",
+    "    // flush pending writes\n",
+    "    // propagate to caller\n",
     "",
-    "    // legacy code\n",
+    "    // apply configuration\n",
+    "    // normalise output\n",
     "",
 ]
 
 GO_COMMENTS = [
     "",
-    "\t// process the data\n",
-    "\t// handle input\n",
-    "\t// TODO: review this\n",
-    "\t// security: needs audit\n",
+    "\t// initialise local state\n",
+    "\t// update internal counters\n",
+    "\t// flush pending writes\n",
+    "\t// propagate to caller\n",
     "",
-    "\t// legacy code path\n",
+    "\t// apply configuration\n",
+    "\t// normalise output\n",
     "",
 ]
 
@@ -3277,25 +3427,101 @@ _COMMENT_POOLS = {
 }
 
 def make_variation(func_str, language, rng):
-    """Apply lightweight random variation to make each copy unique."""
+    """Apply realistic random variation to make each copy unique and harder to pattern-match."""
     code = func_str
 
-    # 30% chance — prepend a language-appropriate comment
-    if rng.random() < 0.3:
+    # ── Variable renaming ────────────────────────────────────────────────────
+    # Swap out common placeholder names for realistic alternatives
+    if language == "c":
+        rename_pool = [
+            ("buffer",     rng.choice(["buf", "tmp_buf", "recv_buf", "out_buf", "local_storage", "scratch"])),
+            ("user_input", rng.choice(["input", "raw_data", "incoming", "payload", "req_data", "src"])),
+            ("result",     rng.choice(["output", "retval", "response", "res", "out"])),
+            ("cmd",        rng.choice(["command", "exec_str", "shell_cmd", "cmd_buf", "run_str"])),
+            ("filename",   rng.choice(["fname", "file_path", "fpath", "target_file", "name"])),
+            ("query",      rng.choice(["sql_str", "stmt", "db_query", "q", "sql_buf"])),
+        ]
+    elif language == "python":
+        rename_pool = [
+            ("query",    rng.choice(["sql", "stmt", "sql_query", "statement", "db_stmt"])),
+            ("data",     rng.choice(["payload", "content", "body", "raw", "incoming"])),
+            ("result",   rng.choice(["output", "response", "ret", "res", "out"])),
+            ("path",     rng.choice(["filepath", "fpath", "full_path", "target", "dest"])),
+            ("cmd",      rng.choice(["command", "shell_cmd", "exec_str", "run_str"])),
+            ("filename", rng.choice(["fname", "file_path", "fpath", "name", "target"])),
+        ]
+    elif language == "java":
+        rename_pool = [
+            ("query",    rng.choice(["sqlStr", "stmt", "dbQuery", "sqlQuery", "statement"])),
+            ("input",    rng.choice(["userInput", "rawData", "incoming", "payload", "reqData"])),
+            ("cmd",      rng.choice(["command", "shellCmd", "execStr", "runStr"])),
+            ("path",     rng.choice(["filePath", "fpath", "targetPath", "destPath"])),
+        ]
+    elif language == "javascript":
+        rename_pool = [
+            ("query",    rng.choice(["sqlStr", "stmt", "dbQuery", "sqlQuery"])),
+            ("input",    rng.choice(["userInput", "rawData", "incoming", "payload"])),
+            ("cmd",      rng.choice(["command", "shellCmd", "execStr"])),
+            ("path",     rng.choice(["filePath", "fpath", "targetPath"])),
+        ]
+    else:  # go
+        rename_pool = [
+            ("query",    rng.choice(["sqlStr", "stmt", "dbQuery", "q"])),
+            ("input",    rng.choice(["userInput", "rawData", "incoming", "payload"])),
+            ("cmd",      rng.choice(["command", "shellCmd", "execStr"])),
+            ("path",     rng.choice(["filePath", "fpath", "targetPath"])),
+        ]
+
+    for old_name, new_name in rename_pool:
+        if old_name != new_name and rng.random() < 0.5:
+            # Whole-word replacement only
+            import re as _re
+            code = _re.sub(r'\b' + old_name + r'\b', new_name, code)
+
+    # ── Insert neutral comment in the middle of the function body ────────────
+    if rng.random() < 0.4:
         comments = _COMMENT_POOLS.get(language, PY_COMMENTS)
-        comment = rng.choice(comments)
+        comment = rng.choice([c for c in comments if c.strip()])
         if comment:
             lines = code.split("\n")
-            if len(lines) > 1:
-                # Insert comment after the first line (signature)
-                lines.insert(1, comment.rstrip("\n"))
+            # Insert somewhere after signature, not at the very end
+            if len(lines) > 3:
+                insert_at = rng.randint(2, max(2, len(lines) - 2))
+                lines.insert(insert_at, comment.rstrip("\n"))
                 code = "\n".join(lines)
 
-    # 20% chance — add trailing whitespace / blank line at end
+    # ── Insert a dummy logging / metrics call ────────────────────────────────
+    dummy_stmts = {
+        "c":          ["    log_debug(\"entering function\");",
+                       "    metrics_inc(\"calls\");",
+                       "    trace_enter();",
+                       "    assert(ctx != NULL);"],
+        "python":     ["    logger.debug('entering function')",
+                       "    metrics.inc('calls')",
+                       "    assert ctx is not None",
+                       "    logging.debug('processing request')"],
+        "java":       ["    log.debug(\"entering method\");",
+                       "    metrics.increment(\"calls\");",
+                       "    Objects.requireNonNull(ctx);"],
+        "javascript": ["    logger.debug('entering function');",
+                       "    metrics.inc('calls');",
+                       "    console.debug('processing');"],
+        "go":         ["\tlog.Debug(\"entering function\")",
+                       "\tmetrics.Inc(\"calls\")",
+                       "\tdefer metrics.Track()()" ],
+    }
+    pool = dummy_stmts.get(language, dummy_stmts["python"])
+    if rng.random() < 0.35:
+        stmt = rng.choice(pool)
+        lines = code.split("\n")
+        if len(lines) > 2:
+            insert_at = rng.randint(1, min(3, len(lines) - 1))
+            lines.insert(insert_at, stmt)
+            code = "\n".join(lines)
+
+    # ── Whitespace variations ────────────────────────────────────────────────
     if rng.random() < 0.2:
         code = code + "\n"
-
-    # 15% chance — add a leading blank line
     if rng.random() < 0.15:
         code = "\n" + code
 
