@@ -86,8 +86,26 @@ def load_model(model_dir, device, model_name="microsoft/unixcoder-base"):
     return model, tokenizer
 
 
+def load_metadata(data_file):
+    """Load cwe and language fields directly from jsonl — index matches TextDataset order."""
+    records = []
+    with open(data_file, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                d = json.loads(line)
+                if "func" not in d or "target" not in d or not d["func"].strip():
+                    continue
+                records.append({"cwe": d.get("cwe", []), "language": d.get("language", "unknown")})
+            except Exception:
+                continue
+    return records
+
+
 def get_probabilities(model, tokenizer, data_file, device, block_size=400):
-    """Run inference and return (probs, labels, examples) arrays."""
+    """Run inference and return (probs, labels, metadata) arrays."""
 
     class _Args:
         dropout_probability = 0.1
@@ -108,7 +126,10 @@ def get_probabilities(model, tokenizer, data_file, device, block_size=400):
             all_probs.extend(logits.cpu().numpy().flatten().tolist())
             all_labels.extend(batch_labels.cpu().numpy().tolist())
 
-    return np.array(all_probs), np.array(all_labels), dataset.examples
+    # Load cwe/language directly from file — guaranteed to match dataset order
+    metadata = load_metadata(data_file)
+
+    return np.array(all_probs), np.array(all_labels), metadata
 
 
 def metrics_at_threshold(probs, labels, threshold=0.5):
@@ -130,40 +151,37 @@ def metrics_at_threshold(probs, labels, threshold=0.5):
 # Per-CWE and per-language breakdown
 # ══════════════════════════════════════════════════════════════════════════════
 
-def per_cwe_f1(probs, labels, examples, threshold=0.5):
-    """Return dict of CWE -> F1."""
+def per_cwe_f1(probs, labels, metadata, threshold=0.5):
+    """Return dict of CWE -> recall (detection rate per CWE, vulnerable samples only)."""
     preds = (probs >= threshold).astype(int)
     cwe_data = defaultdict(lambda: {"preds": [], "labels": []})
 
-    for i, ex in enumerate(examples):
-        raw_cwe = getattr(ex, "cwe", None) or "unknown"
-        # cwe field may be a list or a string
-        if isinstance(raw_cwe, list):
-            cwes = raw_cwe
-        else:
-            try:
-                cwes = json.loads(raw_cwe.replace("'", '"'))
-            except Exception:
-                cwes = [raw_cwe]
+    for i, meta in enumerate(metadata):
+        raw_cwe = meta.get("cwe", [])
+        if not raw_cwe:
+            continue
+        cwes = raw_cwe if isinstance(raw_cwe, list) else [raw_cwe]
+        cwes = [c for c in cwes if c]
         for cwe in cwes:
-            cwe_data[cwe]["preds"].append(preds[i])
-            cwe_data[cwe]["labels"].append(labels[i])
+            cwe_data[cwe]["preds"].append(int(preds[i]))
+            cwe_data[cwe]["labels"].append(int(labels[i]))
 
     results = {}
     for cwe, data in cwe_data.items():
-        if len(set(data["labels"])) < 2:
-            continue  # skip if only one class
-        results[cwe] = f1_score(data["labels"], data["preds"], zero_division=0)
+        if not data["labels"]:
+            continue
+        results[cwe] = recall_score(data["labels"], data["preds"], zero_division=0)
+
     return dict(sorted(results.items(), key=lambda x: x[1], reverse=True))
 
 
-def per_language_metrics(probs, labels, examples, threshold=0.5):
+def per_language_metrics(probs, labels, metadata, threshold=0.5):
     """Return dict of language -> metrics dict."""
     preds = (probs >= threshold).astype(int)
     lang_data = defaultdict(lambda: {"probs": [], "preds": [], "labels": []})
 
-    for i, ex in enumerate(examples):
-        lang = getattr(ex, "language", "unknown") or "unknown"
+    for i, meta in enumerate(metadata):
+        lang = meta.get("language", "unknown") or "unknown"
         lang_data[lang]["probs"].append(probs[i])
         lang_data[lang]["preds"].append(preds[i])
         lang_data[lang]["labels"].append(labels[i])
@@ -214,7 +232,7 @@ def plot_per_cwe_f1(cwe_f1_dict, title, save_path, highlight_shared=True):
     fig, ax = plt.subplots(figsize=(8, max(4, len(cwes) * 0.4)))
     bars = ax.barh(cwes, f1s, color=colors)
     ax.set_xlim(0, 1.0)
-    ax.set_xlabel("F1 Score")
+    ax.set_xlabel("Recall (Detection Rate)")
     ax.set_title(title)
     ax.xaxis.set_major_formatter(mticker.FormatStrFormatter("%.2f"))
 
