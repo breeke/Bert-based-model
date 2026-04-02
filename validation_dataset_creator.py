@@ -898,21 +898,27 @@ def make_variation(func_str, language, rng):
 
 def generate(output_dir="./Files", copies=15, seed=99):
     """
-    Generates held_out_valid.jsonl.
+    Generates:
+      held_out_valid.jsonl         — combined C + Python
+      held_out_c_valid.jsonl       — C only
+      held_out_python_valid.jsonl  — Python only
+
     Uses seed=99 (training uses seed=42) and copies=15 (training uses 40)
     to ensure maximum divergence from training data.
     """
     os.makedirs(output_dir, exist_ok=True)
     rng = random.Random(seed)
-    samples = []
     uid = 0
 
-    def expand(patterns, label):
+    c_samples      = []
+    python_samples = []
+
+    def expand(patterns, label, bucket):
         nonlocal uid
         for p in patterns:
             for _ in range(copies):
                 code = make_variation(p["func"], p["language"], rng)
-                samples.append({
+                bucket.append({
                     "func":     code,
                     "target":   label,
                     "idx":      f"hov_{uid}",
@@ -921,33 +927,38 @@ def generate(output_dir="./Files", copies=15, seed=99):
                 })
                 uid += 1
 
-    expand(C_VULN,       1)
-    expand(C_SAFE,       0)
-    expand(PYTHON_VULN,  1)
-    expand(PYTHON_SAFE,  0)
+    expand(C_VULN,      1, c_samples)
+    expand(C_SAFE,      0, c_samples)
+    expand(PYTHON_VULN, 1, python_samples)
+    expand(PYTHON_SAFE, 0, python_samples)
 
-    rng.shuffle(samples)
+    rng.shuffle(c_samples)
+    rng.shuffle(python_samples)
+    all_samples = c_samples + python_samples
+    rng.shuffle(all_samples)
 
-    out_path = os.path.join(output_dir, "held_out_valid.jsonl")
-    with open(out_path, "w", encoding="utf-8") as f:
-        for s in samples:
-            json.dump(s, f, ensure_ascii=False)
-            f.write("\n")
+    def write_file(samples, filename):
+        path = os.path.join(output_dir, filename)
+        with open(path, "w", encoding="utf-8") as f:
+            for s in samples:
+                json.dump(s, f, ensure_ascii=False)
+                f.write("\n")
+        total = len(samples)
+        vuln  = sum(1 for s in samples if s["target"] == 1)
+        cwes  = Counter(c for s in samples for c in s["cwe"])
+        logger.info(f"Written {total} samples to {path}")
+        logger.info(f"  Vulnerable : {vuln} ({vuln/total*100:.1f}%)")
+        logger.info(f"  Safe       : {total-vuln} ({(total-vuln)/total*100:.1f}%)")
+        logger.info(f"  Top CWEs   : {cwes.most_common(5)}")
 
-    total  = len(samples)
-    vuln   = sum(1 for s in samples if s["target"] == 1)
-    safe   = total - vuln
-    langs  = Counter(s["language"] for s in samples)
-    cwes   = Counter()
-    for s in samples:
-        for c in s["cwe"]:
-            cwes[c] += 1
+    logger.info("\n--- Combined (C + Python) ---")
+    write_file(all_samples, "held_out_valid.jsonl")
 
-    logger.info(f"Written {total} samples to {out_path}")
-    logger.info(f"  Vulnerable : {vuln} ({vuln/total*100:.1f}%)")
-    logger.info(f"  Safe       : {safe} ({safe/total*100:.1f}%)")
-    logger.info(f"  Languages  : {dict(langs)}")
-    logger.info(f"  CWE counts : {cwes.most_common(10)}")
+    logger.info("\n--- C only ---")
+    write_file(c_samples, "held_out_c_valid.jsonl")
+
+    logger.info("\n--- Python only ---")
+    write_file(python_samples, "held_out_python_valid.jsonl")
 
 
 if __name__ == "__main__":
