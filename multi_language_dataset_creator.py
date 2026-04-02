@@ -698,6 +698,137 @@ C_VULNERABLE = [
 }""",
         "cwe": ["CWE-89"], "language": "c", "category": "sql_injection"
     },
+
+    # ---- Out-of-Bounds Write (CWE-787) ----
+    {
+        "func": """void write_field(struct record *rec, int field_idx, const char *value) {
+    int offset = field_idx * FIELD_SIZE;
+    memcpy(rec->data + offset, value, strlen(value));
+    rec->data[offset + strlen(value)] = '\\0';
+}""",
+        "cwe": ["CWE-787"], "language": "c", "category": "oob_write"
+    },
+    {
+        "func": """int append_chunk(char *dst, int dst_used, int dst_cap,
+                  const char *chunk, int chunk_len) {
+    memcpy(dst + dst_used, chunk, chunk_len);
+    return dst_used + chunk_len;
+}""",
+        "cwe": ["CWE-787"], "language": "c", "category": "oob_write"
+    },
+    {
+        "func": """void serialize_items(struct item *items, int count, uint8_t *out) {
+    int pos = 0;
+    for (int i = 0; i < count; i++) {
+        memcpy(out + pos, &items[i], sizeof(struct item));
+        pos += sizeof(struct item);
+    }
+}""",
+        "cwe": ["CWE-787"], "language": "c", "category": "oob_write"
+    },
+    {
+        "func": """void build_tlv(uint8_t *buf, uint8_t tag, const uint8_t *val, uint16_t vlen) {
+    buf[0] = tag;
+    buf[1] = (vlen >> 8) & 0xff;
+    buf[2] = vlen & 0xff;
+    memcpy(buf + 3, val, vlen);
+}""",
+        "cwe": ["CWE-787"], "language": "c", "category": "oob_write"
+    },
+
+    # ---- Buffer Error / General (CWE-119) ----
+    {
+        "func": """int parse_config_line(char *line, struct config *cfg) {
+    char key[64], value[256];
+    sscanf(line, "%s = %s", key, value);
+    config_set(cfg, key, value);
+    return 0;
+}""",
+        "cwe": ["CWE-119"], "language": "c", "category": "buffer_error"
+    },
+    {
+        "func": """void read_token(FILE *fp, char *token_out) {
+    int c, i = 0;
+    while ((c = fgetc(fp)) != EOF && c != ' ' && c != '\\n')
+        token_out[i++] = (char)c;
+    token_out[i] = '\\0';
+}""",
+        "cwe": ["CWE-119"], "language": "c", "category": "buffer_error"
+    },
+    {
+        "func": """int decode_base64(const char *in, uint8_t *out) {
+    int i = 0, j = 0;
+    while (in[i]) {
+        out[j++] = base64_decode_char(in[i++]);
+        out[j++] = base64_decode_char(in[i++]);
+        out[j++] = base64_decode_char(in[i++]);
+    }
+    return j;
+}""",
+        "cwe": ["CWE-119"], "language": "c", "category": "buffer_error"
+    },
+
+    # ---- Improper Input Validation (CWE-20) ----
+    {
+        "func": """void set_user_age(struct user *u, const char *age_str) {
+    u->age = atoi(age_str);
+    update_user(u);
+}""",
+        "cwe": ["CWE-20"], "language": "c", "category": "input_validation"
+    },
+    {
+        "func": """int resize_pool(struct pool *p, const char *new_size_str) {
+    int new_size = atoi(new_size_str);
+    p->data = realloc(p->data, new_size * sizeof(void *));
+    p->capacity = new_size;
+    return 0;
+}""",
+        "cwe": ["CWE-20"], "language": "c", "category": "input_validation"
+    },
+    {
+        "func": """void set_timeout(struct conn *c, const char *ms_str) {
+    c->timeout_ms = strtol(ms_str, NULL, 10);
+    apply_timeout(c);
+}""",
+        "cwe": ["CWE-20"], "language": "c", "category": "input_validation"
+    },
+    {
+        "func": """int jump_to_offset(struct vm *vm, const char *offset_str) {
+    int offset = atoi(offset_str);
+    vm->pc += offset;
+    return execute(vm);
+}""",
+        "cwe": ["CWE-20"], "language": "c", "category": "input_validation"
+    },
+
+    # ---- Resource Exhaustion (CWE-400) ----
+    {
+        "func": """void handle_upload(int fd, uint32_t claimed_size) {
+    char *buf = malloc(claimed_size);
+    read(fd, buf, claimed_size);
+    process_upload(buf, claimed_size);
+    free(buf);
+}""",
+        "cwe": ["CWE-400"], "language": "c", "category": "resource_exhaustion"
+    },
+    {
+        "func": """int expand_history(struct shell *sh, uint32_t new_entries) {
+    sh->history = realloc(sh->history,
+                          new_entries * sizeof(struct hist_entry));
+    sh->history_cap = new_entries;
+    return 0;
+}""",
+        "cwe": ["CWE-400"], "language": "c", "category": "resource_exhaustion"
+    },
+    {
+        "func": """void cache_response(const char *key, const char *body, uint32_t body_len) {
+    struct cache_entry *e = malloc(sizeof(*e) + body_len);
+    memcpy(e->data, body, body_len);
+    e->size = body_len;
+    cache_insert(key, e);
+}""",
+        "cwe": ["CWE-400"], "language": "c", "category": "resource_exhaustion"
+    },
 ]
 
 # ---------------------------------------------------------------------------
@@ -1270,6 +1401,99 @@ C_SAFE = [
 }""",
         "cwe": [], "language": "c", "category": "sql_safe"
     },
+
+    # ---- Safe: CWE-787 (bounds-checked writes) ----
+    {
+        "func": """void write_field(struct record *rec, int field_idx, const char *value) {
+    if (field_idx < 0 || field_idx >= MAX_FIELDS) return;
+    int offset = field_idx * FIELD_SIZE;
+    size_t vlen = strnlen(value, FIELD_SIZE - 1);
+    memcpy(rec->data + offset, value, vlen);
+    rec->data[offset + vlen] = '\\0';
+}""",
+        "cwe": [], "language": "c", "category": "oob_write_safe"
+    },
+    {
+        "func": """int append_chunk(char *dst, int dst_used, int dst_cap,
+                  const char *chunk, int chunk_len) {
+    if (chunk_len <= 0 || dst_used + chunk_len > dst_cap) return -1;
+    memcpy(dst + dst_used, chunk, chunk_len);
+    return dst_used + chunk_len;
+}""",
+        "cwe": [], "language": "c", "category": "oob_write_safe"
+    },
+
+    # ---- Safe: CWE-119 (width-limited parsing) ----
+    {
+        "func": """int parse_config_line(char *line, struct config *cfg) {
+    char key[64], value[256];
+    if (sscanf(line, "%63s = %255s", key, value) != 2) return -1;
+    config_set(cfg, key, value);
+    return 0;
+}""",
+        "cwe": [], "language": "c", "category": "buffer_error_safe"
+    },
+    {
+        "func": """void read_token(FILE *fp, char *token_out, size_t max_len) {
+    int c;
+    size_t i = 0;
+    while ((c = fgetc(fp)) != EOF && c != ' ' && c != '\\n') {
+        if (i + 1 >= max_len) break;
+        token_out[i++] = (char)c;
+    }
+    token_out[i] = '\\0';
+}""",
+        "cwe": [], "language": "c", "category": "buffer_error_safe"
+    },
+
+    # ---- Safe: CWE-20 (validated input) ----
+    {
+        "func": """int resize_pool(struct pool *p, const char *new_size_str) {
+    char *end;
+    long new_size = strtol(new_size_str, &end, 10);
+    if (*end != '\\0' || new_size <= 0 || new_size > MAX_POOL_SIZE) return -1;
+    void *tmp = realloc(p->data, (size_t)new_size * sizeof(void *));
+    if (!tmp) return -1;
+    p->data = tmp;
+    p->capacity = (int)new_size;
+    return 0;
+}""",
+        "cwe": [], "language": "c", "category": "input_validation_safe"
+    },
+    {
+        "func": """void set_user_age(struct user *u, const char *age_str) {
+    char *end;
+    long age = strtol(age_str, &end, 10);
+    if (*end != '\\0' || age < 0 || age > 150) return;
+    u->age = (int)age;
+    update_user(u);
+}""",
+        "cwe": [], "language": "c", "category": "input_validation_safe"
+    },
+
+    # ---- Safe: CWE-400 (size-capped allocation) ----
+    {
+        "func": """void handle_upload(int fd, uint32_t claimed_size) {
+    if (claimed_size == 0 || claimed_size > MAX_UPLOAD_SIZE) return;
+    char *buf = malloc(claimed_size);
+    if (!buf) return;
+    ssize_t got = read(fd, buf, claimed_size);
+    if (got > 0) process_upload(buf, (size_t)got);
+    free(buf);
+}""",
+        "cwe": [], "language": "c", "category": "resource_exhaustion_safe"
+    },
+    {
+        "func": """void cache_response(const char *key, const char *body, uint32_t body_len) {
+    if (body_len > MAX_CACHE_ENTRY) return;
+    struct cache_entry *e = malloc(sizeof(*e) + body_len);
+    if (!e) return;
+    memcpy(e->data, body, body_len);
+    e->size = body_len;
+    cache_insert(key, e);
+}""",
+        "cwe": [], "language": "c", "category": "resource_exhaustion_safe"
+    },
 ]
 
 # ---------------------------------------------------------------------------
@@ -1699,6 +1923,51 @@ PYTHON_VULNERABLE = [
     from string import Formatter
     return Formatter().vformat(template, [], user_data)""",
         "cwe": ["CWE-134"], "language": "python", "category": "format_string"
+    },
+
+    # ---- Improper Input Validation (CWE-20) ----
+    {
+        "func": """def set_page_size(request, config):
+    page_size = int(request.args.get('page_size', 20))
+    config['page_size'] = page_size
+    return config""",
+        "cwe": ["CWE-20"], "language": "python", "category": "input_validation"
+    },
+    {
+        "func": """def move_player(game_state, dx, dy):
+    game_state['x'] += int(dx)
+    game_state['y'] += int(dy)
+    return game_state""",
+        "cwe": ["CWE-20"], "language": "python", "category": "input_validation"
+    },
+    {
+        "func": """def apply_discount(cart, discount_str):
+    discount = float(discount_str)
+    cart['total'] = cart['total'] * (1 - discount)
+    return cart""",
+        "cwe": ["CWE-20"], "language": "python", "category": "input_validation"
+    },
+
+    # ---- Resource Exhaustion (CWE-400) ----
+    {
+        "func": """def expand_list(items, repeat_count):
+    repeat = int(repeat_count)
+    return items * repeat""",
+        "cwe": ["CWE-400"], "language": "python", "category": "resource_exhaustion"
+    },
+    {
+        "func": """def read_upload(request):
+    data = request.body.read()
+    return process(data)""",
+        "cwe": ["CWE-400"], "language": "python", "category": "resource_exhaustion"
+    },
+    {
+        "func": """def cache_all(db, key_prefix):
+    rows = db.execute("SELECT * FROM events").fetchall()
+    for row in rows:
+        cache.set(f"{key_prefix}:{row['id']}", row)
+    return len(rows)""",
+        "cwe": ["CWE-400"], "language": "python", "category": "resource_exhaustion"
     },
 ]
 
@@ -2162,6 +2431,47 @@ PYTHON_SAFE = [
         raise ValueError("unknown template")
     return tmpl.format(name=str(user_data.get("name", "User")))""",
         "cwe": [], "language": "python", "category": "format_safe"
+    },
+
+    # ---- Safe: CWE-20 (validated input) ----
+    {
+        "func": """def set_page_size(request, config):
+    try:
+        page_size = int(request.args.get('page_size', 20))
+    except (TypeError, ValueError):
+        page_size = 20
+    config['page_size'] = max(1, min(page_size, 100))
+    return config""",
+        "cwe": [], "language": "python", "category": "input_validation_safe"
+    },
+    {
+        "func": """def apply_discount(cart, discount_str):
+    try:
+        discount = float(discount_str)
+    except (TypeError, ValueError):
+        return cart
+    if not (0.0 <= discount <= 1.0):
+        raise ValueError('discount must be between 0 and 1')
+    cart['total'] = round(cart['total'] * (1 - discount), 2)
+    return cart""",
+        "cwe": [], "language": "python", "category": "input_validation_safe"
+    },
+
+    # ---- Safe: CWE-400 (size-capped operations) ----
+    {
+        "func": """def expand_list(items, repeat_count):
+    repeat = max(0, min(int(repeat_count), 1000))
+    return items * repeat""",
+        "cwe": [], "language": "python", "category": "resource_exhaustion_safe"
+    },
+    {
+        "func": """def read_upload(request):
+    MAX_SIZE = 10 * 1024 * 1024
+    data = request.body.read(MAX_SIZE + 1)
+    if len(data) > MAX_SIZE:
+        raise ValueError('upload too large')
+    return process(data)""",
+        "cwe": [], "language": "python", "category": "resource_exhaustion_safe"
     },
 ]
 
@@ -3426,6 +3736,126 @@ _COMMENT_POOLS = {
     "go":         GO_COMMENTS,
 }
 
+def wrap_in_context(func_str, language, rng):
+    """
+    Embed the vulnerable/safe core inside realistic surrounding code.
+    Increases function length and nesting depth to closer match real-world code,
+    which reduces the synthetic-to-real generalisation gap.
+    """
+
+    # ── C context wrappers ───────────────────────────────────────────────────
+    if language == "c":
+        # Prologue lines inserted at top of function body
+        prologues = [
+            ["    int status = 0;",
+             "    log_debug(\"entering %s\", __func__);"],
+            ["    if (!ctx) return -1;",
+             "    metrics_inc(\"requests\");"],
+            ["    size_t n = 0;",
+             "    int rc = 0;",
+             "    assert(len > 0);"],
+            ["    pthread_mutex_lock(&g_lock);",
+             "    int err = 0;"],
+            ["    struct timeval tv;",
+             "    gettimeofday(&tv, NULL);",
+             "    int retval = 0;"],
+        ]
+        # Epilogue lines inserted before closing brace
+        epilogues = [
+            ["    return status;"],
+            ["    return rc;"],
+            ["    return retval;"],
+            ["    pthread_mutex_unlock(&g_lock);",
+             "    return err;"],
+            ["    log_debug(\"done, status=%d\", status);",
+             "    return status;"],
+        ]
+        # Optional conditional wrapper around the core body
+        cond_wrappers = [
+            ("    if (len > 0) {", "    }"),
+            ("    if (ctx->ready) {", "    }"),
+            ("    if (flags & FLAG_ENABLED) {", "    }"),
+            ("    if (retries < MAX_RETRIES) {", "    }"),
+            None, None, None,   # no wrapping most of the time
+        ]
+
+        # Extract signature line and body lines
+        lines = func_str.split("\n")
+        sig_end = next((i for i, l in enumerate(lines) if "{" in l), 0)
+        body_lines = lines[sig_end + 1:]
+        # Strip closing brace
+        if body_lines and body_lines[-1].strip() == "}":
+            body_lines = body_lines[:-1]
+
+        prologue = rng.choice(prologues)
+        epilogue = rng.choice(epilogues)
+        cond     = rng.choice(cond_wrappers)
+
+        new_body = prologue[:]
+        if cond:
+            new_body.append(cond[0])
+            new_body += ["    " + l for l in body_lines]
+            new_body.append(cond[1])
+        else:
+            new_body += body_lines
+        new_body += epilogue
+
+        sig = "\n".join(lines[:sig_end + 1])
+        return sig + "\n" + "\n".join(new_body) + "\n}"
+
+    # ── Python context wrappers ───────────────────────────────────────────────
+    elif language == "python":
+        prologues = [
+            ["    if not ctx:",
+             "        return None",
+             "    logger.debug('processing request')"],
+            ["    result = None",
+             "    try:"],
+            ["    metrics.inc('calls')",
+             "    if not data:",
+             "        raise ValueError('empty input')"],
+            ["    start_time = time.monotonic()",
+             "    logger.info(f'starting operation')"],
+            ["    with db_lock:",
+             "        retries = 0"],
+        ]
+        epilogues = [
+            ["    return result"],
+            ["    except Exception as e:",
+             "        logger.error(f'error: {e}')",
+             "        return None"],
+            ["    logger.debug('done')",
+             "    return result"],
+            ["    elapsed = time.monotonic() - start_time",
+             "    return result"],
+            [],
+        ]
+
+        lines = func_str.split("\n")
+        # Find the def line and body
+        def_idx = next((i for i, l in enumerate(lines) if l.strip().startswith("def ")), 0)
+        body_lines = lines[def_idx + 1:]
+
+        prologue = rng.choice(prologues)
+        epilogue = rng.choice(epilogues)
+
+        # 30% chance: wrap core in an if block
+        if rng.random() < 0.3:
+            condition = rng.choice([
+                "    if request.method in ('POST', 'PUT'):",
+                "    if user.is_authenticated:",
+                "    if feature_enabled('processing'):",
+                "    if len(data) > 0:",
+            ])
+            body_lines = [condition] + ["    " + l for l in body_lines]
+
+        new_lines = lines[:def_idx + 1] + prologue + body_lines + epilogue
+        return "\n".join(new_lines)
+
+    # ── Other languages — return unchanged ───────────────────────────────────
+    return func_str
+
+
 def make_variation(func_str, language, rng):
     """Apply realistic random variation to make each copy unique and harder to pattern-match."""
     code = func_str
@@ -3524,6 +3954,13 @@ def make_variation(func_str, language, rng):
         code = code + "\n"
     if rng.random() < 0.15:
         code = "\n" + code
+
+    # ── Context wrapping (50% chance) — increases length & nesting depth ─────
+    if rng.random() < 0.50:
+        try:
+            code = wrap_in_context(code, language, rng)
+        except Exception:
+            pass  # keep original if wrapping fails
 
     return code
 
