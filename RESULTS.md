@@ -244,5 +244,4 @@ to shift, not just the decision boundary.
 
 ---
 
-*Generated from `evaluate_experiments.py` and `analyse_insights.py` on branch
-`claude/review-recent-branch-POtjK`.*
+
