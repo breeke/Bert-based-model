@@ -25,6 +25,7 @@ import os
 import random
 import logging
 from collections import Counter
+from multi_language_dataset_creator import wrap_in_context
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -918,6 +919,8 @@ def generate(output_dir="./Files", copies=15, seed=99):
         for p in patterns:
             for _ in range(copies):
                 code = make_variation(p["func"], p["language"], rng)
+                if random.random() < 0.5:
+                    code = wrap_in_context(code, p["language"], rng)
                 bucket.append({
                     "func":     code,
                     "target":   label,
