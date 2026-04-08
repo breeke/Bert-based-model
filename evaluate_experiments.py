@@ -74,6 +74,7 @@ def load_model(model_dir, device, model_name="microsoft/unixcoder-base"):
     class _Args:
         block_size = 400
         dropout_probability = 0.1
+        label_smoothing = 0.0
 
     model = Model(base, config, tokenizer, _Args())
     model_path = os.path.join(model_dir, "best_model.bin")
@@ -104,11 +105,34 @@ def load_metadata(data_file):
     return records
 
 
+def _load_temperature(results_dir="./results"):
+    """Return saved temperature scalar, or 1.0 if not calibrated yet."""
+    temp_path = os.path.join(results_dir, "temperature.json")
+    if os.path.exists(temp_path):
+        with open(temp_path) as f:
+            T = json.load(f).get("temperature", 1.0)
+        logger.info(f"Applying temperature scaling T={T:.4f}")
+        return float(T)
+    return 1.0
+
+
+def _apply_temperature(probs, T):
+    """Scale probabilities using temperature T via inverse-sigmoid → scale → sigmoid."""
+    if T == 1.0:
+        return probs
+    raw = np.log(probs / (1 - probs + 1e-10) + 1e-10)
+    return 1 / (1 + np.exp(-raw / T))
+
+
 def get_probabilities(model, tokenizer, data_file, device, block_size=400):
-    """Run inference and return (probs, labels, metadata) arrays."""
+    """Run inference and return (probs, labels, metadata) arrays.
+
+    Applies temperature scaling automatically if results/temperature.json exists.
+    """
 
     class _Args:
         dropout_probability = 0.1
+        label_smoothing = 0.0
 
     _args = _Args()
     _args.block_size = block_size
@@ -126,10 +150,16 @@ def get_probabilities(model, tokenizer, data_file, device, block_size=400):
             all_probs.extend(logits.cpu().numpy().flatten().tolist())
             all_labels.extend(batch_labels.cpu().numpy().tolist())
 
+    probs = np.array(all_probs)
+
+    # Apply temperature scaling if calibration has been run
+    T = _load_temperature()
+    probs = _apply_temperature(probs, T)
+
     # Load cwe/language directly from file — guaranteed to match dataset order
     metadata = load_metadata(data_file)
 
-    return np.array(all_probs), np.array(all_labels), metadata
+    return probs, np.array(all_labels), metadata
 
 
 def metrics_at_threshold(probs, labels, threshold=0.5):
