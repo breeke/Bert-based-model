@@ -188,8 +188,8 @@ def main():
     # Optional parameters
     parser.add_argument("--eval_data_file", default=None, help="Evaluation data file")
     parser.add_argument("--test_data_file", default=None, help="Test data file")
-    parser.add_argument("--model_name_or_path", default="microsoft/codebert-base", help="Pretrained model")
-    parser.add_argument("--tokenizer_name", default="microsoft/codebert-base", help="Tokenizer")
+    parser.add_argument("--model_name_or_path", default="microsoft/unixcoder-base", help="Pretrained model")
+    parser.add_argument("--tokenizer_name", default="microsoft/unixcoder-base", help="Tokenizer")
     
     # Training parameters
     parser.add_argument("--block_size", default=400, type=int, help="Maximum sequence length")
