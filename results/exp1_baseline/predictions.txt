@@ -1410,7 +1410,7 @@ py_safe_resource_exhaustion_safe_9969	0
 java_safe_crypto_safe_11356	0
 py_safe_command_safe_8380	0
 c_vuln_buffer_overflow_224	1
-c_vuln_double_free_859	1
+c_vuln_double_free_859	0
 py_safe_eval_safe_8854	0
 py_safe_format_safe_9809	0
 go_vuln_sql_injection_13372	1
