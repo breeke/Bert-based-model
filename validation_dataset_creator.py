@@ -312,6 +312,74 @@ C_VULN = [
 }""",
         "cwe": ["CWE-193"], "language": "c"
     },
+
+    # CWE-367 — TOCTOU race condition (C)
+    {
+        "func": """int install_binary(const char *src, const char *dst) {
+    if (access(src, R_OK) == 0) {
+        rename(src, dst);
+        chmod(dst, 0755);
+        return 0;
+    }
+    return -1;
+}""",
+        "cwe": ["CWE-367"], "language": "c"
+    },
+    {
+        "func": """void rotate_log(const char *logpath) {
+    struct stat st;
+    if (stat(logpath, &st) == 0 && st.st_size > MAX_LOG_SIZE) {
+        char backup[256];
+        snprintf(backup, sizeof(backup), "%s.bak", logpath);
+        link(logpath, backup);
+        unlink(logpath);
+    }
+}""",
+        "cwe": ["CWE-367"], "language": "c"
+    },
+    {
+        "func": """int exec_if_safe(const char *path) {
+    struct stat st;
+    lstat(path, &st);
+    if (!S_ISLNK(st.st_mode)) {
+        char *argv[] = {(char *)path, NULL};
+        execve(path, argv, environ);
+    }
+    return 0;
+}""",
+        "cwe": ["CWE-367"], "language": "c"
+    },
+
+    # CWE-732 — Insecure file permissions (C)
+    {
+        "func": """int create_work_dir(const char *path) {
+    if (mkdir(path, 0777) != 0)
+        return -1;
+    return 0;
+}""",
+        "cwe": ["CWE-732"], "language": "c"
+    },
+    {
+        "func": """int write_pid_file(const char *path) {
+    int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    if (fd < 0) return -1;
+    dprintf(fd, "%d\n", getpid());
+    close(fd);
+    return 0;
+}""",
+        "cwe": ["CWE-732"], "language": "c"
+    },
+    {
+        "func": """void save_audit_log(const char *entry) {
+    umask(0);
+    FILE *f = fopen("/var/log/audit.log", "a");
+    if (f) {
+        fprintf(f, "%s\n", entry);
+        fclose(f);
+    }
+}""",
+        "cwe": ["CWE-732"], "language": "c"
+    },
 ]
 
 
