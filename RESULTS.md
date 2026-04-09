@@ -2,7 +2,7 @@
 
 **Model:** UniXcoder (`microsoft/unixcoder-base`) fine-tuned for binary vulnerability classification
 **Branch:** `claude/review-recent-branch-POtjK`
-**Held-out test set:** `Files/held_out_valid.jsonl` (independent patterns, 1140 samples)
+**Held-out test set:** `Files/held_out_valid.jsonl` (independent patterns, 1230 samples — 660 C, 570 Python)
 **Real-world test set:** `Files/sample_test.jsonl` (DiverseVul subset, 200 samples)
 
 ---
@@ -23,7 +23,7 @@
 ## 1. Experiment 1 — Baseline
 
 **Model:** Joint baseline trained on `multi_lang_train.jsonl`
-**Test set:** `held_out_valid.jsonl` (1140 samples — 570 C, 570 Python)
+**Test set:** `held_out_valid.jsonl` (1230 samples — 660 C, 570 Python; all 8 shared CWEs covered in both language splits)
 
 ### Overall Metrics
 
@@ -35,7 +35,11 @@
 | **F1** | **0.9323** |
 | AUC-ROC | 0.9796 |
 
-### Confusion Matrix (n=1140)
+### Confusion Matrix (n=1140 — previous data version)
+
+> **Note:** These results were generated on the previous 1140-sample held-out set (570 C, 570 Python).
+> The held-out set has since been updated to 1230 samples (660 C, 570 Python) with CWE-367 and
+> CWE-732 now included in the C split. Re-run `evaluate_experiments.py` to get metrics on the updated data.
 
 | | Predicted Safe | Predicted Vulnerable |
 |---|---|---|
@@ -52,7 +56,7 @@
 | Language | F1 | Precision | Recall | n |
 |---|---|---|---|---|
 | Python | **0.9478** | 0.9375 | 0.9583 | 570 |
-| C | 0.9159 | **0.9576** | 0.8778 | 570 |
+| C | 0.9159 | **0.9576** | 0.8778 | 660 *(updated split)* |
 
 Python achieves higher F1 and recall. C achieves higher precision but misses more vulnerabilities.
 
@@ -194,7 +198,7 @@ Tests all 8 shared CWEs (present in both C and Python training data).
 
 ### On C Test Set
 
-*(Generated from `c_only_test.jsonl` with C-only, Python-only, and Joint models)*
+*(Generated from `held_out_c_valid.jsonl` — 660 samples, all 8 shared CWEs including CWE-367 and CWE-732)*
 
 | CWE | C-only | Python-only | Joint |
 |---|---|---|---|
@@ -220,7 +224,7 @@ Tests all 8 shared CWEs (present in both C and Python training data).
 | CWE-798 (Hardcoded creds) | 0.48 | 0.70 | 1.00 |
 | CWE-89 (SQL injection) | 0.62 | 0.68 | 1.00 |
 
-> **Images:** Run `python analyse_insights.py --mode syntax_vs_semantics --baseline_model ./results/exp1_baseline --c_only_model ./results/exp2_c_only --python_only_model ./results/exp2_python_only` to generate `results/insights/insight1_cwe_transfer_c.png` and `insight1_cwe_transfer_python.png`
+> **Images:** Run `python analyse_insights.py --mode syntax_vs_semantics --baseline_model ./results/exp1_baseline --c_only_model ./results/exp2_c_only --python_only_model ./results/exp2_python_only --c_only_test ./Files/held_out_c_valid.jsonl --python_only_test ./Files/held_out_python_valid.jsonl` to generate `results/insights/insight1_cwe_transfer_c.png` and `insight1_cwe_transfer_python.png`
 
 ### Transfer Asymmetry
 
@@ -333,7 +337,7 @@ Based on the overall gap (synthetic F1=0.932, real-world F1=0.410):
 
 | Experiment | Key Result |
 |---|---|
-| Exp 1 — Baseline | F1 = 0.932 on held-out synthetic (1140 samples) |
+| Exp 1 — Baseline | F1 = 0.932 on held-out synthetic (1230 samples; metrics from previous 1140-sample run) |
 | Exp 2 — Ablation | Joint model best; C-only→Python transfers better than Python-only→C |
 | Exp 3 — Real-World | F1 drops to 0.410 on DiverseVul; generalisation gap = −0.522 |
 | Exp 4 — Threshold | Threshold 0.7 maximises F1 (0.954); 0.2–0.3 preferred for real-world recall |
