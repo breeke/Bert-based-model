@@ -362,5 +362,4 @@ python train.py --train_data_file ./Files/multi_lang_train.jsonl --output_dir ./
 
 ---
 
-*Results generated on branch `claude/review-recent-branch-POtjK`.
-Insight plots saved to `results/insights/` after running `analyse_insights.py`.*
+
