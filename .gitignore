@@ -40,6 +40,9 @@ output/
 checkpoint/
 logs/
 
+# Experiment results (generated — not tracked)
+
+
 # Data (optional - uncomment if you don't want to track data files)
 # *.jsonl
 # Files/

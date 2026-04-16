@@ -8,11 +8,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 class InputFeatures:
-    def __init__(self, input_tokens, input_ids, idx, label):
+    def __init__(self, input_tokens, input_ids, idx, label, language=None, cwe=None):
         self.input_tokens = input_tokens
         self.input_ids = input_ids
         self.idx = str(idx)
         self.label = label
+        self.language = language
+        self.cwe = cwe
 
 def convert_examples_to_features(js, tokenizer, args):
     """Convert DiverseVul JSON to model features with improved normalization"""
@@ -50,7 +52,9 @@ def convert_examples_to_features(js, tokenizer, args):
     return InputFeatures(
         source_tokens, source_ids,
         js.get('idx', js.get('hash', '0')),
-        js['target']
+        js['target'],
+        language=js.get('language', None),
+        cwe=js.get('cwe', None),
     )
 
 class TextDataset(Dataset):

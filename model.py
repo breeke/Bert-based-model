@@ -21,40 +21,48 @@ class Model(nn.Module):
         # Dropout and classification layers
         self.dropout = nn.Dropout(getattr(args, 'dropout_probability', 0.1))
         self.classifier = nn.Linear(hidden_size, 1)
-        
+        self.label_smoothing = getattr(args, 'label_smoothing', 0.0)
+
         # Initialize weights
         nn.init.normal_(self.classifier.weight, std=0.02)
         nn.init.zeros_(self.classifier.bias)
 
-    def forward(self, input_ids=None, labels=None): 
+    def forward(self, input_ids=None, labels=None, return_logits=False):
         if input_ids is None:
             raise ValueError("input_ids cannot be None")
-        
+
         # Create attention mask
         pad_token_id = self.tokenizer.pad_token_id if self.tokenizer.pad_token_id else 1
         attention_mask = input_ids.ne(pad_token_id)
-        
-        # FIXED: Access the base RoBERTa model correctly
-        outputs = self.encoder.roberta(input_ids, attention_mask=attention_mask)
-        
+
+        # Support both CodeBERT (encoder.roberta) and UniXcoder (encoder is the RoBERTa model directly)
+        roberta_fn = getattr(self.encoder, 'roberta', self.encoder)
+        outputs = roberta_fn(input_ids, attention_mask=attention_mask)
+
         # Get the sequence output (hidden states)
         sequence_output = outputs.last_hidden_state
-        
+
         # Use [CLS] token (first token) for classification
         cls_output = sequence_output[:, 0, :]
         cls_output = self.dropout(cls_output)
-        
+
         # Get logits and probabilities
         logits = self.classifier(cls_output)
         prob = torch.sigmoid(logits)
-        
+
         if labels is not None:
-            # Training mode - compute loss
+            # Training mode - compute loss with optional label smoothing
             labels = labels.float().view(-1, 1)
-            loss = -(labels * torch.log(prob + 1e-10) + 
+            if self.label_smoothing > 0:
+                # Soft targets: 1 → 1-ε/2,  0 → ε/2
+                labels = labels * (1 - self.label_smoothing) + self.label_smoothing * 0.5
+            loss = -(labels * torch.log(prob + 1e-10) +
                     (1 - labels) * torch.log(1 - prob + 1e-10))
             loss = loss.mean()
             return loss, prob
+        elif return_logits:
+            # Return raw pre-sigmoid logits (used by calibrate.py)
+            return logits
         else:
             # Inference mode
             return prob

@@ -188,8 +188,8 @@ def main():
     # Optional parameters
     parser.add_argument("--eval_data_file", default=None, help="Evaluation data file")
     parser.add_argument("--test_data_file", default=None, help="Test data file")
-    parser.add_argument("--model_name_or_path", default="microsoft/codebert-base", help="Pretrained model")
-    parser.add_argument("--tokenizer_name", default="microsoft/codebert-base", help="Tokenizer")
+    parser.add_argument("--model_name_or_path", default="microsoft/unixcoder-base", help="Pretrained model")
+    parser.add_argument("--tokenizer_name", default="microsoft/unixcoder-base", help="Tokenizer")
     
     # Training parameters
     parser.add_argument("--block_size", default=400, type=int, help="Maximum sequence length")
@@ -199,7 +199,8 @@ def main():
     parser.add_argument("--weight_decay", default=0.01, type=float, help="Weight decay")
     parser.add_argument("--num_epochs", default=3, type=int, help="Number of training epochs")
     parser.add_argument("--dropout_probability", default=0.1, type=float, help="Dropout probability")
-    
+    parser.add_argument("--label_smoothing", default=0.1, type=float, help="Label smoothing epsilon (0=off, 0.1=recommended)")
+
     # Action flags
     parser.add_argument("--do_train", action='store_true', help="Run training")
     parser.add_argument("--do_eval", action='store_true', help="Run evaluation")
