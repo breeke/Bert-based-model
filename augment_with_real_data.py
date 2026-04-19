@@ -24,12 +24,12 @@ import random
 
 
 def load_jsonl(path):
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         return [json.loads(l) for l in f if l.strip()]
 
 
 def write_jsonl(path, records):
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         for r in records:
             f.write(json.dumps(r) + "\n")
 
