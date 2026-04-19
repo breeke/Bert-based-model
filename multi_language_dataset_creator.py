@@ -1375,6 +1375,74 @@ C_SAFE = [
         "cwe": [], "language": "c", "category": "crypto_safe"
     },
 
+    # ---- Hard Negatives: system() with hardcoded args (same structure as CWE-78, no user input) ----
+    {
+        "func": """void flush_disk_cache(void) {
+    system("sync");
+}""",
+        "cwe": [], "language": "c", "category": "command_safe"
+    },
+    {
+        "func": """void restart_daemon(void) {
+    system("/usr/sbin/service restart myapp");
+}""",
+        "cwe": [], "language": "c", "category": "command_safe"
+    },
+    {
+        "func": """void rotate_logs(void) {
+    system("logrotate /etc/logrotate.conf");
+}""",
+        "cwe": [], "language": "c", "category": "command_safe"
+    },
+    {
+        "func": """void check_disk_space(void) {
+    char cmd[128];
+    snprintf(cmd, sizeof(cmd), "df -h /var/log");
+    system(cmd);
+}""",
+        "cwe": [], "language": "c", "category": "command_safe"
+    },
+
+    # ---- Hard Negatives: contrastive crypto — SHA-256 via OpenSSL (same structure as MD5 patterns) ----
+    {
+        "func": """void hash_with_sha256(const char *input, unsigned char *out) {
+    EVP_MD_CTX *ctx = EVP_MD_CTX_new();
+    EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
+    EVP_DigestUpdate(ctx, input, strlen(input));
+    unsigned int len;
+    EVP_DigestFinal_ex(ctx, out, &len);
+    EVP_MD_CTX_free(ctx);
+}""",
+        "cwe": [], "language": "c", "category": "crypto_safe"
+    },
+    {
+        "func": """void compute_sha512(const unsigned char *data, size_t len, unsigned char *digest) {
+    SHA512_CTX ctx;
+    SHA512_Init(&ctx);
+    SHA512_Update(&ctx, data, len);
+    SHA512_Final(digest, &ctx);
+}""",
+        "cwe": [], "language": "c", "category": "crypto_safe"
+    },
+
+    # ---- Hard Negatives: format string with safe snprintf (same call site as CWE-134 patterns) ----
+    {
+        "func": """void log_event(const char *user_msg) {
+    char buf[256];
+    snprintf(buf, sizeof(buf), "EVENT: %s", user_msg);
+    write_log(buf);
+}""",
+        "cwe": [], "language": "c", "category": "format_safe"
+    },
+    {
+        "func": """void display_status(const char *label, int value) {
+    char out[128];
+    snprintf(out, sizeof(out), "%s: %d", label, value);
+    puts(out);
+}""",
+        "cwe": [], "language": "c", "category": "format_safe"
+    },
+
     # ---- Safe SQL (parameterized) ----
     {
         "func": """int get_user(sqlite3 *db, const char *username) {
@@ -2278,6 +2346,89 @@ PYTHON_SAFE = [
         "cwe": [], "language": "python", "category": "crypto_safe"
     },
 
+    # ---- Hard Negatives: sha256/sha512 (same hashlib structure as CWE-327, but safe algorithm) ----
+    {
+        "func": """def hash_data(data):
+    import hashlib
+    return hashlib.sha256(data.encode()).hexdigest()""",
+        "cwe": [], "language": "python", "category": "crypto_safe"
+    },
+    {
+        "func": """def generate_checksum(content):
+    import hashlib
+    return hashlib.sha512(content.encode()).hexdigest()""",
+        "cwe": [], "language": "python", "category": "crypto_safe"
+    },
+    {
+        "func": """def verify_integrity(data, expected_hash):
+    import hashlib
+    digest = hashlib.sha256(data).hexdigest()
+    return digest == expected_hash""",
+        "cwe": [], "language": "python", "category": "crypto_safe"
+    },
+    {
+        "func": """def hash_password(password, salt):
+    import hashlib
+    return hashlib.pbkdf2_hmac('sha256', password.encode(), salt, 100000).hex()""",
+        "cwe": [], "language": "python", "category": "crypto_safe"
+    },
+    {
+        "func": """def compute_file_hash(filepath):
+    import hashlib
+    h = hashlib.sha256()
+    with open(filepath, 'rb') as f:
+        for chunk in iter(lambda: f.read(8192), b''):
+            h.update(chunk)
+    return h.hexdigest()""",
+        "cwe": [], "language": "python", "category": "crypto_safe"
+    },
+    {
+        "func": """def sign_token(payload, key):
+    import hashlib, hmac
+    return hmac.new(key.encode(), payload.encode(), hashlib.sha256).hexdigest()""",
+        "cwe": [], "language": "python", "category": "crypto_safe"
+    },
+
+    # ---- Hard Negatives: os.system with hardcoded args (same structure as CWE-78, but no user input) ----
+    {
+        "func": """def flush_cache():
+    import os
+    os.system("sync")""",
+        "cwe": [], "language": "python", "category": "command_safe"
+    },
+    {
+        "func": """def cleanup_logs():
+    import subprocess
+    subprocess.run(["find", "/var/log/myapp", "-mtime", "+30", "-delete"], check=True)""",
+        "cwe": [], "language": "python", "category": "command_safe"
+    },
+    {
+        "func": """def restart_service():
+    import subprocess
+    subprocess.run(["/usr/bin/systemctl", "restart", "nginx"], check=True)""",
+        "cwe": [], "language": "python", "category": "command_safe"
+    },
+
+    # ---- Hard Negatives: contrastive pairs (exact fixed versions of CWE-78 patterns) ----
+    {
+        "func": """def run_scan(target):
+    import subprocess, re
+    if not re.match(r'^[a-zA-Z0-9.\-]+$', target):
+        raise ValueError("Invalid target")
+    result = subprocess.run(["nmap", target], capture_output=True, text=True)
+    return result.stdout""",
+        "cwe": [], "language": "python", "category": "command_safe"
+    },
+    {
+        "func": """def execute_query(db, table, value):
+    allowed = {"users", "orders", "products"}
+    if table not in allowed:
+        raise ValueError("Unknown table")
+    return db.execute(f"SELECT * FROM {table} WHERE id = %s", (value,)).fetchone()""",
+        "cwe": [], "language": "python", "category": "sql_safe"
+    },
+
+    # ---- Hard Negatives: safe XML with hashlib context nearby ----
     # ---- Safe XML Parsing ----
     {
         "func": """def parse_xml_config(xml_string):
