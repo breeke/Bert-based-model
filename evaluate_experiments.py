@@ -598,14 +598,14 @@ def main():
                         help="Which experiment(s) to run")
 
     # Model directories
-    parser.add_argument("--baseline_model",    default="./results/exp1_baseline")
+    parser.add_argument("--baseline_model",    default="./results/exp1_improved")
     parser.add_argument("--c_only_model",      default="./results/exp2_c_only")
     parser.add_argument("--python_only_model", default="./results/exp2_python_only")
 
     # Data files
-    parser.add_argument("--test_data",       default="./Files/multi_lang_test.jsonl")
-    parser.add_argument("--c_only_test",     default="./Files/c_only_test.jsonl")
-    parser.add_argument("--python_only_test",default="./Files/python_only_test.jsonl")
+    parser.add_argument("--test_data",       default="./Files/held_out_valid.jsonl")
+    parser.add_argument("--c_only_test",     default="./Files/held_out_c_valid.jsonl")
+    parser.add_argument("--python_only_test",default="./Files/held_out_python_valid.jsonl")
     parser.add_argument("--realworld_test",  default="./Files/sample_test.jsonl")
 
     args = parser.parse_args()

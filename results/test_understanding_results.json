@@ -1,0 +1,192 @@
+{
+  "summary": {
+    "total": 25,
+    "passed": 20,
+    "failed": 5
+  },
+  "results": {
+    "test1_rename": [
+      {
+        "name": "CWE-78 C \u2014 original (system + user input)",
+        "prob": 0.9585,
+        "predicted": "VULNERABLE",
+        "expected": "VULNERABLE",
+        "passed": true
+      },
+      {
+        "name": "CWE-78 C \u2014 renamed variables (same logic)",
+        "prob": 0.9575,
+        "predicted": "VULNERABLE",
+        "expected": "VULNERABLE",
+        "passed": true
+      },
+      {
+        "name": "CWE-327 Python \u2014 original (md5)",
+        "prob": 0.9599,
+        "predicted": "VULNERABLE",
+        "expected": "VULNERABLE",
+        "passed": true
+      },
+      {
+        "name": "CWE-327 Python \u2014 renamed variables (same logic)",
+        "prob": 0.9588,
+        "predicted": "VULNERABLE",
+        "expected": "VULNERABLE",
+        "passed": true
+      },
+      {
+        "name": "CWE-89 Python \u2014 original (SQL injection)",
+        "prob": 0.9586,
+        "predicted": "VULNERABLE",
+        "expected": "VULNERABLE",
+        "passed": true
+      },
+      {
+        "name": "CWE-89 Python \u2014 renamed variables (same logic)",
+        "prob": 0.9596,
+        "predicted": "VULNERABLE",
+        "expected": "VULNERABLE",
+        "passed": true
+      }
+    ],
+    "test2_minimal_fix": [
+      {
+        "name": "CWE-327 Python \u2014 VULNERABLE (md5)",
+        "prob": 0.9599,
+        "predicted": "VULNERABLE",
+        "expected": "VULNERABLE",
+        "passed": true
+      },
+      {
+        "name": "CWE-327 Python \u2014 FIXED (sha256 only change)",
+        "prob": 0.0479,
+        "predicted": "SAFE",
+        "expected": "SAFE",
+        "passed": true
+      },
+      {
+        "name": "CWE-798 Python \u2014 VULNERABLE (hardcoded password)",
+        "prob": 0.9601,
+        "predicted": "VULNERABLE",
+        "expected": "VULNERABLE",
+        "passed": true
+      },
+      {
+        "name": "CWE-798 Python \u2014 FIXED (env var only change)",
+        "prob": 0.057,
+        "predicted": "SAFE",
+        "expected": "SAFE",
+        "passed": true
+      },
+      {
+        "name": "CWE-89 Python \u2014 VULNERABLE (string concat query)",
+        "prob": 0.9586,
+        "predicted": "VULNERABLE",
+        "expected": "VULNERABLE",
+        "passed": true
+      },
+      {
+        "name": "CWE-89 Python \u2014 FIXED (parameterized query only change)",
+        "prob": 0.0478,
+        "predicted": "SAFE",
+        "expected": "SAFE",
+        "passed": true
+      },
+      {
+        "name": "CWE-78 C \u2014 VULNERABLE (system + user input)",
+        "prob": 0.9585,
+        "predicted": "VULNERABLE",
+        "expected": "VULNERABLE",
+        "passed": true
+      },
+      {
+        "name": "CWE-78 C \u2014 FIXED (hardcoded path only change)",
+        "prob": 0.9291,
+        "predicted": "VULNERABLE",
+        "expected": "SAFE",
+        "passed": false
+      }
+    ],
+    "test3_dead_code": [
+      {
+        "name": "CWE-78 C \u2014 SAFE function (no vulnerability)",
+        "prob": 0.9203,
+        "predicted": "VULNERABLE",
+        "expected": "SAFE",
+        "passed": false
+      },
+      {
+        "name": "CWE-78 C \u2014 SAFE function + dead system() call (if 0)",
+        "prob": 0.86,
+        "predicted": "VULNERABLE",
+        "expected": "SAFE",
+        "passed": false
+      },
+      {
+        "name": "CWE-327 Python \u2014 SAFE function (no hashing)",
+        "prob": 0.9564,
+        "predicted": "VULNERABLE",
+        "expected": "SAFE",
+        "passed": false
+      },
+      {
+        "name": "CWE-327 Python \u2014 SAFE function + dead md5 block (if False)",
+        "prob": 0.953,
+        "predicted": "VULNERABLE",
+        "expected": "SAFE",
+        "passed": false
+      },
+      {
+        "name": "CWE-798 Python \u2014 SAFE function + dead hardcoded password (if False)",
+        "prob": 0.0581,
+        "predicted": "SAFE",
+        "expected": "SAFE",
+        "passed": true
+      }
+    ],
+    "test4_token_ablation": [
+      {
+        "name": "CWE-78 C \u2014 original (system keyword present)",
+        "prob": 0.9585,
+        "predicted": "VULNERABLE",
+        "expected": "VULNERABLE",
+        "passed": true
+      },
+      {
+        "name": "CWE-78 C \u2014 system replaced with safe_exec (ablated)",
+        "prob": 0.9582,
+        "predicted": "VULNERABLE",
+        "expected": "VULNERABLE",
+        "passed": true
+      },
+      {
+        "name": "CWE-327 Python \u2014 original (md5 keyword present)",
+        "prob": 0.9599,
+        "predicted": "VULNERABLE",
+        "expected": "VULNERABLE",
+        "passed": true
+      },
+      {
+        "name": "CWE-327 Python \u2014 md5 replaced with hash_fn (ablated)",
+        "prob": 0.9593,
+        "predicted": "VULNERABLE",
+        "expected": "VULNERABLE",
+        "passed": true
+      },
+      {
+        "name": "CWE-798 Python \u2014 original (hardcoded string present)",
+        "prob": 0.9601,
+        "predicted": "VULNERABLE",
+        "expected": "VULNERABLE",
+        "passed": true
+      },
+      {
+        "name": "CWE-798 Python \u2014 credential string replaced with variable (ablated)",
+        "prob": 0.9509,
+        "predicted": "VULNERABLE",
+        "expected": "VULNERABLE",
+        "passed": true
+      }
+    ]
+  }
+}

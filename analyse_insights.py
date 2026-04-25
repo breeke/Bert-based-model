@@ -552,7 +552,7 @@ def main():
                                  "error_analysis", "calibration", "gap_per_cwe"])
 
     # Model paths
-    parser.add_argument("--baseline_model",    default="./results/exp1_baseline")
+    parser.add_argument("--baseline_model",    default="./results/exp1_improved")
     parser.add_argument("--c_only_model",      default="./results/exp2_c_only")
     parser.add_argument("--python_only_model", default="./results/exp2_python_only")
 
