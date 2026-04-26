@@ -1,0 +1,105 @@
+\documentclass[12pt,a4paper]{report}
+
+% ---------- Packages ----------
+\usepackage[margin=25mm]{geometry}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{microtype}
+\usepackage{parskip}
+\usepackage{natbib}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{emptypage}
+
+% ---------- Graphics path ----------
+\graphicspath{{../results/plots/}{../results/insights/}}
+
+% ---------- Line spacing ----------
+\onehalfspacing
+
+% ---------- Header/footer ----------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\nouppercase{\leftmark}}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ---------- Code listing style ----------
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{gray!8},
+  commentstyle=\color{gray},
+  keywordstyle=\color{blue!70!black},
+  stringstyle=\color{red!60!black},
+}
+
+% ---------- Title ----------
+\title{
+  \vspace{2cm}
+  {\Large University Dissertation}\\[1.5cm]
+  {\LARGE\bfseries Cross-Language Software Vulnerability Detection\\
+  via Fine-Tuned Pre-Trained Code Models}\\[1cm]
+  {\large Synthetic Training, Real-World Generalisation,\\
+  and Semantic Understanding}\\[2cm]
+}
+\author{[Author Name]}
+\date{April 2026}
+
+% ============================================================
+\begin{document}
+% ============================================================
+
+\maketitle
+\thispagestyle{empty}
+
+\clearpage
+\pagenumbering{roman}
+
+% ---------- Abstract ----------
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+\input{chapters/abstract}
+
+\clearpage
+
+% ---------- Table of Contents ----------
+\tableofcontents
+\clearpage
+
+\listoffigures
+\clearpage
+
+\listoftables
+\clearpage
+
+\pagenumbering{arabic}
+
+% ---------- Chapters ----------
+\input{chapters/ch1_introduction}
+\input{chapters/ch2_background}
+\input{chapters/ch3_methodology}
+\input{chapters/ch4_experiments}
+\input{chapters/ch5_analysis}
+\input{chapters/ch6_improvements}
+\input{chapters/ch7_discussion}
+\input{chapters/ch8_conclusion}
+
+% ---------- Bibliography ----------
+\clearpage
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

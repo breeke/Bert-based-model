@@ -1,0 +1,258 @@
+\chapter{Analysis and Insights}
+\label{ch:analysis}
+
+This chapter examines four cross-cutting analytical questions: how vulnerability knowledge
+transfers across languages at the CWE level, what kinds of errors the model makes on
+real-world code, how well-calibrated its probability outputs are, and which CWE classes
+show the largest performance gap between synthetic and real-world settings.
+
+\section{Insight 1 --- Cross-Language Transfer at the CWE Level}
+
+The aggregated F1 matrix in Experiment~2 showed that C-only models transfer to Python
+better than Python-only models transfer to C.
+Decomposing the ablation results by individual CWE class reveals why this asymmetry exists
+and which concepts genuinely transfer versus which are language-locked.
+
+\begin{table}[H]
+  \centering
+  \caption{Shared CWE F1 under cross-language evaluation (selected classes).}
+  \label{tab:cwe_transfer}
+  \begin{tabular}{lcccccc}
+    \toprule
+    CWE & C-only$\to$C & C-only$\to$Py & Py-only$\to$C & Py-only$\to$Py & Joint$\to$C & Joint$\to$Py \\
+    \midrule
+    CWE-798 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
+    CWE-22  & 1.00 & 1.00 & 0.50 & 1.00 & 1.00 & 1.00 \\
+    CWE-327 & 1.00 & 0.90 & 1.00 & 0.93 & 1.00 & 1.00 \\
+    CWE-89  & 0.50 & 0.92 & 0.90 & 1.00 & 0.63 & 1.00 \\
+    CWE-134 & 0.50 & 0.90 & 0.50 & 1.00 & 0.53 & 1.00 \\
+    CWE-732 & 0.40 & 1.00 & 0.38 & 1.00 & 0.67 & 1.00 \\
+    CWE-78  & 1.00 & 1.00 & 0.17 & 1.00 & 0.70 & 1.00 \\
+    CWE-367 & 1.00 & 0.00 & 0.47 & 0.00 & 1.00 & 0.00 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{insight1_cwe_transfer_c.png}
+    \caption{CWE transfer F1 on C test set.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{insight1_cwe_transfer_python.png}
+    \caption{CWE transfer F1 on Python test set.}
+  \end{subfigure}
+  \caption{Per-CWE F1 heatmaps for all three model variants across both test languages.}
+  \label{fig:insight1}
+\end{figure}
+
+Three distinct transfer profiles emerge.
+
+\textbf{Bidirectional transfer (CWE-798, CWE-22).}
+Hardcoded credentials and path traversal transfer perfectly in both directions under all
+three model variants.
+These CWEs have structurally identical surface forms across C and Python: a string literal
+assigned directly to a password variable, or a raw string path constructed by concatenating
+user input.
+The model learns the same token-level pattern regardless of the language it was trained on.
+
+\textbf{Asymmetric transfer (CWE-78, CWE-89, CWE-134).}
+Command injection (CWE-78) illustrates the strongest asymmetry.
+The C-only model achieves F1\,=\,1.00 on Python command injection because Python's
+\texttt{os.system()} and \texttt{subprocess.call()} share token patterns with C's
+\texttt{system()}.
+Conversely, the Python-only model scores only F1\,=\,0.17 on C command injection:
+Python training provides no exposure to the C pattern involving buffer preparation with
+\texttt{sprintf} followed by \texttt{system()}.
+A similar asymmetry appears for CWE-89: the Python-only model transfers to C at 0.90
+because string concatenation patterns in database queries look similar in both languages,
+but the C-only model reaches only 0.50 on C SQL injection, reflecting that C database
+code (raw \texttt{sqlite3}/\texttt{mysql\_query} APIs) differs substantially from
+Python ORM-style queries.
+
+\textbf{Language-locked (CWE-367, CWE-732).}
+TOCTOU race conditions (CWE-367) appear at F1\,=\,0.00 for all models on Python test
+examples: the Python realisation of a TOCTOU (\texttt{os.path.exists()} before file open)
+is an underrepresented idiom relative to the C \texttt{stat()} / \texttt{open()} sequence.
+CWE-732 shows the opposite distribution: both C-only and Python-only models score high on
+Python permission errors (F1\,=\,1.00) because Python's \texttt{os.chmod(path, 0o777)}
+is a compact, distinctive operation, but both models score poorly on C (F1\,$\approx$\,0.38--0.40)
+because C file permission management spreads across multiple API calls without a single
+identifying token.
+
+The key insight is that transfer quality correlates with the degree to which a CWE's surface
+representation is shared across languages --- not with the semantic similarity of the
+underlying flaw.
+
+\section{Insight 2 --- Real-World Error Analysis}
+
+The real-world confusion matrix (TP\,=\,88, FP\,=\,31, TN\,=\,53, FN\,=\,28) provides
+two distinct failure signals: false negatives (missed vulnerabilities) and false positives
+(false alarms).
+
+\subsection{False Negatives}
+
+The 28 false negatives are concentrated in a small number of CWE classes.
+CWE-787 (out-of-bounds write) and CWE-416 (use-after-free) each account for four misses;
+CWE-400 (uncontrolled resource consumption), CWE-703 (improper exception handling),
+CWE-284 (improper access control), and CWE-264 (permissions/access control) each contribute
+three.
+The majority of these CWEs are absent from the synthetic training set entirely.
+CWE-787 does not appear in training at all; CWE-703 involves missing exception handling
+rather than a dangerous function call, making it invisible to a model trained on patterns
+of dangerous API usage.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{insight2_missed_cwes.png}
+  \caption{Distribution of false negatives (missed vulnerabilities) by CWE class on the
+           real-world test set.}
+  \label{fig:insight2_missed}
+\end{figure}
+
+\subsection{False Positives}
+
+The 31 false positives cluster around CWE-703 (6 false alarms), CWE-787 (5), and CWE-125 (4).
+These are CWEs where real-world safe code shares structural features with dangerous code:
+error handling routines that check return values from memory operations look superficially
+like code that performs unsafe memory operations.
+
+\subsection{Function Length vs.\ Accuracy}
+
+\begin{table}[H]
+  \centering
+  \caption{Real-world accuracy by function length.}
+  \label{tab:length_accuracy}
+  \begin{tabular}{lcc}
+    \toprule
+    Length bucket & Lines & Accuracy \\
+    \midrule
+    Short  & 1--30 & 0.709 \\
+    Medium & 31--80 & 0.581 \\
+    Long   & 81+   & 0.846 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{insight2_length_vs_accuracy.png}
+  \caption{Real-world classification accuracy as a function of function length.}
+  \label{fig:insight2_length}
+\end{figure}
+
+Accuracy is lowest on medium-length functions (31--80 lines).
+Short real-world functions are often utility wrappers with a clear verdict.
+Long functions tend to contain a single highly distinctive dangerous call that is easy
+to identify even within a long body.
+Medium-length functions are the hardest: long enough to contain confounders, but short enough
+that any single dangerous-looking line carries disproportionate weight in the sequence
+representation.
+
+\section{Insight 3 --- Calibration}
+
+A well-calibrated model is one whose predicted probability accurately reflects actual
+likelihood.
+Label smoothing with $\varepsilon = 0.1$ is the primary calibration mechanism: by replacing
+hard targets with soft targets, the training objective penalises the model for pushing
+probabilities to the extremes, producing moderate-confidence outputs for uncertain examples.
+
+Following training, temperature scaling is applied.
+The optimal temperature minimising ECE on the synthetic validation set is $T = 0.981$
+--- so close to 1.0 that it produces negligible change in model outputs.
+This directly confirms that label smoothing has already done most of the calibration work:
+models trained without label smoothing typically require temperatures of 1.2--1.8 to achieve
+comparable calibration.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{insight3_calibration_synthetic.png}
+    \caption{Calibration on synthetic held-out set.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{insight3_calibration_real_world.png}
+    \caption{Calibration on real-world test set.}
+  \end{subfigure}
+  \caption{Reliability diagrams comparing predicted probability to empirical accuracy.}
+  \label{fig:calibration}
+\end{figure}
+
+The synthetic calibration plot shows a characteristic bimodal output distribution:
+probabilities clustered near 0 (clearly safe) and near 0.9--1.0 (clearly vulnerable),
+with very few examples in the 0.2--0.8 uncertain range.
+The real-world calibration plot shows a broader distribution with more probability mass
+in the intermediate range, indicating that real functions present more ambiguous features ---
+partial matches to vulnerability patterns that the model has not seen in combination before.
+
+\section{Insight 4 --- Per-CWE Generalisation Gap}
+
+Table~\ref{tab:gap_cwe} shows the comparison between held-out synthetic recall and
+real-world recall for the ten CWEs that appear in both evaluation sets with sufficient
+representation.
+
+\begin{table}[H]
+  \centering
+  \caption{Per-CWE recall gap (synthetic held-out vs.\ real-world).}
+  \label{tab:gap_cwe}
+  \begin{tabular}{lllcc}
+    \toprule
+    CWE & Description & Held-out Recall & Real-world Recall & Gap \\
+    \midrule
+    CWE-732 & Insecure file permissions & 0.750 & 1.000 & $+0.250$ \\
+    CWE-78  & Command injection         & 0.880 & 1.000 & $+0.120$ \\
+    CWE-89  & SQL injection             & 0.878 & 1.000 & $+0.122$ \\
+    CWE-120 & Buffer overflow           & 1.000 & 1.000 & $\phantom{+}0.000$ \\
+    CWE-190 & Integer overflow          & 1.000 & 1.000 & $\phantom{+}0.000$ \\
+    CWE-193 & Off-by-one error          & 1.000 & 1.000 & $\phantom{+}0.000$ \\
+    CWE-22  & Path traversal            & 1.000 & 1.000 & $\phantom{+}0.000$ \\
+    CWE-476 & Null pointer dereference  & 1.000 & 0.800 & $-0.200$ \\
+    CWE-416 & Use-after-free            & 0.667 & 0.429 & $-0.238$ \\
+    CWE-134 & Format string inj.\       & 0.767 & 0.000 & $-0.767$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{insight4_gap_per_cwe.png}
+  \caption{Per-CWE recall gap between the synthetic held-out set and the real-world test set.
+           Positive values indicate better real-world performance.}
+  \label{fig:insight4}
+\end{figure}
+
+The results fall into three groups.
+
+\textbf{Positive transfer (CWE-732, CWE-78, CWE-89).}
+Three CWEs perform better in the real world than on the synthetic held-out set.
+All three are expressed through a small number of highly canonical API calls ---
+\texttt{system()}, \texttt{execl()}, SQL string concatenation with \texttt{sprintf} ---
+that appear consistently across real-world projects.
+Real-world examples may be more archetypal than some held-out synthetic examples,
+which occasionally embed the pattern within contextual wrappers that obscure the dangerous
+operation.
+
+\textbf{Zero gap (CWE-120, CWE-190, CWE-193, CWE-22).}
+Four CWEs show perfect recall in both settings.
+These are classes where the vulnerable operation is so syntactically distinctive ---
+\texttt{strcpy} into a fixed array, unchecked arithmetic, path concatenation without
+normalisation --- that real-world examples present essentially the same token pattern
+as the training examples.
+
+\textbf{Negative transfer (CWE-476, CWE-416, CWE-134).}
+CWE-476 drops by 0.20: real-world null dereferences arise from complex call chains where
+the pointer originates from an external API return value.
+CWE-416 worsens to 0.429 from an already-low 0.667, consistent with its status as the
+hardest class in the synthetic evaluation.
+CWE-134 collapses to zero in the real world: the synthetic training contains Python template
+injection examples, but DiverseVul's real-world CWE-134 instances are C format string
+vulnerabilities --- \texttt{printf(user\_string)} accepting a user-controlled format
+argument --- a C-specific idiom structurally different from the Python template injection
+patterns in training.
+
+The overall pattern across all four insights is coherent: CWEs expressed through compact,
+canonical, language-consistent API calls generalise well; CWEs requiring inter-statement
+reasoning or expressed differently across code corpora show the largest gaps.

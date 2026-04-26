@@ -1,0 +1,89 @@
+\chapter{Conclusion}
+\label{ch:conclusion}
+
+\section{Summary of Contributions}
+
+This dissertation set out to investigate whether a pre-trained code model could be
+fine-tuned to detect software vulnerabilities across multiple programming languages,
+and to understand the conditions under which such a model generalises from clean training
+data to real-world code.
+The work produced a complete system --- from dataset construction through training,
+evaluation, iterative improvement, and diagnostic analysis --- and the results answer
+the central questions with specificity.
+
+\textbf{A multi-language synthetic vulnerability dataset.}
+A hand-crafted dataset covering 17 CWE types across C and Python was constructed,
+with eight shared cross-language vulnerability classes.
+The dataset includes contextually wrapped examples, hard negative contrastive pairs,
+and a held-out validation set of 1{,}230 samples.
+The generation pipeline is parameterised and extensible, allowing new CWE types and
+languages to be added without changes to the training infrastructure.
+
+\textbf{A fine-tuned UniXcoder vulnerability classifier.}
+UniXcoder was fine-tuned as a binary classifier with a lightweight CLS-head, label
+smoothing ($\varepsilon = 0.1$), and AdamW optimisation.
+The resulting joint model achieves F1\,=\,0.931, AUC-ROC\,=\,0.964, and
+precision\,=\,0.961 on the synthetic held-out set.
+Eleven of seventeen CWE classes reach perfect recall.
+
+\textbf{A cross-language ablation study.}
+Three model variants were evaluated in a 3$\times$3 matrix, revealing that joint training
+consistently outperforms single-language training, that C-to-Python transfer is
+substantially more effective than Python-to-C transfer, and that transfer quality is
+determined by the structural similarity of a CWE's surface representation across languages.
+
+\textbf{Two targeted training interventions.}
+Hard negative mining resolved systematic false positives on safe strong-cryptography
+functions.
+Real-world data augmentation with 1{,}000 DiverseVul samples reduced the
+synthetic-to-real generalisation gap from $-0.522$ to $-0.182$ F1 points,
+raising real-world F1 from 0.410 to 0.749.
+
+\textbf{A semantic understanding test suite.}
+Four probing tests distinguish pattern-matching from semantic understanding.
+The model passes all renaming and token-ablation tests (12/12), passes 7/8 minimal-fix
+cases, and fails 4/5 dead-code cases --- directly demonstrating the architectural
+ceiling of sequence encoders in a principled, interpretable way.
+
+\section{Principal Findings}
+
+Three findings stand out as the most broadly informative.
+
+\textbf{Sequence models learn meaningful vulnerability representations, but hit a predictable ceiling.}
+The renaming and ablation test results confirm that the model has learned something beyond
+keyword association.
+But the dead-code and data-flow failures locate the ceiling precisely: anything requiring
+inter-statement reasoning lies outside what a sequence encoder can represent.
+This ceiling is an inherent property of the architecture, not a fixable training artefact.
+
+\textbf{Cross-language transfer quality is determined by surface representation, not semantic equivalence.}
+CWE-798 transfers perfectly in both directions because a string literal assigned to a
+password variable looks identical in C and Python.
+CWE-367 transfers almost not at all because the C and Python realisations use structurally
+different API sequences.
+This clarifies what ``cross-language vulnerability detection'' means in practice:
+detecting shared surface patterns, not shared semantics.
+
+\textbf{Real-world augmentation is the highest-leverage single intervention.}
+The 0.278 F1 point improvement from adding 1{,}000 real-world samples dwarfs all other
+single changes.
+For practitioners building on similar approaches, the implication is direct: if real-world
+performance matters, investing in labelled real-world training data has a higher return
+than architectural experimentation on synthetic benchmarks alone.
+
+\section{Closing Remarks}
+
+The system demonstrates that a pre-trained code model, with careful dataset design,
+targeted hard negatives, and real-world augmentation, can reach practically useful
+performance on a multi-language vulnerability detection task.
+The semantic understanding tests move the evaluation beyond accuracy figures to a
+qualitative characterisation of what the model has actually learned, which is a
+precondition for trusting any machine learning system in a security-critical context.
+
+The gap between synthetic and real-world performance is not a failure of the approach
+but a measurement of the problem's difficulty.
+Closing it further requires more real-world training data, broader CWE coverage, and ---
+ultimately --- architectural advances that bring data-flow and control-flow reasoning
+into the model's representational vocabulary.
+The results reported here establish a clear baseline, locate the ceiling of sequence-based
+approaches precisely, and map a concrete path forward.

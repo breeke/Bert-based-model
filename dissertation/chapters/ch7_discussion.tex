@@ -1,0 +1,191 @@
+\chapter{Discussion and Limitations}
+\label{ch:discussion}
+
+This chapter interprets the experimental findings in the context of related work,
+identifies the principal limitations of the approach, and maps out directions for
+future improvement.
+
+\section{What the Results Show About Sequence-Based Code Understanding}
+
+The joint model achieves F1\,=\,0.931 on the synthetic held-out set --- a strong result
+that places it in the range reported for fine-tuned CodeBERT and GraphCodeBERT baselines
+on comparable binary classification benchmarks~\citep{fu2022linevul,ni2023diversevul}.
+The semantic understanding tests nuance this headline figure.
+The model passes all six variable-renaming cases and all six token-ablation cases,
+demonstrating that its representations are not anchored to specific identifier strings
+or isolated keywords.
+These results are consistent with what one would expect from a model pre-trained on
+hundreds of millions of code tokens: the attention mechanism has learned associations
+between structural patterns --- user-controlled data flowing into an execution sink,
+or an unchecked arithmetic expression in a size comparison --- that persist across
+surface variations.
+
+However, the model fails all four control-flow-dependent dead-code cases and one
+data-flow-dependent minimal-fix case (CWE-78 C with a hardcoded system argument).
+These failures reveal the ceiling of sequence-level encoding.
+A transformer encoder operating on a token sequence can learn that certain patterns of
+tokens co-occur in dangerous code, but it cannot determine whether a code path is
+reachable, whether a variable's value at a given point is user-controlled, or whether
+a pointer freed at one location is dereferenced at another.
+These are properties that require an explicit representation of program structure:
+a control-flow graph for reachability, a data-dependence graph for taint analysis,
+a points-to graph for alias resolution.
+Pre-trained models that incorporate these structures --- such as
+GraphCodeBERT~\citep{guo2021graphcodebert} and graph-augmented vulnerability detectors
+such as Devign~\citep{zhou2019devign} and Reveal~\citep{chakraborty2022reveal} --- have
+demonstrated gains on exactly the CWE classes where sequence models fail.
+The results of this work motivate rather than undermine that line of research:
+they show precisely which vulnerability classes would benefit from richer structural
+representations.
+
+\section{Cross-Language Transfer: Limits and Potential}
+
+The ablation results and the per-CWE transfer analysis show that cross-language transfer
+is highly uneven.
+Where a vulnerability is expressed through the same surface API in both languages,
+transfer is near-perfect.
+Where the languages implement the same conceptual flaw through structurally different
+mechanisms --- file permission management, TOCTOU detection --- transfer fails almost
+entirely.
+
+This finding has implications beyond this specific system.
+It suggests that current pre-trained code models, despite being trained on multi-language
+corpora, learn language-specific realisations of concepts rather than language-agnostic
+representations.
+A model that has seen Python's \texttt{os.chmod(path, 0o777)} does not automatically
+learn to recognise C's \texttt{fchmod(fd, 0777)} as the same concept.
+Achieving genuine cross-language transfer for structurally divergent CWEs would require
+either explicit cross-language supervision --- paired examples of the same vulnerability
+in both languages --- or a representation that operates at the semantic rather than
+syntactic level.
+
+The asymmetry between C-to-Python and Python-to-C transfer reflects the historical
+relationship between the languages: Python contains many C-originated security idioms that
+were adopted as the language incorporated system calls, while C does not contain the
+Python-specific idioms.
+This directional asymmetry suggests that pre-training corpus properties --- the frequency
+and distribution of cross-language overlapping tokens --- play a meaningful role in
+determining transfer direction.
+
+\section{The Synthetic Data Ceiling}
+
+The residual gap of 0.182 F1 points between synthetic and real-world performance, even
+after augmentation, reflects a fundamental limitation of synthetic training data.
+Hand-crafted training examples are, by construction, unambiguous: each vulnerable example
+contains exactly one exploitable pattern presented in its most recognisable form.
+Real-world functions are more complex in several ways.
+
+First, real functions are longer and contain multiple operations, some of which superficially
+resemble vulnerability patterns without being exploitable.
+A function that performs bounds checking before an array access contains the same
+array-indexing token sequence as an out-of-bounds vulnerability; distinguishing them
+requires understanding the guard condition, not just the access itself.
+Second, real vulnerabilities are often latent: the dangerous operation arises from the
+interaction between multiple lines across a function body.
+Third, real code contains domain-specific idioms and coding styles that differ from the
+hand-crafted training examples in ways the model has never been exposed to.
+
+The augmentation with 1{,}000 DiverseVul samples partially addresses the third issue
+by exposing the model to real code styles, but does not resolve the first two issues ---
+they require architectural changes rather than more training data.
+The asymptote of the data augmentation approach is the ceiling imposed by the model's
+inability to reason about inter-statement program properties.
+
+A related limitation is class coverage.
+The real-world test set contains CWE-787, CWE-400, CWE-703, and CWE-284, none of which
+appear in the synthetic training set.
+Recall on unseen CWE classes is zero.
+Expanding the synthetic dataset to cover additional classes, or incorporating a larger
+real-world training corpus --- DiverseVul provides approximately 200{,}000 labelled
+C functions; only 1{,}000 are used here --- would directly address this gap.
+
+\section{Calibration and Practical Deployment}
+
+The near-unity temperature ($T = 0.981$) after calibration indicates that the
+label-smoothed model is well-calibrated on synthetic data without requiring post-hoc
+adjustment.
+Model outputs can be treated as approximate probabilities and used to prioritise a
+vulnerability report queue.
+
+However, calibration was assessed on synthetic data.
+The real-world calibration plot shows a broader, less bimodal distribution than the
+synthetic one, reflecting the model's uncertainty about real-world functions that partially
+match training patterns.
+A deployment-quality calibration assessment would require a substantially larger held-out
+real-world set spanning the same CWE distribution as the deployment target.
+
+Threshold selection is a further practical consideration.
+F1 varies relatively little between thresholds 0.1 and 0.7 (0.928 to 0.927), but the
+precision/recall trade-off within that range is substantial.
+An organisation using this system for automated code review has a different operating
+requirement than one using it for manual audit support.
+The threshold sweep in Experiment~4 provides the data to make this choice explicitly,
+which is more informative than reporting a single threshold result.
+
+\section{Limitations Summary}
+
+The principal limitations of the system are:
+
+\begin{enumerate}
+  \item \textbf{Architectural.}
+        The model cannot reason about control-flow reachability (dead code) or data-flow
+        provenance (whether a variable is user-controlled).
+        Failures on CWE-78 C minimal-fix and all dead-code test cases follow directly from this.
+
+  \item \textbf{CWE coverage.}
+        The synthetic training set covers 17 CWE types.
+        The DiverseVul test set contains approximately 50 distinct CWE types.
+        Recall on unseen CWE classes is zero.
+
+  \item \textbf{Language coverage.}
+        The model is trained on C and Python only.
+        Applying it to Java, JavaScript, or Go would require retraining or fine-tuning
+        on data from those languages.
+
+  \item \textbf{Synthetic distribution shift.}
+        Even with augmentation, the training distribution is skewed towards clean,
+        minimal, function-isolated vulnerability patterns.
+        Real-world functions are longer, noisier, and more context-dependent.
+
+  \item \textbf{Real-world evaluation scale.}
+        The real-world test set contains 200 samples.
+        This is sufficient to measure overall accuracy but insufficient to estimate
+        per-CWE recall reliably for low-frequency classes.
+
+  \item \textbf{Single-language real-world data.}
+        The DiverseVul augmentation is exclusively C/C++.
+        A Python vulnerability dataset analogous to DiverseVul at comparable scale does
+        not currently exist.
+\end{enumerate}
+
+\section{Future Directions}
+
+Four directions would most directly address the identified limitations.
+
+\textbf{Graph-augmented encoding.}
+Replacing or augmenting the sequence encoder with a graph neural network operating on the
+program's data-flow graph would enable the model to track taint directly --- following
+user-controlled values from input sources through assignments and function calls to
+execution sinks.
+This would be the most impactful single architectural change, directly addressing the
+CWE-78 data-flow failure and likely improving CWE-416 (use-after-free) and CWE-476
+(null dereference).
+
+\textbf{Larger real-world training corpus.}
+Using more of the DiverseVul training split --- or combining DiverseVul with BigVul and
+additional CVE-labelled repositories --- would reduce the generalisation gap further.
+The 0.278 F1 improvement from 1{,}000 real samples suggests a favourable response to
+real data volume; a 10{,}000-sample augmentation might plausibly close the remaining gap
+substantially.
+
+\textbf{CWE class expansion.}
+Adding synthetic training examples for CWE-787 (out-of-bounds write), CWE-400 (uncontrolled
+resource consumption), and CWE-703 (improper exception handling) would cover the three most
+common false-negative classes in the real-world test.
+Template-based synthetic generation for these classes follows the same methodology used
+for the existing 17 CWEs.
+
+\textbf{Multi-language real-world evaluation.}
+Constructing or obtaining a Python-language real-world vulnerability evaluation set ---
+sourced from PyPI security advisories or OSV database entries --- would allow the same
+synthetic-to-real gap analysis for Python that Experiment~3 provides for C.

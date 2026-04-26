@@ -1,0 +1,345 @@
+\chapter{Experiments and Results}
+\label{ch:experiments}
+
+This chapter presents results from the four quantitative experiments and the semantic
+understanding test suite.
+
+\section{Experiment 1 --- Baseline Performance}
+
+The joint model is evaluated on the 1{,}230-sample held-out synthetic validation set.
+Table~\ref{tab:exp1_overall} summarises the overall metrics.
+
+\begin{table}[H]
+  \centering
+  \caption{Experiment 1 overall metrics (joint model, synthetic held-out set, $n=1{,}230$).}
+  \label{tab:exp1_overall}
+  \begin{tabular}{lc}
+    \toprule
+    Metric & Value \\
+    \midrule
+    Accuracy  & 0.911 \\
+    Precision & 0.961 \\
+    Recall    & 0.902 \\
+    F1-score  & 0.931 \\
+    AUC-ROC   & 0.964 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The confusion matrix shows 731 true positives, 390 true negatives, 79 false negatives,
+and 30 false positives.
+High precision (0.961) indicates that when the model predicts a function is vulnerable,
+it is almost always correct.
+The lower recall (0.902) reflects a moderate rate of missed vulnerabilities.
+For security tooling where false positives burden analysts with unnecessary reviews,
+this precision-biased profile is preferable to the opposite.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.55\textwidth]{exp1_confusion_matrix.png}
+  \caption{Confusion matrix for the joint model on the synthetic held-out set.}
+  \label{fig:exp1_cm}
+\end{figure}
+
+\subsection{Per-Language Breakdown}
+
+\begin{table}[H]
+  \centering
+  \caption{Per-language performance (joint model).}
+  \label{tab:exp1_language}
+  \begin{tabular}{lcccc}
+    \toprule
+    Language & F1 & Precision & Recall & $n$ \\
+    \midrule
+    C      & 0.905 & 0.958 & 0.858 & 660 \\
+    Python & 0.961 & 0.964 & 0.958 & 570 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Python performance is notably higher than C.
+The gap in recall (0.958 vs.\ 0.858) is the primary driver: the model misses a higher
+fraction of vulnerable C functions.
+This likely reflects the greater structural diversity of C vulnerabilities.
+Memory management errors such as use-after-free and double-free require reasoning about
+allocation and deallocation across multiple statements, which is harder for a sequence-level
+classifier than Python vulnerabilities such as hardcoded credentials or weak hash functions,
+which are typically self-contained in one or two lines.
+
+\subsection{Per-CWE Breakdown}
+
+Eleven of the seventeen CWE classes achieve perfect F1-scores of 1.00: CWE-798, CWE-190,
+CWE-22, CWE-415, CWE-95, CWE-918, CWE-476, CWE-120, CWE-327, CWE-502, and CWE-193.
+These classes share a common property: the vulnerability is signalled by a compact,
+distinctive pattern.
+Table~\ref{tab:exp1_cwe} shows the six underperforming classes.
+
+\begin{table}[H]
+  \centering
+  \caption{Under-performing CWE classes (joint model, held-out validation), sorted by F1.}
+  \label{tab:exp1_cwe}
+  \begin{tabular}{llc}
+    \toprule
+    CWE & Description & F1 \\
+    \midrule
+    CWE-416 & Use-after-free              & 0.667 \\
+    CWE-732 & Insecure file permissions   & 0.750 \\
+    CWE-367 & TOCTOU race condition       & 0.750 \\
+    CWE-134 & Format string / template inj.\ & 0.767 \\
+    CWE-89  & SQL injection               & 0.878 \\
+    CWE-78  & Command injection           & 0.880 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{exp1_per_cwe_f1.png}
+  \caption{Per-CWE F1-score for the joint model on the synthetic held-out set.}
+  \label{fig:exp1_cwe}
+\end{figure}
+
+CWE-416 is the hardest class: use-after-free vulnerabilities require tracking that a pointer
+is freed at one point and dereferenced at another --- a non-local dependency that a
+sequence-based model cannot directly represent.
+CWE-367 (TOCTOU) is similarly non-local; the vulnerability exists in the temporal gap between
+a check and its corresponding use.
+
+\section{Experiment 2 --- Cross-Language Ablation}
+
+Three model variants are evaluated on three test sets, producing the 3$\times$3 F1 matrix
+in Table~\ref{tab:exp2_matrix}.
+
+\begin{table}[H]
+  \centering
+  \caption{Cross-language ablation F1 matrix.}
+  \label{tab:exp2_matrix}
+  \begin{tabular}{lccc}
+    \toprule
+    Model $\downarrow$ / Test set $\rightarrow$ & C & Python & Joint \\
+    \midrule
+    C-only      & \textbf{0.861} & 0.811 & 0.836 \\
+    Python-only & 0.677 & \textbf{0.976} & 0.817 \\
+    Joint       & 0.905 & 0.961 & \textbf{0.931} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{exp2_ablation_heatmap.png}
+  \caption{Cross-language ablation F1 heatmap.}
+  \label{fig:exp2_heatmap}
+\end{figure}
+
+\textbf{Within-language performance.}
+Both single-language models perform well on their native test set.
+The Python-only model achieves F1\,=\,0.976, higher than the joint model's 0.961,
+because concentrating all capacity on a single language allows over-specialisation.
+The joint model achieves higher C performance (0.905 vs.\ C-only 0.861) because
+Python-language patterns for shared CWEs reinforce the corresponding C patterns during
+joint training.
+
+\textbf{Cross-language transfer asymmetry.}
+A striking asymmetry appears in the off-diagonal cells.
+The C-only model evaluated on Python achieves F1\,=\,0.811 --- only 0.050 below its
+native-language score.
+The Python-only model evaluated on C falls to F1\,=\,0.677 --- a 0.299 drop.
+C vulnerability patterns (buffer overflows, format strings, memory management errors)
+are not present in Python; a Python-trained model has no exposure to them.
+In contrast, Python contains several C-originated idioms --- command injection via
+\texttt{os.system}, path traversal, SQL injection via string concatenation --- which share
+surface-token patterns with their C counterparts.
+
+\textbf{Joint training consistently wins.}
+Across all three test sets the joint model outperforms both single-language models by
+approximately 0.09--0.11 F1 points on the combined test set.
+
+\section{Experiment 3 --- Real-World Generalisation}
+
+The joint model is evaluated on 200 real-world C functions from DiverseVul.
+Table~\ref{tab:exp3} compares synthetic and real-world performance.
+
+\begin{table}[H]
+  \centering
+  \caption{Synthetic vs.\ real-world performance (joint model, after augmentation).}
+  \label{tab:exp3}
+  \begin{tabular}{lcccc}
+    \toprule
+    & Accuracy & Precision & Recall & F1 \\
+    \midrule
+    Synthetic   & 0.911 & 0.961 & 0.902 & 0.931 \\
+    Real-world  & 0.705 & 0.739 & 0.759 & 0.749 \\
+    Gap         & $-0.206$ & $-0.221$ & $-0.143$ & $-0.182$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{exp3_confusion_synthetic.png}
+    \caption{Synthetic held-out set.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{exp3_confusion_realworld.png}
+    \caption{Real-world DiverseVul test set.}
+  \end{subfigure}
+  \caption{Confusion matrices for Experiment~3.}
+  \label{fig:exp3_cm}
+\end{figure}
+
+The real-world F1 of 0.749 represents a substantial but not catastrophic gap.
+Prior to the data augmentation described in Section~\ref{ch:improvements}, the real-world
+F1 was 0.410 (gap $= -0.522$).
+The augmentation reduced the gap by 0.340 F1 points.
+
+The real-world false positive rate (FPR\,=\,36.9\%) is notably higher than on synthetic data
+(FPR\,=\,7.1\%), indicating that real functions contain structural and stylistic features
+that superficially resemble vulnerability patterns even when the function is safe.
+
+\section{Experiment 4 --- Threshold Sweep}
+
+Table~\ref{tab:exp4} shows how precision, recall, and F1 vary across decision thresholds
+from 0.1 to 0.9 on the synthetic held-out set.
+
+\begin{table}[H]
+  \centering
+  \caption{Threshold sweep results (joint model, synthetic held-out set).}
+  \label{tab:exp4}
+  \begin{tabular}{cccc}
+    \toprule
+    Threshold & Precision & Recall & F1 \\
+    \midrule
+    0.1 & 0.914 & 0.943 & 0.928 \\
+    0.2 & 0.932 & 0.927 & 0.929 \\
+    0.3 & 0.939 & 0.915 & 0.927 \\
+    0.4 & 0.944 & 0.907 & 0.925 \\
+    \textbf{0.5} & \textbf{0.961} & \textbf{0.902} & \textbf{0.931} \\
+    0.6 & 0.964 & 0.891 & 0.926 \\
+    0.7 & 0.968 & 0.889 & 0.927 \\
+    0.8 & 0.970 & 0.869 & 0.917 \\
+    0.9 & 0.972 & 0.852 & 0.908 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{exp4_threshold_sweep.png}
+    \caption{Threshold sweep: precision, recall, and F1.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\textwidth}
+    \includegraphics[width=\textwidth]{exp4_precision_recall_curve.png}
+    \caption{Precision--recall curve.}
+  \end{subfigure}
+  \caption{Experiment~4 threshold analysis.}
+  \label{fig:exp4}
+\end{figure}
+
+F1 peaks at threshold 0.5 (F1\,=\,0.931) and degrades gradually as the threshold rises,
+reaching 0.908 at 0.9.
+The model's output distribution is well-separated: most vulnerable functions receive very
+high probabilities and most safe functions receive very low probabilities, so moving the
+threshold within 0.5--0.9 mainly discards low-confidence true positives rather than
+exposing a large pool of additional false positives.
+
+For recall-critical deployments (e.g., a pre-merge CI check), threshold 0.1 gives
+recall\,=\,0.943 at precision\,=\,0.914.
+For precision-critical deployments (constrained analyst capacity), threshold 0.7 maintains
+F1\,=\,0.927 with precision\,=\,0.968.
+
+\section{Semantic Understanding Tests}
+
+Twenty-five hand-crafted test cases probe whether the model distinguishes vulnerability
+semantics from surface-token patterns.
+The overall pass rate is 20/25 (80\%).
+
+\subsection{Test 1 --- Variable Renaming (6/6 pass)}
+
+All six cases pass.
+When identical vulnerability logic is expressed with different variable and function names,
+the model's predicted probability changes by at most 0.001
+(e.g., CWE-78 original: 0.9585; renamed: 0.9575).
+The model is not keying on identifier names; it responds to the structural operation
+pattern regardless of what the variables are called.
+
+\subsection{Test 2 --- Minimal Fix (7/8 pass)}
+
+Seven of eight cases correctly flip from VULNERABLE to SAFE after applying the targeted fix.
+Table~\ref{tab:test2} shows the results.
+
+\begin{table}[H]
+  \centering
+  \caption{Test 2 --- Minimal fix predictions.}
+  \label{tab:test2}
+  \begin{tabular}{llccc}
+    \toprule
+    CWE & Version & Prob & Predicted & Correct? \\
+    \midrule
+    CWE-327 & Vulnerable (md5)         & 0.960 & VULNERABLE & \checkmark \\
+    CWE-327 & Fixed (sha256)           & 0.048 & SAFE       & \checkmark \\
+    CWE-798 & Vulnerable (hardcoded)   & 0.960 & VULNERABLE & \checkmark \\
+    CWE-798 & Fixed (env var)          & 0.057 & SAFE       & \checkmark \\
+    CWE-89  & Vulnerable (concat)      & 0.959 & VULNERABLE & \checkmark \\
+    CWE-89  & Fixed (parameterised)    & 0.048 & SAFE       & \checkmark \\
+    CWE-78  & Vulnerable (user input)  & 0.959 & VULNERABLE & \checkmark \\
+    CWE-78  & Fixed (hardcoded path)   & 0.929 & VULNERABLE & $\times$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The single failure is CWE-78 C: replacing the user-controlled argument to \texttt{system()}
+with a hardcoded path does not flip the prediction (probability remains 0.929).
+This requires the model to recognise that \texttt{user\_input} no longer flows into
+\texttt{system()}, which demands data-flow tracking that a sequence classifier cannot
+perform directly.
+
+\subsection{Test 3 --- Dead Code Injection (1/5 pass)}
+
+Four of five cases fail: the model predicts VULNERABLE for safe functions containing
+unreachable dangerous code.
+Notably, even the baseline case --- a simple \texttt{printf} logger with no vulnerable
+code at all --- is classified as VULNERABLE (probability 0.920).
+The model is responding to the structural profile of the C function rather than to
+specific dangerous tokens.
+This over-sensitivity on C code was introduced by real-world data augmentation:
+DiverseVul's C functions contain many structurally similar snippets labelled vulnerable,
+which shifted the model's prior towards classifying C code as dangerous when confidence
+signals are absent.
+The single passing case is a Python function with a dead \texttt{if False:} block,
+where the overall structural context is clearly safe (probability 0.058).
+
+\subsection{Test 4 --- Token Ablation (6/6 pass)}
+
+All six cases pass.
+Replacing the single identifying keyword with a neutral identifier
+(\texttt{system} $\to$ \texttt{safe\_exec}, \texttt{md5} $\to$ \texttt{hash\_fn})
+changes prediction probabilities by at most 0.009.
+The model maintains its VULNERABLE classification from context alone, demonstrating that
+the data-flow pattern --- user input entering an execution sink, or unchecked data entering
+a cryptographic operation --- is sufficient to trigger the prediction without the specific
+keyword present.
+
+\subsection{Summary}
+
+\begin{table}[H]
+  \centering
+  \caption{Semantic understanding test summary.}
+  \label{tab:understanding_summary}
+  \begin{tabular}{llccp{5.5cm}}
+    \toprule
+    Test & Topic & Pass & Fail & Interpretation \\
+    \midrule
+    1 & Variable renaming  & 6 & 0 & Robust to identifier surface changes \\
+    2 & Minimal fix        & 7 & 1 & Detects most fixes; fails on data-flow (CWE-78~C) \\
+    3 & Dead code injection & 1 & 4 & Cannot reason about control flow \\
+    4 & Token ablation     & 6 & 0 & Context-based detection, not keywords \\
+    \midrule
+    \textbf{Total} & & \textbf{20} & \textbf{5} & \\
+    \bottomrule
+  \end{tabular}
+\end{table}

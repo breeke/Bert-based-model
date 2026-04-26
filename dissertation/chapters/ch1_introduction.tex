@@ -1,0 +1,110 @@
+\chapter{Introduction}
+
+\section{Motivation}
+
+Software vulnerabilities are a persistent and growing challenge in computer security.
+The National Vulnerability Database recorded over 28{,}000 new CVE entries in 2023 alone,
+spanning memory safety errors, injection flaws, cryptographic weaknesses, and access control failures
+across virtually every class of software system.
+The consequences of undetected vulnerabilities range from data breaches and service outages
+to critical infrastructure compromise; the economic cost of software vulnerabilities
+has been estimated in the hundreds of billions of dollars annually.
+
+Despite this scale, the primary method by which organisations detect vulnerabilities before
+deployment remains manual code review --- a process that is slow, expensive, and dependent on
+the reviewer's familiarity with the specific vulnerability class and codebase.
+Automated static analysis tools such as Flawfinder and Coverity partially automate this process,
+but they operate on hand-written rule sets that require expert maintenance, produce high rates of
+false positives that erode analyst trust, and cannot generalise to vulnerability patterns
+not anticipated by their authors.
+
+Machine learning approaches offer a different trade-off: rather than encoding expert rules,
+they learn vulnerability patterns from labelled examples, with the potential to discover
+surface regularities that human-written rules miss.
+Recent years have seen substantial progress in applying deep learning to this problem,
+from LSTM-based approaches operating on token sequences to graph neural networks that
+incorporate program structure, to transformer encoders pre-trained on hundreds of millions
+of lines of code.
+Yet two fundamental problems remain largely unsolved.
+First, existing systems are predominantly language-specific: a model trained on C vulnerability
+data is not directly applicable to Python, and vice versa, even when the underlying flaw
+is conceptually identical.
+Second, models trained on benchmark datasets of real-world labelled code often fail to
+generalise in practice, either because the benchmark distribution does not reflect the
+diversity of production code, or because the model has learned surface correlates of
+vulnerability labels rather than the underlying vulnerability patterns.
+
+\section{Research Questions}
+
+This dissertation addresses these problems through a set of concrete research questions:
+
+\begin{enumerate}
+  \item \textbf{RQ1}: Can a pre-trained code model fine-tuned on a synthetic multi-language
+        dataset reliably detect vulnerabilities across C and Python?
+  \item \textbf{RQ2}: How does joint cross-language training affect per-language and
+        cross-language detection performance relative to single-language models?
+  \item \textbf{RQ3}: To what extent does a model trained on synthetic data generalise
+        to real-world vulnerability patterns, and what is the magnitude of the performance gap?
+  \item \textbf{RQ4}: Do targeted training interventions --- hard negative mining and
+        real-world data augmentation --- measurably reduce the synthetic-to-real gap?
+  \item \textbf{RQ5}: Is the model performing keyword matching or genuine semantic
+        pattern recognition, and which failure modes are architectural rather than correctable
+        through data?
+\end{enumerate}
+
+\section{Approach and Contributions}
+
+The system developed in this dissertation fine-tunes UniXcoder~\citep{guo2022unixcoder},
+a 125-million-parameter encoder pre-trained on code and natural language across multiple
+programming languages, as a binary vulnerability classifier.
+A lightweight classification head --- a dropout layer followed by a linear projection
+and sigmoid activation over the \texttt{[CLS]} token embedding --- is attached to
+the pre-trained encoder and trained end-to-end on a hand-crafted multi-language
+synthetic dataset.
+
+The synthetic dataset covers 17 CWE types in C and Python, with 8 shared cross-language
+vulnerability classes, and is constructed to include clean contrastive pairs:
+each vulnerable example has a corresponding safe counterpart that uses the correct
+mitigation while preserving the surrounding code structure.
+
+Four quantitative experiments evaluate the system: a baseline performance evaluation on
+a held-out synthetic set (Experiment 1), a cross-language ablation comparing C-only,
+Python-only, and joint models in a 3$\times$3 matrix (Experiment 2), a real-world
+generalisation test on 200 DiverseVul~\citep{ni2023diversevul} C functions
+(Experiment 3), and a decision threshold sweep (Experiment 4).
+A qualitative semantic understanding test suite with four probing tests distinguishes
+pattern-matching from structural reasoning.
+
+Two interventions are implemented and evaluated: hard negative mining to resolve
+false positives on safe strong-cryptography functions, and real-world data augmentation
+with 1{,}000 DiverseVul training samples to reduce the synthetic-to-real gap.
+
+The main contributions are:
+\begin{itemize}
+  \item A parameterised multi-language synthetic vulnerability dataset covering 17 CWE types,
+        with contextual wrapping and hard negative contrastive pairs.
+  \item A fine-tuned UniXcoder classifier achieving F1\,=\,0.931 on synthetic evaluation
+        and F1\,=\,0.749 on real-world evaluation.
+  \item A cross-language ablation study quantifying transfer quality at the CWE level and
+        identifying the structural conditions for successful transfer.
+  \item A semantic understanding test suite with four probing tests that locate the model's
+        architectural ceiling precisely.
+  \item Empirical evaluation of hard negative mining and real-world augmentation as targeted
+        interventions, with before-and-after comparison.
+\end{itemize}
+
+\section{Dissertation Structure}
+
+Chapter~\ref{ch:background} reviews related work, covering static analysis tools,
+machine learning approaches to vulnerability detection, pre-trained code models,
+vulnerability datasets, and calibration methods.
+Chapter~\ref{ch:methodology} describes the model architecture, dataset construction,
+training procedure, and evaluation framework.
+Chapter~\ref{ch:experiments} presents results from all four experiments and the
+semantic understanding tests.
+Chapter~\ref{ch:analysis} analyses cross-language transfer, real-world error patterns,
+calibration, and the per-CWE generalisation gap.
+Chapter~\ref{ch:improvements} describes the two training interventions and quantifies
+their effect.
+Chapter~\ref{ch:discussion} discusses limitations and future directions.
+Chapter~\ref{ch:conclusion} concludes.

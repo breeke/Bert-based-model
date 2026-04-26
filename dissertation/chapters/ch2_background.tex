@@ -1,0 +1,192 @@
+\chapter{Background and Related Work}
+\label{ch:background}
+
+\section{Static Analysis for Vulnerability Detection}
+
+The oldest automated approach to vulnerability detection is static analysis: examining source
+code or compiled artefacts without executing them, using rules derived from expert knowledge
+of common vulnerability patterns.
+Tools such as Flawfinder~\citep{wheeler2004flawfinder} and RATS scan C and C++ source code
+for calls to known-dangerous functions --- \texttt{strcpy}, \texttt{gets}, \texttt{sprintf} ---
+and flag their usage.
+Commercial tools such as Coverity and Fortify extend this with dataflow analysis that tracks
+whether values from untrusted sources can reach dangerous sinks, reducing some categories of
+false positives.
+
+Despite their maturity, rule-based static analysers have three well-documented limitations.
+First, their rules must be written and maintained by security experts, making them expensive
+to extend to new vulnerability classes or new languages.
+Second, they cannot represent complex semantic conditions --- a \texttt{strcpy} call is flagged
+regardless of whether the destination buffer is large enough, because tracking buffer sizes
+through arbitrary control flow is undecidable in general.
+Third, false-positive rates are high: industry surveys suggest that between 50\% and 90\%
+of alerts from commercial tools are false positives, which leads to alert fatigue and
+analyst disengagement~\citep{johnson2013don}.
+
+Machine learning offers a complementary approach: rather than encoding rules, learn from
+labelled examples, with the potential to generalise to patterns that rules do not capture.
+
+\section{Early Machine Learning Approaches}
+
+Early ML-based vulnerability detection treated source functions as sequences of tokens or
+program slices and applied recurrent neural networks.
+VulDeePecker~\citep{li2018vuldeepecker} extracted program slices centred on API calls
+and classified them with a bidirectional LSTM, achieving strong results on two CWE classes
+(buffer overflows and resource management errors) in C/C++.
+SySeVR~\citep{li2022sysevr} extended this to a broader range of vulnerability types by
+defining syntax-based, semantics-based, vector representations of program slices.
+
+These approaches established that sequential deep learning could match or exceed rule-based
+tools on their native benchmark distributions.
+However, they shared important weaknesses: models trained on slices centred on specific
+API calls do not generalise to CWEs where the dangerous operation is not API-identifiable,
+and the slice extraction step requires language-specific tooling, preventing direct
+application to new languages.
+
+\section{Graph-Based Vulnerability Detection}
+
+A conceptually richer representation of code structure is the program graph: abstract syntax
+trees (ASTs), control-flow graphs (CFGs), and data-flow graphs (DFGs) capture relationships
+between program elements that are invisible in token sequences.
+
+Devign~\citep{zhou2019devign} applied a gated graph neural network to a combined graph
+representation --- a joint encoding of the AST, CFG, call graph, and data-dependence graph ---
+and achieved state-of-the-art results on a large C/C++ dataset.
+Reveal~\citep{chakraborty2022reveal} similarly used a graph neural network over a
+code property graph, and showed that graph representations substantially outperform
+sequence representations on functions where the vulnerability depends on inter-statement
+relationships such as use-after-free and null pointer dereference.
+
+The practical limitation of graph-based approaches is the complexity of their preprocessing
+pipelines: extracting program graphs requires a full compiler or parser for each supported
+language, and the graph construction is language-specific.
+Building a graph-based system that handles both C and Python without separate per-language
+toolchains is substantially harder than adapting a text-based model.
+
+\section{Pre-Trained Code Models}
+
+The availability of large corpora of open-source code has made it possible to pre-train
+transformer encoders on code at scale, producing representations that capture both syntactic
+and functional regularities across millions of functions.
+
+CodeBERT~\citep{feng2020codebert} was the first large pre-trained model for code,
+training a RoBERTa~\citep{liu2019roberta} encoder jointly on natural language and code
+using masked language modelling and replaced token detection objectives.
+CodeBERT's pre-training on a six-language corpus (Python, Java, JavaScript, PHP, Ruby, Go)
+gave it representations that transfer across these languages, and fine-tuning on
+vulnerability detection tasks has produced competitive results.
+
+GraphCodeBERT~\citep{guo2021graphcodebert} extended CodeBERT by incorporating
+data-flow information into the pre-training objective: in addition to masked language
+modelling, the model learns to predict which tokens depend on which other tokens through
+an auxiliary data-flow alignment task.
+This gives GraphCodeBERT partial access to program structure without requiring full graph
+extraction, and it has shown improvements over CodeBERT on code understanding tasks including
+vulnerability detection.
+
+UniXcoder~\citep{guo2022unixcoder} further extends this line of work with cross-modal
+pre-training objectives that jointly train on code tokens, natural language docstrings,
+and linearised abstract syntax trees.
+This multi-modal training gives UniXcoder richer representations of code structure than
+models trained on code text alone, and its multi-language pre-training corpus makes it
+a natural choice for cross-language transfer experiments.
+UniXcoder is selected as the base model for this work on this basis.
+
+LineVul~\citep{fu2022linevul} fine-tuned CodeBERT specifically for vulnerability detection
+and proposed line-level localisation in addition to function-level classification, showing
+that the model's attention mechanism can be used to identify which lines within a vulnerable
+function are most likely to contain the flaw.
+
+\section{Vulnerability Datasets}
+
+The availability of labelled vulnerability data is a fundamental bottleneck for ML-based
+detection.
+BigVul~\citep{fan2020bigvul} is a large-scale dataset of C/C++ functions extracted from
+open-source projects, labelled by matching commit messages against CVE records.
+It contains approximately 188{,}000 functions, of which around 10{,}000 are labelled vulnerable.
+The dataset's principal weakness is label noise: commit message matching is imprecise,
+and many functions labelled as vulnerable contain multiple unrelated changes from which the
+actual vulnerability is difficult to isolate.
+
+DiverseVul~\citep{ni2023diversevul} addresses this by extracting function-level samples
+from commits that reference CVE identifiers in a structured way, producing approximately
+330{,}000 labelled samples across a broader range of CWE types than BigVul.
+DiverseVul includes structured CWE annotations for a substantial fraction of its entries,
+making it possible to evaluate per-class recall rather than only overall accuracy.
+It is used in this work as the source of real-world evaluation and augmentation data.
+
+A notable gap in both datasets is Python coverage.
+BigVul and DiverseVul are almost exclusively C/C++; large-scale function-level Python
+vulnerability datasets comparable in size and annotation quality do not currently exist.
+This gap motivates the synthetic data approach used in this work.
+
+\section{Synthetic Vulnerability Data}
+
+The use of synthetic data to supplement or replace real-world labelled data has precedent
+in several domains.
+In the security context, synthetic vulnerability generation has been used to augment
+small real-world datasets and to produce balanced class distributions.
+Hand-crafted synthetic examples have the advantage of being clean (no label noise),
+structurally precise (the dangerous operation is unambiguous), and extensible to any
+vulnerability class the designer can characterise.
+
+The principal risk of synthetic training data is distribution shift: a model trained on
+idealised, compact, purpose-built examples may fail to recognise the same vulnerability
+when it appears in the longer, noisier, more contextually complex functions found in
+real codebases.
+This synthetic-to-real generalisation gap is a central focus of this dissertation
+and is measured quantitatively in Experiment~3.
+
+\section{Cross-Language Transfer}
+
+Multi-language vulnerability detection has received limited attention in the literature.
+Most published systems are evaluated on a single language, and cross-language performance
+is rarely reported.
+An exception is work using code-to-code translation as an intermediate step: functions
+in one language are translated to another (using a neural machine translation model),
+and the translated function is evaluated by a monolingual classifier.
+This approach is impractical at scale and does not generalise to CWEs that are expressed
+through language-specific APIs.
+
+Pre-trained multi-language models offer a more natural path to cross-language transfer:
+by sharing encoder parameters across languages, the model learns representations that
+should generalise across language boundaries for conceptually shared constructs.
+However, the extent to which this transfer holds at the CWE level --- and which CWE classes
+benefit most --- has not been systematically investigated.
+The cross-language ablation study in Chapter~\ref{ch:experiments} provides the first
+detailed analysis of this question across a controlled set of shared vulnerability classes.
+
+\section{Calibration of Neural Classifiers}
+
+A well-calibrated classifier is one whose output probabilities correspond to empirical
+frequencies: a prediction of 0.8 should be correct approximately 80\% of the time.
+\citet{guo2017calibration} showed that modern neural networks are systematically
+overconfident --- their confidence scores are higher than their empirical accuracy ---
+and proposed temperature scaling as a simple post-hoc calibration method.
+Temperature scaling divides the pre-sigmoid logits by a scalar $T > 1$ to flatten the
+output distribution, with $T$ optimised to minimise the Expected Calibration Error (ECE)
+on a held-out calibration set.
+
+Label smoothing~\citep{muller2019label} is a training-time alternative that directly
+regularises overconfidence by replacing hard targets with soft targets:
+$\tilde{y} = y(1 - \varepsilon) + \varepsilon/K$, where $K$ is the number of classes
+and $\varepsilon$ is the smoothing parameter.
+For binary classification this reduces to $\tilde{y} = y(1-\varepsilon) + \varepsilon \cdot 0.5$.
+\citet{muller2019label} showed that label smoothing improves calibration across a wide
+range of tasks and can substitute for post-hoc temperature scaling.
+
+Both techniques are applied in this work: label smoothing ($\varepsilon = 0.1$) is used
+during training, and temperature scaling is applied post-hoc.
+The near-unity temperature found by calibration ($T = 0.981$) confirms that label
+smoothing has already produced well-calibrated outputs before post-hoc adjustment.
+
+\section{Summary}
+
+The literature establishes that pre-trained code models are effective for within-language
+vulnerability detection at function level, that graph-based representations improve
+performance on inter-statement vulnerability classes, and that the availability of
+labelled real-world data is a fundamental bottleneck.
+The contributions of this dissertation --- a multi-language synthetic dataset, a
+cross-language ablation study at CWE level, a semantic understanding test suite, and
+targeted training interventions --- address gaps that the existing literature has
+not filled.
