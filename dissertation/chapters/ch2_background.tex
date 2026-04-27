@@ -38,43 +38,35 @@ that the overhead of managing multiple tools is a primary barrier to adoption in
 industrial workflows~\citep{johnson2013don}.
 The goal of cross-language vulnerability detection addresses this barrier directly.
 
-\section{Motivation for a Unified Cross-Language Approach}
+\section{Motivation}
 
-The limitations of existing detection tools establish a clear research gap.
-Rule-based static analysers such as Flawfinder operate on one language at a time and
-require security experts to write and maintain rules for every new vulnerability class;
-they cannot adapt to unfamiliar codebases, and their false-positive rates are high enough
-to undermine analyst trust in practice~\citep{johnson2013don}.
+Existing vulnerability detection tools each address part of the problem but leave
+practical gaps when applied to polyglot codebases.
+Rule-based static analysers such as Flawfinder are language-specific and require ongoing
+expert maintenance to cover new vulnerability classes; their false-positive rates are
+high enough to reduce analyst trust over time~\citep{johnson2013don}.
 Early machine learning approaches --- VulDeePecker~\citep{li2018vuldeepecker} and
-SySeVR~\citep{li2022sysevr} --- demonstrated that neural networks can learn vulnerability
-representations without hand-crafted features, but were designed and evaluated on a single
-language (C/C++) and relied on language-specific program slicing that cannot be applied
-directly to a second language.
-More recent graph-based detectors~\citep{zhou2019devign,chakraborty2022reveal} achieve
-higher accuracy on inter-statement vulnerability classes but require full program graph
-extraction, which demands a separate compiler toolchain per language and makes
-multi-language deployment operationally complex.
+SySeVR~\citep{li2022sysevr} --- showed that learned representations can reduce reliance
+on hand-crafted rules, but were built and evaluated on C/C++ and depend on
+language-specific program slicing that does not transfer directly to other languages.
+Graph-based detectors~\citep{zhou2019devign,chakraborty2022reveal} improve accuracy on
+vulnerability classes that span multiple statements, but require a separate compiler
+toolchain per language, which adds complexity when supporting more than one language at
+the same time.
 
-What is missing in the literature is a detection system that: (1) operates over multiple
-programming languages from a single trained model, (2) does not require language-specific
-preprocessing beyond tokenisation, (3) is evaluated on both synthetic and real-world code
-to measure the generalisation gap, and (4) is analysed at the CWE level to determine
-which vulnerability classes transfer across languages and which do not.
-The scale of real-world vulnerability data available from open-source repositories provides
-the raw material for such a study~\citep{xu2022detecting}, but no existing work has
-conducted a systematic cross-language ablation at the CWE level using a single pre-trained
-encoder.
-This dissertation fills that gap.
-
-Pre-trained transformer models trained on multi-language code corpora are a natural fit
-for this objective.
-They share encoder parameters across languages, learning representations that should
-generalise across language boundaries for conceptually shared constructs, while requiring
-only a lightweight classification head to be fine-tuned on labelled vulnerability data.
-The absence of a large-scale real-world Python vulnerability dataset comparable to
-DiverseVul~\citep{ni2023diversevul} motivates a synthetic training approach for the Python
-component, with real-world C/C++ augmentation to reduce the distribution shift between
-synthetic and real code.
+Pre-trained transformer models offer a more straightforward path to multi-language
+detection.
+Because they are pre-trained on code from several languages, their representations carry
+some cross-language signal without requiring separate preprocessing pipelines, and
+fine-tuning with a lightweight classification head is relatively low-cost in terms of
+labelled data~\citep{xu2022detecting}.
+Whether this cross-language signal holds at the level of individual CWE classes --- and
+which classes benefit most --- is an open question that this work investigates on a
+modest scale.
+A practical constraint shaping the experimental design is the absence of a large
+Python-specific real-world vulnerability dataset comparable to
+DiverseVul~\citep{ni2023diversevul}; this motivates the use of a synthetic Python
+training set supplemented by real-world C/C++ augmentation.
 
 \section{Pre-Trained Transformer Models for Code}
 
