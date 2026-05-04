@@ -320,32 +320,75 @@ of synthetic tuning."
 **SLIDE TITLE:** Experiment 4: What Has the Model Actually Learned?
 
 **VISUAL:**
-- No image needed for this slide — the table is the main content
-- Keep it clean; the four-row table with pass/fail is enough visual structure
+- No image needed — the four code examples are the visual content
+- Suggest a 2×2 grid layout, one box per test, each with a before/after snippet
 
 **ON SLIDE:**
 
-Four probing tests — each takes a known example and makes one controlled change:
+---
 
-| Test | What is changed | What a pass means |
-|---|---|---|
-| **Variable renaming** | All variable names replaced with meaningless ones (e.g. `buf` → `x1`) | Model still predicts VULNERABLE — it learned the structure, not the names |
-| **Minimal fix** | The one-line change that actually fixes the bug (e.g. `md5` → `sha256`, string concat → parameterised query) | Model flips to SAFE — it recognised the fixing change |
-| **Dead code** | A dangerous-looking block wrapped in `if(0)` or `if False:` so it can never run | Model predicts SAFE — it understood the code is unreachable |
-| **Token ablation** | The single "dangerous" keyword replaced with a neutral one (e.g. `system` → `safe_exec`) | Model still predicts VULNERABLE — it learned the surrounding pattern, not one keyword |
+**Test 1 — Variable Renaming** ✓ 6/6 pass
+*Does renaming all variables change the prediction?*
 
-**Results: 20 / 25 pass** — renaming ✓ 6/6 · fix ✓ 7/8 · dead code ✗ 1/5 · ablation ✓ 6/6
+```
+BEFORE                              AFTER (same logic, different names)
+void run_command(char *user_input)  void execute_action(char *data)
+  sprintf(cmd, "ls %s", user_input)   sprintf(buffer, "ls %s", data)
+  system(cmd)                          system(buffer)
+→ VULNERABLE (p=0.958)              → VULNERABLE (p=0.957)  ✓
+```
+
+---
+
+**Test 2 — Minimal Fix** ✓ 7/8 pass
+*Does the one-line security fix flip the prediction?*
+
+```
+BEFORE (vulnerable)                 AFTER (only change: md5 → sha256)
+hashlib.md5(password.encode())      hashlib.sha256(password.encode())
+→ VULNERABLE (p=0.960)              → SAFE (p=0.048)  ✓
+```
+
+---
+
+**Test 3 — Dead Code** ✗ 1/5 pass
+*Does unreachable code still trigger VULNERABLE?*
+
+```
+BEFORE (safe)                       AFTER (dangerous call inside if(0))
+void safe_logger(char *message) {   void safe_logger(char *message) {
+    printf("Log: %s\n", message);       printf("Log: %s\n", message);
+}                                       if (0) { system(message); }
+                                    }
+→ SAFE (p=0.056)                    → VULNERABLE (p=0.860)  ✗
+```
+
+---
+
+**Test 4 — Token Ablation** ✓ 6/6 pass
+*Does removing the dangerous keyword drop the prediction?*
+
+```
+BEFORE (system present)             AFTER (system → safe_exec)
+system(cmd)                         safe_exec(cmd)
+→ VULNERABLE (p=0.958)              → VULNERABLE (p=0.958)  ✓
+```
+
+---
 
 **SAY:**
-"Standard accuracy numbers don't tell you what the model has learned — just whether it
-gets the right answer. So I put together four tests that each isolate one specific aspect.
-The renaming test asks: if I strip out all the variable names, does the prediction hold?
-It does — 6 out of 6 — which means the model isn't just memorising identifier strings.
-The minimal-fix test asks: if I make the one change that actually fixes the bug, does the
-model notice? Mostly yes — 7 out of 8. The token ablation test asks: if I remove the
-obvious dangerous keyword like system or md5, does the model still catch it? Yes — it's
-detecting the surrounding structure, not a single token. The dead-code test is where it
-falls apart — 4 out of 5 fail."
+"Rather than just reporting accuracy, I ran four controlled tests to understand what
+the model has actually learned. In the renaming test, I take a vulnerable C function and
+rename every variable — run_command becomes execute_action, user_input becomes data,
+cmd becomes buffer. The prediction barely moves: 0.958 to 0.957. The model is reading
+the code structure, not the names. In the minimal-fix test, I change just one token —
+md5 to sha256 — and the probability drops from 0.960 to 0.048. It knows exactly what
+made that function dangerous. The token ablation test flips this: replace system with
+safe_exec and the probability doesn't move — 0.958 stays 0.958 — which means it's
+detecting the pattern around that call, not the call name itself. Then the dead code
+test: I add a system call inside if(0), which can never run. The model predicts
+VULNERABLE at 0.860. It saw the token, matched the pattern, and had no way to know
+the branch was unreachable."
 
 ---
 
