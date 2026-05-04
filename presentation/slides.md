@@ -1,82 +1,140 @@
-# Presentation Draft — Cross-Language Vulnerability Detection
-**Target: 15–17 min content + Q&A**
-Each slide is approximately 1 minute unless noted.
-
----
-
-## Slide 1 — Title (~30 sec)
-
+# Presentation Slide Content
 **Cross-Language Software Vulnerability Detection**
-*via Fine-Tuned Pre-Trained Code Models*
+15–17 min content + Q&A
 
-Synthetic Training · Real-World Generalisation · Semantic Understanding
-
-[Author Name] | April 2026
+Each slide shows: what the audience sees | what to say
 
 ---
 
-## Slide 2 — Motivation (~1 min)
+## Slide 1 — Title (30 sec)
 
-**The Problem with Polyglot Codebases**
+**SLIDE TITLE:** *(none — full-bleed title slide)*
 
-- ~80% of real projects use 7+ programming languages
+**ON SLIDE:**
+> Cross-Language Software Vulnerability Detection
+> via Fine-Tuned Pre-Trained Code Models
+>
+> [Author Name]
+> April 2026
+
+**SAY:**
+"This dissertation looks at whether a single pre-trained model can be fine-tuned to detect
+software vulnerabilities across both C and Python — without separate tools or preprocessing
+for each language. I'll walk through the motivation, what was built, the experiments, and
+what the results actually tell us."
+
+---
+
+## Slide 2 — Motivation (1 min)
+
+**SLIDE TITLE:** The Problem with Polyglot Codebases
+
+**ON SLIDE:**
+- Around 80% of real-world projects use 7 or more programming languages
 - Vulnerability patterns differ per language:
-  - Memory errors → mostly C/C++
-  - Injection flaws → every language, but through different APIs
-- Existing tools are monolingual — Flawfinder, Coverity etc. each cover one language
-- Managing multiple tools leads to alert fatigue and low adoption
+  - Memory errors (buffer overflow, use-after-free) → mostly C/C++
+  - Injection flaws (SQL, command, path) → every language, different APIs
+- Existing automated tools are **monolingual** — one tool per language
+- Running multiple tools creates alert fatigue and low adoption in practice
 
-**Goal:** A single trained model that detects vulnerabilities across C and Python,
-without language-specific preprocessing
+**VISUAL:** Simple two-column split — left: list of languages in a typical project (C, Python, JS, YAML, Bash…); right: a quote or stat about alert fatigue from the literature.
 
-> *Speaker note: Keep this brief — establish the "why" and move on.*
+**SAY:**
+"Most serious software projects today are written in multiple languages simultaneously.
+The security problem is that vulnerability patterns look different depending on the language —
+the same conceptual flaw, like command injection, shows up through completely different APIs
+in C versus Python. The current solution is to run a separate tool for each language, which
+in practice means analysts get flooded with alerts from different systems and start ignoring
+them. The goal here was to see whether a single model could handle both C and Python."
 
 ---
 
-## Slide 3 — Research Questions (~1 min)
+## Slide 3 — Research Questions (45 sec)
 
-**What this work investigates**
+**SLIDE TITLE:** What This Work Investigates
 
-1. Can a pre-trained code model be fine-tuned to detect vulnerabilities across C and Python?
-2. Which CWE classes transfer across languages, and why?
-3. How large is the gap between synthetic and real-world performance — and can it be reduced?
+**ON SLIDE:**
+1. Can a pre-trained code model detect vulnerabilities across C and Python from one model?
+2. Which CWE vulnerability classes transfer across languages — and why?
+3. How large is the gap between synthetic and real-world performance, and can it be reduced?
 4. Does the model rely on pattern-matching or something closer to semantic understanding?
-5. How well-calibrated are its confidence outputs for practical use?
+5. How well-calibrated are the model's confidence scores for practical use?
+
+**SAY:**
+"These five questions shaped the experimental design. The first three are about whether the
+approach works and where it breaks down. The fourth is more diagnostic — trying to understand
+what the model has actually learned rather than just measuring accuracy. The fifth is about
+whether the outputs can be trusted in practice."
 
 ---
 
-## Slide 4 — Approach Overview (~1 min)
+## Slide 4 — System Overview (1 min)
 
-**One model, two languages**
+**SLIDE TITLE:** Approach at a Glance
 
-| Component | Choice | Reason |
+**ON SLIDE:**
+```
+Source code (C or Python)
+        ↓
+  UniXcoder encoder
+  (pre-trained on multi-language code)
+        ↓
+  [CLS] token
+        ↓
+  Dropout → Linear → Sigmoid
+        ↓
+  VULNERABLE / SAFE  (+ confidence score)
+```
+
+Three training ingredients:
+- Synthetic examples: 17 CWE types across C and Python
+- Hard negatives: safe code that looks dangerous on the surface
+- Real-world augmentation: 1,000 samples from DiverseVul (real CVE-labelled C functions)
+
+**SAY:**
+"The model itself is straightforward — UniXcoder is a pre-trained encoder that already
+understands code structure from large-scale pre-training. On top of it sits a very small
+classification head. The interesting parts are the training data: a synthetic dataset
+covering 17 vulnerability classes in two languages, deliberately constructed contrastive
+pairs to fix specific failure modes, and a small injection of real-world C code to reduce
+the gap between training conditions and what real code looks like."
+
+---
+
+## Slide 5 — Dataset (1 min)
+
+**SLIDE TITLE:** Dataset Construction
+
+**ON SLIDE:**
+
+| | C | Python |
 |---|---|---|
-| Base model | UniXcoder | Multi-language pre-training + AST awareness |
-| Classification head | CLS → Dropout → Linear → Sigmoid | Lightweight, low data cost |
-| Training data | Synthetic: 17 CWEs × {C, Python} | No large Python real-world dataset exists |
-| Augmentation | 1,000 DiverseVul C/C++ samples | Reduce synthetic-to-real gap |
-| Calibration | Label smoothing ε = 0.1 | Trustworthy confidence scores |
+| CWE types | 14 | 11 |
+| Shared across both languages | **8** | **8** |
+| Held-out validation samples | 660 | 570 |
+
+- Examples are wrapped in realistic function context (not bare snippets)
+- Hard negative pairs: safe functions using the same API as vulnerable ones
+- Real-world test set: **200 DiverseVul samples** — never seen during training
+
+Notable gap: no large real-world Python vulnerability dataset exists at scale,
+which is why synthetic training data was necessary for Python.
+
+**SAY:**
+"The synthetic dataset covers 17 CWE types — 8 of which appear in both languages, which
+is what the cross-language experiments are based on. Each example is wrapped in a
+realistic function body rather than being a bare code snippet, to make the training
+distribution closer to what a real function looks like. For evaluation I kept 1,230 samples
+completely held out from training, plus a separate 200-sample set of real CVE-labelled
+functions from DiverseVul, which is a dataset of real C code from open-source projects."
 
 ---
 
-## Slide 5 — Dataset and Model (~1 min)
+## Slide 6 — Baseline Results (1.5 min)
 
-**Dataset**
-- 17 CWE types covering C and Python (8 shared cross-language classes)
-- Each example wrapped in realistic context; hard negative contrastive pairs included
-- Held-out validation: **1,230 samples** (660 C + 570 Python)
-- Real-world test: **200 DiverseVul samples** — kept completely separate throughout
+**SLIDE TITLE:** Experiment 1: How Well Does the Joint Model Perform?
 
-**Model**
-- UniXcoder encoder → CLS token → Dropout(0.1) → Linear → Sigmoid
-- AdamW, lr = 2×10⁻⁵, 3 epochs, batch size 8
-- Label smoothing: vulnerable target → 0.95, safe target → 0.05
-
----
-
-## Slide 6 — Experiment 1: Baseline Results (~1.5 min)
-
-**Joint model on held-out synthetic set (n = 1,230)**
+**ON SLIDE:**
 
 | Metric | Score |
 |---|---|
@@ -85,161 +143,271 @@ without language-specific preprocessing
 | Recall | 0.902 |
 | AUC-ROC | 0.964 |
 
-- C: F1 = 0.905 | Python: F1 = 0.961
-- **11 of 17 CWE classes reach perfect F1 = 1.00**
-- Hardest class: CWE-416 (use-after-free) at F1 = 0.667
+C: F1 = 0.905 &nbsp;&nbsp;&nbsp; Python: F1 = 0.961
 
-> *[Show per-CWE bar chart here]*
+**11 of 17 CWE classes reach perfect F1 = 1.00**
+Hardest class: CWE-416 (use-after-free) — F1 = 0.667
 
----
+**VISUAL:** Bar chart of per-CWE F1 scores (exp1_per_cwe_f1.png) — place to the right of the metrics table.
 
-## Slide 7 — Experiment 2: Cross-Language Ablation (~1.5 min)
-
-**3×3 matrix: train language × test language**
-
-| Model | Test: C | Test: Python | Test: Joint |
-|---|---|---|---|
-| C-only | 0.861 | 0.811 | 0.836 |
-| Python-only | 0.677 | 0.976 | 0.817 |
-| **Joint** | **0.905** | **0.961** | **0.931** |
-
-- Joint training outperforms single-language training on every test set
-- C → Python transfer (0.811) is much stronger than Python → C (0.677)
-- Python-only model: precision = 1.00 but recall = 0.596 on C — it becomes overly conservative
+**SAY:**
+"On the held-out synthetic set of 1,230 samples, the joint model reaches F1 of 0.931 with
+precision just under 0.96 — meaning when it flags something as vulnerable, it's right 96%
+of the time. 11 of the 17 CWE classes are detected perfectly. The hardest is use-after-free,
+which is expected — it requires tracking where a pointer was freed relative to where it's
+used, which is an inter-statement reasoning problem. Python outperforms C slightly, which
+comes down to Python's vulnerability patterns tending to be more syntactically compact."
 
 ---
 
-## Slide 8 — CWE Transfer: Three Profiles (~1 min)
+## Slide 7 — Cross-Language Ablation (1.5 min)
 
-**Transfer quality depends on surface similarity, not semantic similarity**
+**SLIDE TITLE:** Experiment 2: Does Cross-Language Transfer Actually Work?
 
-| Profile | Example CWEs | Why |
+**ON SLIDE:**
+
+| Trained on → Tested on | C test | Python test |
 |---|---|---|
-| **Bidirectional** — transfers both ways | CWE-798 (hardcoded credentials) | String literal = same token pattern in both languages |
-| **Asymmetric** — one direction only | CWE-78 (command injection) | C-only → Python works; Python-only → C fails (different API sequence) |
-| **Language-locked** — neither direction | CWE-367 (TOCTOU race) | Completely different idioms in C vs Python |
+| C only | 0.861 | 0.811 |
+| Python only | 0.677 | 0.976 |
+| **Joint (both)** | **0.905** | **0.961** |
+
+Key findings:
+- Joint training outperforms single-language training on **every** test set
+- C → Python transfer (0.811) is substantially stronger than Python → C (0.677)
+- Python-only model collapses on C: precision 1.00 but recall only 0.596 — too conservative
+
+**VISUAL:** Heatmap from exp2_ablation_heatmap.png placed alongside or below the table.
+
+**SAY:**
+"This is a 3-by-3 ablation — three model variants, three test sets. The clearest result is
+that joint training helps in both directions: it's better on C than the C-only model, and
+better on Python than the Python-only model. The asymmetry is interesting — C-trained models
+transfer to Python reasonably well because Python adopted a lot of C-originated idioms.
+The reverse is much weaker. The Python-only model essentially refuses to flag C functions —
+very high precision but very low recall."
 
 ---
 
-## Slide 9 — Training Improvements: Hard Negatives (~1 min)
+## Slide 8 — CWE Transfer Profiles (1 min)
 
-**Problem:** model flagged `hashlib.sha256` (safe) as vulnerable at p = 0.906
-because it learned `hashlib` → vulnerable rather than the specific algorithm name
+**SLIDE TITLE:** Why Some CWEs Transfer and Others Don't
 
-**Fix:** Added 17 safe contrastive examples — sha256/sha512 usage, hardcoded `system()` calls
+**ON SLIDE:**
 
-| Version | Before | After |
+**Bidirectional transfer** ✓ both directions
+- CWE-798 (hardcoded credentials) — a string literal assigned to a password variable looks identical in C and Python
+
+**Asymmetric transfer** → one direction only
+- CWE-78 (command injection) — C-only model transfers to Python (shared `system()` token); Python-only fails on C (different buffer pattern)
+
+**Language-locked** ✗ neither direction
+- CWE-367 (TOCTOU race condition) — C uses `stat()`/`open()`; Python uses `os.path.exists()`/`open()` — completely different surface tokens
+
+**Key insight:** Transfer quality tracks **surface similarity**, not how conceptually similar the flaw is.
+
+**SAY:**
+"Digging into the per-CWE numbers explains the asymmetry. Hardcoded credentials transfer
+perfectly in both directions because the pattern is literally the same — a string assigned
+to a variable called password. Command injection is asymmetric because Python's os.system()
+shares tokens with C's system(), but C's pattern involves buffer setup with sprintf first.
+TOCTOU race conditions don't transfer at all — the languages express the same race condition
+through completely different function calls. The headline finding is that transfer quality
+is about surface token overlap, not semantic equivalence."
+
+---
+
+## Slide 9 — Hard Negative Mining (1 min)
+
+**SLIDE TITLE:** Fixing Failure Mode 1: Hard Negatives
+
+**ON SLIDE:**
+
+**Problem found:** `hashlib.sha256` (safe) predicted VULNERABLE at p = 0.906
+→ Model learned: *anything with hashlib = dangerous*
+
+**Fix:** Added 17 safe contrastive examples with sha256, sha512, and safe `system()` usage
+
+**Result:**
+
+| Case | Before | After |
 |---|---|---|
-| CWE-327 — vulnerable (md5) | 0.960 | 0.960 ✓ |
-| CWE-327 — fixed (sha256) | 0.906 ✗ | **0.048** ✓ |
-| CWE-78 — fixed (hardcoded path) | 0.929 ✗ | 0.929 ✗ |
+| md5 — VULNERABLE | 0.960 | 0.960 ✓ |
+| sha256 — SAFE | 0.906 ✗ | **0.048** ✓ |
+| system() with hardcoded path — SAFE | 0.929 ✗ | 0.929 ✗ |
 
-CWE-327 fully resolved. CWE-78 remains — distinguishing user-controlled vs hardcoded buffers
-requires **data-flow tracking**, which a sequence encoder cannot do.
+CWE-327 fully resolved. The `system()` case is **not fixable with data** — it needs data-flow tracking to distinguish user-controlled from hardcoded inputs.
+
+**SAY:**
+"After the initial training run I went through the false positives manually and found two
+systematic patterns. The clearest one: the model was flagging sha256 as vulnerable because
+it had only ever seen hashlib in vulnerable examples using md5. Adding 17 contrastive
+examples — safe functions using sha256 in the same structural position as the dangerous
+md5 examples — dropped the sha256 probability from 0.906 to 0.048. The system() case
+is different. Both the vulnerable and the safe version call system() with a char buffer.
+The only difference is where the buffer's value came from — and that requires following
+data flow through the function, which a sequence encoder can't do."
 
 ---
 
-## Slide 10 — Training Improvements: Real-World Augmentation (~1.5 min)
+## Slide 10 — Real-World Augmentation (1.5 min)
 
-**Added 1,000 DiverseVul C/C++ samples to training**
+**SLIDE TITLE:** Fixing Failure Mode 2: Real-World Augmentation
 
-| Stage | Synthetic F1 | Real-world F1 | Gap |
+**ON SLIDE:**
+
+**Problem:** Real-world F1 = 0.410 despite synthetic F1 = 0.931
+→ Real functions are longer, noisier, and stylistically different from synthetic examples
+
+**Fix:** Added 1,000 DiverseVul C/C++ samples (real CVE-labelled functions) to training
+
+| Training stage | Synthetic F1 | Real-world F1 | Gap |
 |---|---|---|---|
-| Synthetic-only | 0.931 | 0.410 | −0.522 |
+| Synthetic only | 0.931 | 0.410 | −0.522 |
 | + Hard negatives | 0.931 | 0.471 | −0.460 |
-| **+ Augmentation** | **0.931** | **0.749** | **−0.182** |
+| **+ Real augmentation** | **0.931** | **0.749** | **−0.182** |
 
-- Synthetic performance unchanged throughout — no regression
-- Real-world F1 nearly doubled: 0.410 → 0.749
-- **Single highest-leverage change in the entire project**
-- Remaining gap reflects CWE classes entirely absent from training (CWE-787, CWE-400, CWE-703)
+Synthetic performance unchanged. Real-world F1 nearly doubled.
+This was the single highest-leverage change in the project.
+
+**SAY:**
+"The bigger problem was the gap between synthetic and real performance — 0.931 on the
+held-out set, 0.410 on real CVE code. That's a 0.52 point gap. Hard negatives helped a
+little — they reduced false positives on safe code that shares tokens with dangerous code.
+But the majority of the improvement came from mixing 1,000 real DiverseVul samples into
+the training set. That alone took real-world F1 from 0.471 to 0.749 and cut the gap to
+0.182. Synthetic performance didn't move at all. The lesson is simple: if real-world
+performance matters, real-world training data has a much higher return than any amount
+of synthetic tuning."
 
 ---
 
-## Slide 11 — Semantic Understanding Tests (~1.5 min)
+## Slide 11 — Semantic Understanding Tests (1.5 min)
 
-**Four tests to distinguish pattern-matching from deeper understanding**
+**SLIDE TITLE:** Experiment 4: What Has the Model Actually Learned?
 
-| Test | What it checks | Result |
+**ON SLIDE:**
+
+Four probing tests designed to go beyond accuracy:
+
+| Test | Question asked | Outcome |
 |---|---|---|
-| 1. Variable renaming | Does prediction change if variable names change? | **6/6 pass** ✓ |
-| 2. Minimal fix | Does the model recognise the one-line fix? | **7/8 pass** ✓ |
-| 3. Dead code | Does unreachable code still trigger a prediction? | **1/5 pass** ✗ |
-| 4. Token ablation | Does removing the dangerous keyword break detection? | **6/6 pass** ✓ |
-| **Total** | | **20/25** |
+| Variable renaming | Does prediction change if we rename all variables? | **6/6 pass** |
+| Minimal fix | Does a one-line security fix flip the prediction? | **7/8 pass** |
+| Dead code | Does unreachable code still trigger VULNERABLE? | **1/5 pass** |
+| Token ablation | Can we remove the "dangerous" keyword and still detect it? | **6/6 pass** |
+| | **Total** | **20 / 25** |
+
+**SAY:**
+"Standard accuracy numbers don't tell you what the model has learned — just whether it
+gets the right answer. So I designed four tests that probe specific aspects of understanding.
+The renaming and ablation tests check whether the model is just keyword-spotting. The
+minimal-fix test checks whether it recognises the change that actually fixes a vulnerability.
+The dead-code test checks whether it understands control flow — whether it knows a code
+path is unreachable. The results split cleanly."
 
 ---
 
-## Slide 12 — What the Tests Reveal (~1 min)
+## Slide 12 — What the Tests Reveal (1 min)
 
-**The model has learned structure, not just keywords**
+**SLIDE TITLE:** The Ceiling of Sequence-Based Models
 
-✓ Predictions are stable across variable renames and keyword ablation
-✓ Detects the structural change that fixes a vulnerability (md5 → sha256: p drops 0.960 → 0.048)
+**ON SLIDE:**
 
-**But it cannot reason about control flow**
+**What the model has learned** ✓
+- Stable predictions across variable renames — not anchored to identifier names
+- Stable across single-token removal — not relying on one keyword
+- Detects the structural change that fixes a vulnerability:
+  md5 → sha256 drops predicted probability from 0.960 to 0.048
 
-✗ Code inside `if(0)` or `if False:` still triggers VULNERABLE
-✗ This requires a control-flow graph — unavailable to a sequence encoder
-✗ This is an **architectural ceiling**, not a fixable data problem
+**Where it fails** ✗
+- Code inside `if(0)` or `if False:` still predicts VULNERABLE
+- The model cannot determine whether a code path is reachable
+- Reachability requires a **control-flow graph** — unavailable to a sequence encoder
+- This is an **architectural ceiling**, not a data problem
 
-> *This is one of the more interesting findings — the tests locate the limit precisely rather than just observing a lower accuracy number.*
-
----
-
-## Slide 13 — Calibration (~45 sec)
-
-**Are the confidence scores trustworthy?**
-
-- Temperature scaling after training: optimal T = **0.981** (essentially 1.0)
-- Near-unity temperature means label smoothing already did the calibration work
-- On synthetic data: outputs are **bimodal** — clearly safe (p ≈ 0) or clearly vulnerable (p ≈ 0.96)
-- On real-world data: broader distribution — more ambiguous partial matches
-- Outputs can be used to **prioritise** a vulnerability report queue
-
----
-
-## Slide 14 — Limitations and Future Work (~1 min)
-
-**Honest limitations**
-- Model cannot track data-flow or check reachability — architectural, not fixable with more data
-- Only 17 CWE types; DiverseVul test spans ~50; recall on unseen classes is zero
-- C and Python only; no large Python real-world dataset exists
-- 200-sample real-world test set is small for per-CWE estimates
-
-**Most promising next steps**
-1. Add a GNN data-flow component to address the CWE-78/CWE-416 failures
-2. Scale real-world augmentation (10,000 samples may close the remaining gap)
-3. Extend synthetic templates to CWE-787, CWE-400, CWE-703
+**SAY:**
+"The passing tests confirm the model has learned something structural — it's not just
+matching keywords. But the dead-code failures are a clean demonstration of the limit.
+If I put a dangerous-looking call inside an if(0) block that can never execute, the model
+still flags the function as vulnerable. It's reading the tokens, not reasoning about
+whether they can run. And there's no way to fix that by adding more training data —
+the architecture fundamentally can't represent control flow. Interestingly, one CWE-798
+dead-code case passed — because the hardcoded credential was absent from the token stream
+entirely, so the model correctly predicted safe."
 
 ---
 
-## Slide 15 — Summary (~1 min)
+## Slide 13 — Limitations and Future Work (1 min)
 
-**What was built and what was found**
+**SLIDE TITLE:** Where This Falls Short and What Comes Next
 
-| Contribution | Result |
+**ON SLIDE:**
+
+**Main limitations**
+- Cannot track data flow or check reachability — architectural, not fixable with more data
+- Only 17 CWE types in training; DiverseVul test spans ~50 — recall on unseen classes is zero
+- C and Python only; no large Python real-world dataset exists at comparable scale
+- 200-sample real-world test set too small for reliable per-CWE estimates
+
+**Most direct next steps**
+1. **Graph-augmented encoder** — add a GNN over the data-flow graph to enable taint tracking
+2. **Scale augmentation** — 10,000 real samples could plausibly close the remaining 0.182 gap
+3. **More CWE types** — add synthetic templates for CWE-787, CWE-400, CWE-703 (the three biggest miss clusters in the real-world test)
+
+**SAY:**
+"To be clear about the limitations: the synthetic-to-real gap of 0.182 that remains after
+augmentation isn't a failure — it's a measurement of how hard the problem is. Some of it
+comes from CWE classes that simply aren't in the training data at all; those just need more
+coverage. The harder part is the architectural ceiling — the things where more data won't
+help. The most impactful single architectural change would be adding a data-flow graph
+component, which would let the model follow values from input sources to dangerous sinks."
+
+---
+
+## Slide 14 — Summary (1 min)
+
+**SLIDE TITLE:** Summary
+
+**ON SLIDE:**
+
+| What was built / done | Key number |
 |---|---|
-| Multi-language synthetic dataset | 17 CWEs, C + Python, 1,230 held-out samples |
-| Fine-tuned UniXcoder classifier | F1 = 0.931, AUC = 0.964 on synthetic |
-| Cross-language ablation (3×3) | Joint training outperforms single-language on all sets |
-| Hard negative mining | Eliminated sha256 false positive completely |
-| Real-world augmentation | F1: 0.410 → 0.749; gap: −0.522 → −0.182 |
-| Semantic understanding tests | 20/25; architectural ceiling located precisely |
+| Multi-language synthetic dataset | 17 CWEs · C + Python · 1,230 validation samples |
+| Fine-tuned UniXcoder classifier | F1 = 0.931 · Precision = 0.961 · AUC = 0.964 |
+| Cross-language ablation study | Joint training outperforms single-language on every test set |
+| Hard negative mining | sha256 false positive: 0.906 → 0.048 |
+| Real-world augmentation | Real F1: 0.410 → 0.749 · Gap: −0.522 → −0.182 |
+| Semantic understanding tests | 20/25 · Architectural ceiling located precisely |
 
-**Key takeaway:** With careful dataset design, targeted hard negatives, and real-world
-augmentation, a pre-trained code model can reach practically useful multi-language
-vulnerability detection — and the semantic tests show exactly where and why it falls short.
+**One-sentence takeaway:**
+With careful dataset design, targeted hard negatives, and a small injection of real-world
+data, a pre-trained code model can reach practically useful multi-language vulnerability
+detection — and the semantic tests show exactly what it has learned and where it stops.
+
+**SAY:**
+"To summarise: the system works and reaches practically useful performance on the synthetic
+evaluation. The most important finding beyond the accuracy numbers is probably the
+augmentation result — 1,000 real samples nearly doubled real-world F1 — because it has a
+clear implication for anyone building something similar. And the semantic tests are the
+most honest part of the evaluation: they show the model has learned something meaningful,
+but also draw a clear line at what sequence-based models can and can't do."
 
 ---
 
-## [Questions]
+## Slide 15 — Questions
 
-*Leave remainder of time for Q&A*
+**ON SLIDE:**
+> Thank you
+>
+> Questions?
 
-**Likely questions to prepare for:**
-- Why UniXcoder over CodeBERT or GraphCodeBERT?
-- Why only 1,000 augmentation samples — why not more?
-- How would this scale to Java or JavaScript?
-- What would the graph-augmented architecture actually look like?
-- How was the synthetic data validated for realism?
+**Suggested Q&A prep:**
+
+| Likely question | Short answer |
+|---|---|
+| Why UniXcoder over CodeBERT / GraphCodeBERT? | UniXcoder incorporates AST structure at pre-training time; single architecture for both understanding and generation; competitive on code benchmarks |
+| Why only 1,000 augmentation samples? | Proof-of-concept scale — the strong response suggests scaling further would help, addressed in future work |
+| How does this scale to Java or JavaScript? | Would need retraining with data from those languages; pre-training corpus already includes Java/JS so transfer cost should be low |
+| What would the graph architecture look like? | Replace or augment the sequence encoder with a GNN over the data-flow graph; GraphCodeBERT is the closest existing model |
+| How was synthetic data validated? | Hard negative tests and the semantic understanding suite act as validation — the minimal-fix tests confirm the synthetic patterns are recognisable to the model |
