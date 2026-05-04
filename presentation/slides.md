@@ -320,28 +320,32 @@ of synthetic tuning."
 **SLIDE TITLE:** Experiment 4: What Has the Model Actually Learned?
 
 **VISUAL:**
-- `results/insights/insight2_missed_cwes.png` — bar chart of false negatives by CWE class on the real-world test; place in the bottom half or right column to show which classes the model misses most (CWE-703, CWE-125, CWE-787)
-- Optional secondary: `results/insights/insight2_length_vs_accuracy.png` — accuracy vs function length (short/medium/long); shows medium-length functions are hardest — use this only if you have time to mention it
+- No image needed for this slide — the table is the main content
+- Keep it clean; the four-row table with pass/fail is enough visual structure
 
 **ON SLIDE:**
 
-Four probing tests designed to go beyond accuracy:
+Four probing tests — each takes a known example and makes one controlled change:
 
-| Test | Question asked | Outcome |
+| Test | What is changed | What a pass means |
 |---|---|---|
-| Variable renaming | Does prediction change if we rename all variables? | **6/6 pass** |
-| Minimal fix | Does a one-line security fix flip the prediction? | **7/8 pass** |
-| Dead code | Does unreachable code still trigger VULNERABLE? | **1/5 pass** |
-| Token ablation | Can we remove the "dangerous" keyword and still detect it? | **6/6 pass** |
-| | **Total** | **20 / 25** |
+| **Variable renaming** | All variable names replaced with meaningless ones (e.g. `buf` → `x1`) | Model still predicts VULNERABLE — it learned the structure, not the names |
+| **Minimal fix** | The one-line change that actually fixes the bug (e.g. `md5` → `sha256`, string concat → parameterised query) | Model flips to SAFE — it recognised the fixing change |
+| **Dead code** | A dangerous-looking block wrapped in `if(0)` or `if False:` so it can never run | Model predicts SAFE — it understood the code is unreachable |
+| **Token ablation** | The single "dangerous" keyword replaced with a neutral one (e.g. `system` → `safe_exec`) | Model still predicts VULNERABLE — it learned the surrounding pattern, not one keyword |
+
+**Results: 20 / 25 pass** — renaming ✓ 6/6 · fix ✓ 7/8 · dead code ✗ 1/5 · ablation ✓ 6/6
 
 **SAY:**
 "Standard accuracy numbers don't tell you what the model has learned — just whether it
-gets the right answer. So I designed four tests that probe specific aspects of understanding.
-The renaming and ablation tests check whether the model is just keyword-spotting. The
-minimal-fix test checks whether it recognises the change that actually fixes a vulnerability.
-The dead-code test checks whether it understands control flow — whether it knows a code
-path is unreachable. The results split cleanly."
+gets the right answer. So I put together four tests that each isolate one specific aspect.
+The renaming test asks: if I strip out all the variable names, does the prediction hold?
+It does — 6 out of 6 — which means the model isn't just memorising identifier strings.
+The minimal-fix test asks: if I make the one change that actually fixes the bug, does the
+model notice? Mostly yes — 7 out of 8. The token ablation test asks: if I remove the
+obvious dangerous keyword like system or md5, does the model still catch it? Yes — it's
+detecting the surrounding structure, not a single token. The dead-code test is where it
+falls apart — 4 out of 5 fail."
 
 ---
 
