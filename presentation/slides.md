@@ -77,23 +77,12 @@ whether the outputs can be trusted in practice."
 **SLIDE TITLE:** Approach at a Glance
 
 **ON SLIDE:**
-```
-Source code (C or Python)
-        ↓
-  UniXcoder encoder
-  (pre-trained on multi-language code)
-        ↓
-  [CLS] token
-        ↓
-  Dropout → Linear → Sigmoid
-        ↓
-  VULNERABLE / SAFE  (+ confidence score)
-```
 
-Three training ingredients:
-- Synthetic examples: 17 CWE types across C and Python
-- Hard negatives: safe code that looks dangerous on the surface
-- Real-world augmentation: 1,000 samples from DiverseVul (real CVE-labelled C functions)
+The base model is **UniXcoder**, a transformer pre-trained on large amounts of code across multiple languages, which means it already has a general understanding of code structure before any fine-tuning.
+
+On top of it sits a small classification head — the CLS token from the encoder is passed through a dropout layer and a single linear layer to produce a probability score between 0 and 1, where above 0.5 means VULNERABLE.
+
+The training data has three parts. First, a synthetic dataset of 17 vulnerability types written in both C and Python. Second, hard negatives — safe functions that look similar to dangerous ones, to stop the model from flagging the wrong things. Third, 1,000 real CVE-labelled C functions from DiverseVul to bring the model closer to real-world code.
 
 **SAY:**
 "The model itself is straightforward — UniXcoder is a pre-trained encoder that already
