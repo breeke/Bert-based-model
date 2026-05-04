@@ -181,6 +181,15 @@ Key findings:
 - C → Python transfer (0.811) is substantially stronger than Python → C (0.677)
 - Python-only model collapses on C: precision 1.00 but recall only 0.596 — too conservative
 
+**Why joint training wins:**
+The 8 shared CWEs appear in both languages during training. Seeing the same vulnerability
+concept expressed in two different syntactic forms forces the model to learn the
+*underlying pattern* rather than a language-specific surface representation.
+Each shared CWE effectively doubles the training signal for that concept — the Python
+SQL injection examples reinforce the C SQL injection examples and vice versa.
+The result is a more robust decision boundary for shared classes, which lifts performance
+even on single-language test sets (Joint on C = 0.905 vs C-only on C = 0.861).
+
 **VISUAL — use both:**
 - `results/plots/exp2_ablation_heatmap.png` — colour-coded 3×3 F1 heatmap (rows = train language, columns = test language); place this prominently, it tells the story at a glance
 - The table in the slide is a text backup — if the heatmap is clear enough on its own, drop the table and let the image fill the slide with a few bullet points below it
@@ -188,10 +197,14 @@ Key findings:
 **SAY:**
 "This is a 3-by-3 ablation — three model variants, three test sets. The clearest result is
 that joint training helps in both directions: it's better on C than the C-only model, and
-better on Python than the Python-only model. The asymmetry is interesting — C-trained models
-transfer to Python reasonably well because Python adopted a lot of C-originated idioms.
-The reverse is much weaker. The Python-only model essentially refuses to flag C functions —
-very high precision but very low recall."
+better on Python than the Python-only model. The primary reason is the 8 CWE classes that
+appear in both languages during training. When the model sees SQL injection in Python and
+SQL injection in C, it can't rely on Python-specific tokens — it has to learn the
+structural pattern that makes both dangerous. That shared signal makes the representation
+more general, and that generalisation shows up even on within-language test sets.
+The asymmetry is interesting — C-trained models transfer to Python reasonably well because
+Python adopted a lot of C-originated idioms. The reverse is much weaker. The Python-only
+model essentially refuses to flag C functions — very high precision but very low recall."
 
 ---
 
