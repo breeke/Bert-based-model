@@ -27,25 +27,29 @@ what the results actually tell us."
 
 ## Slide 2 — Motivation (1 min)
 
-**SLIDE TITLE:** The Problem with Polyglot Codebases
+**SLIDE TITLE:** Why Cross-Language Vulnerability Detection?
 
 **ON SLIDE:**
 - Around 80% of real-world projects use 7 or more programming languages
-- Vulnerability patterns differ per language:
-  - Memory errors (buffer overflow, use-after-free) → mostly C/C++
-  - Injection flaws (SQL, command, path) → every language, different APIs
-- Existing automated tools are **monolingual** — one tool per language
-- Running multiple tools creates alert fatigue and low adoption in practice
+- Vulnerability patterns differ per language — same conceptual flaw, different APIs
+- Cross-language detection is an active area: GraphCodeBERT, LineVul, DiverseVul-based work
+- Most existing approaches are evaluated on a single language or a single dataset
+- Less work looks at **which specific vulnerability classes actually transfer** and why
+- This project: fine-tune a pre-trained model on C + Python, measure transfer at the CWE level,
+  and test whether the model has learned patterns or just surface tokens
 
 **VISUAL:** No image file needed. Simple two-column layout — left column: bullet list of languages in a typical project (C, Python, JS, YAML, Bash…); right column: the goal statement in a highlight box.
 
 **SAY:**
-"Most serious software projects today are written in multiple languages simultaneously.
-The security problem is that vulnerability patterns look different depending on the language —
-the same conceptual flaw, like command injection, shows up through completely different APIs
-in C versus Python. The current solution is to run a separate tool for each language, which
-in practice means analysts get flooded with alerts from different systems and start ignoring
-them. The goal here was to see whether a single model could handle both C and Python."
+"Cross-language vulnerability detection isn't an unsolved problem — there's active work in
+this space, and models like GraphCodeBERT and CodeBERT have been applied to vulnerability
+detection across multiple languages. The motivation here is more specific: most of that
+work is evaluated at the overall accuracy level, on C-heavy datasets. There's less
+systematic analysis of which vulnerability classes actually transfer between languages,
+and why some do and others don't. This project looks at that question directly — by
+training on both C and Python and measuring performance class by class, with a separate
+test designed to distinguish what the model has actually learned from what it's just
+pattern-matching."
 
 ---
 
