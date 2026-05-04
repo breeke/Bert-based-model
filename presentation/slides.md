@@ -37,7 +37,7 @@ what the results actually tell us."
 - Existing automated tools are **monolingual** — one tool per language
 - Running multiple tools creates alert fatigue and low adoption in practice
 
-**VISUAL:** Simple two-column split — left: list of languages in a typical project (C, Python, JS, YAML, Bash…); right: a quote or stat about alert fatigue from the literature.
+**VISUAL:** No image file needed. Simple two-column layout — left column: bullet list of languages in a typical project (C, Python, JS, YAML, Bash…); right column: the goal statement in a highlight box.
 
 **SAY:**
 "Most serious software projects today are written in multiple languages simultaneously.
@@ -148,7 +148,11 @@ C: F1 = 0.905 &nbsp;&nbsp;&nbsp; Python: F1 = 0.961
 **11 of 17 CWE classes reach perfect F1 = 1.00**
 Hardest class: CWE-416 (use-after-free) — F1 = 0.667
 
-**VISUAL:** Bar chart of per-CWE F1 scores (exp1_per_cwe_f1.png) — place to the right of the metrics table.
+**VISUAL — use both, side by side:**
+- Left: `results/plots/exp1_confusion_matrix.png` — confusion matrix (TN=390, FP=30, FN=79, TP=731)
+- Right: `results/plots/exp1_per_cwe_f1.png` — bar chart of per-CWE F1, clearly shows the 11 perfect classes and CWE-416 as the lowest bar
+
+Place the two images side by side, metrics table above them or replaced by the confusion matrix.
 
 **SAY:**
 "On the held-out synthetic set of 1,230 samples, the joint model reaches F1 of 0.931 with
@@ -177,7 +181,9 @@ Key findings:
 - C → Python transfer (0.811) is substantially stronger than Python → C (0.677)
 - Python-only model collapses on C: precision 1.00 but recall only 0.596 — too conservative
 
-**VISUAL:** Heatmap from exp2_ablation_heatmap.png placed alongside or below the table.
+**VISUAL — use both:**
+- `results/plots/exp2_ablation_heatmap.png` — colour-coded 3×3 F1 heatmap (rows = train language, columns = test language); place this prominently, it tells the story at a glance
+- The table in the slide is a text backup — if the heatmap is clear enough on its own, drop the table and let the image fill the slide with a few bullet points below it
 
 **SAY:**
 "This is a 3-by-3 ablation — three model variants, three test sets. The clearest result is
@@ -192,6 +198,11 @@ very high precision but very low recall."
 ## Slide 8 — CWE Transfer Profiles (1 min)
 
 **SLIDE TITLE:** Why Some CWEs Transfer and Others Don't
+
+**VISUAL — use both, one per column:**
+- Left: `results/insights/insight1_cwe_transfer_c.png` — per-CWE F1 heatmap on the C test set across all three model variants
+- Right: `results/insights/insight1_cwe_transfer_python.png` — same for Python test set
+- The contrast between the two images makes the asymmetry visible immediately; point to CWE-78 and CWE-367 rows during the talk
 
 **ON SLIDE:**
 
@@ -254,6 +265,11 @@ data flow through the function, which a sequence encoder can't do."
 
 **SLIDE TITLE:** Fixing Failure Mode 2: Real-World Augmentation
 
+**VISUAL — use both, side by side:**
+- Left: `results/plots/exp3_confusion_synthetic.png` — confusion matrix on synthetic held-out set (good numbers, to show the baseline is solid)
+- Right: `results/plots/exp3_confusion_realworld.png` — confusion matrix on real-world test set after augmentation (post-augmentation state)
+- Caption them clearly: "Synthetic (held-out)" and "Real-world (post-augmentation)" so the audience sees the remaining gap visually
+
 **ON SLIDE:**
 
 **Problem:** Real-world F1 = 0.410 despite synthetic F1 = 0.931
@@ -286,6 +302,10 @@ of synthetic tuning."
 
 **SLIDE TITLE:** Experiment 4: What Has the Model Actually Learned?
 
+**VISUAL:**
+- `results/insights/insight2_missed_cwes.png` — bar chart of false negatives by CWE class on the real-world test; place in the bottom half or right column to show which classes the model misses most (CWE-703, CWE-125, CWE-787)
+- Optional secondary: `results/insights/insight2_length_vs_accuracy.png` — accuracy vs function length (short/medium/long); shows medium-length functions are hardest — use this only if you have time to mention it
+
 **ON SLIDE:**
 
 Four probing tests designed to go beyond accuracy:
@@ -311,6 +331,10 @@ path is unreachable. The results split cleanly."
 ## Slide 12 — What the Tests Reveal (1 min)
 
 **SLIDE TITLE:** The Ceiling of Sequence-Based Models
+
+**VISUAL:**
+- `results/insights/insight4_gap_per_cwe.png` — bar chart showing per-CWE recall gap between synthetic held-out and real-world test; bars going left (negative = worse on real) vs right (positive = better on real)
+- Place on the right half; use bullet points on the left; point to CWE-134 (biggest negative gap) and CWE-732/CWE-78 (positive transfer) during the talk
 
 **ON SLIDE:**
 
@@ -338,9 +362,41 @@ entirely, so the model correctly predicted safe."
 
 ---
 
-## Slide 13 — Limitations and Future Work (1 min)
+## Slide 13 — Calibration (45 sec)
+
+**SLIDE TITLE:** Are the Confidence Scores Trustworthy?
+
+**VISUAL — use both, side by side:**
+- Left: `results/insights/insight3_calibration_synthetic.png` — reliability diagram on synthetic held-out set; bimodal, well-calibrated
+- Right: `results/insights/insight3_calibration_real_world.png` — same on real-world test; broader distribution, more mass in the middle
+- Label them clearly: "Synthetic" and "Real-world" — the contrast is the story
+- Alternative if you want the raw output histogram: `results/plots/calibration_histograms.png`
+
+**ON SLIDE:**
+- Temperature scaling after training: T = **0.981** (essentially 1.0)
+- Near-unity T means label smoothing (ε = 0.1) already calibrated the model during training
+- Synthetic outputs: **bimodal** — clearly safe (p ≈ 0.05) or clearly vulnerable (p ≈ 0.96)
+- Real-world outputs: broader — more ambiguous partial matches in the 0.3–0.7 range
+- Practical use: scores can be used to **rank and prioritise** a vulnerability report queue
+
+**SAY:**
+"A quick note on calibration — this matters for practical use. After training, temperature
+scaling found an optimal T of 0.981, which is essentially 1.0, meaning the model's raw
+outputs are already well-calibrated. That's a direct consequence of label smoothing during
+training. The synthetic calibration plot is nicely bimodal — the model is either confident
+it's safe or confident it's vulnerable. The real-world plot is broader, with more mass in
+the middle, which reflects the model's uncertainty when it sees code styles it hasn't been
+trained on."
+
+---
+
+## Slide 15 — Limitations and Future Work (1 min)
 
 **SLIDE TITLE:** Where This Falls Short and What Comes Next
+
+**VISUAL:**
+- No dedicated image needed here — this is a text-heavy summary slide
+- Optional: `results/plots/exp4_precision_recall_curve.png` as a small insert to illustrate the threshold trade-off point if you want to mention deployment flexibility (precision = 1.00 is achievable at threshold 0.8)
 
 **ON SLIDE:**
 
@@ -365,7 +421,7 @@ component, which would let the model follow values from input sources to dangero
 
 ---
 
-## Slide 14 — Summary (1 min)
+## Slide 16 — Summary (1 min)
 
 **SLIDE TITLE:** Summary
 
@@ -395,7 +451,7 @@ but also draw a clear line at what sequence-based models can and can't do."
 
 ---
 
-## Slide 15 — Questions
+## Slide 17 — Questions
 
 **ON SLIDE:**
 > Thank you
