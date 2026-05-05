@@ -100,26 +100,32 @@ the gap between training conditions and what real code looks like."
 
 **ON SLIDE:**
 
-| | C | Python |
-|---|---|---|
-| CWE types | 14 | 11 |
-| Shared across both languages | **8** | **8** |
-| Held-out validation samples | 660 | 570 |
+**Step 1 — Write base patterns**
+Each CWE type was hand-written as a minimal code pattern in C and/or Python — 14 C types, 11 Python types, 8 shared across both languages. Each pattern represents the core dangerous operation in its simplest form.
 
-- Examples are wrapped in realistic function context (not bare snippets)
-- Hard negative pairs: safe functions using the same API as vulnerable ones
-- Real-world test set: **200 DiverseVul samples** — never seen during training
+**Step 2 — Expand with variations**
+Each base pattern was replicated 40 times with small random changes — variable names, spacing, minor structural differences — so the model sees variety rather than identical strings.
 
-Notable gap: no large real-world Python vulnerability dataset exists at scale,
-which is why synthetic training data was necessary for Python.
+**Step 3 — Wrap in realistic context**
+Rather than training on bare snippets, each function was wrapped in realistic surrounding code: prologue lines like mutex locks or null checks, epilogue lines like return statements, and occasional conditional wrappers around the core body. This was done to close the gap between a clean synthetic snippet and what a real function looks like.
+
+**Step 4 — Add hard negatives**
+Safe functions were written that use the same APIs as dangerous ones — for example, `hashlib.sha256` in the same position as a vulnerable `hashlib.md5` call. These force the model to learn the discriminating feature rather than just associating an API name with danger.
+
+**Step 5 — Split**
+70% training · 15% validation · 15% test. The held-out validation set is 1,230 samples (660 C + 570 Python). A completely separate real-world test set of 200 DiverseVul samples was never touched during training.
 
 **SAY:**
-"The synthetic dataset covers 17 CWE types — 8 of which appear in both languages, which
-is what the cross-language experiments are based on. Each example is wrapped in a
-realistic function body rather than being a bare code snippet, to make the training
-distribution closer to what a real function looks like. For evaluation I kept 1,230 samples
-completely held out from training, plus a separate 200-sample set of real CVE-labelled
-functions from DiverseVul, which is a dataset of real C code from open-source projects."
+"The dataset was built in five steps. First, hand-written base patterns — one per CWE per
+language, kept minimal so the vulnerability is unambiguous. Then each pattern was expanded
+40 times with small random variations so the model doesn't just memorise one version.
+The context wrapping step is particularly important — instead of feeding the model a bare
+5-line snippet, each example is embedded in a realistic function body with things like
+null checks, mutex locks, and return statements. That makes the training distribution
+closer to what real code looks like. Hard negatives were added to fix specific failure
+modes — safe functions that share the same API structure as dangerous ones. Finally the
+data was split 70/15/15, with the 200 DiverseVul real-world samples kept completely
+separate as a second test set."
 
 ---
 
