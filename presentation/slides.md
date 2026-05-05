@@ -115,6 +115,8 @@ Safe functions were written that use the same APIs as dangerous ones — for exa
 **Step 5 — Split**
 70% training · 15% validation · 15% test. The held-out validation set is 1,230 samples (660 C + 570 Python). A completely separate real-world test set of 200 DiverseVul samples was never touched during training.
 
+> ⚠️ **All 200 real-world test cases were fully quarantined** — no sample from the DiverseVul test split was exposed to the model at any point during training, validation, or hyperparameter tuning.
+
 **SAY:**
 "The dataset was built in five steps. First, hand-written base patterns — one per CWE per
 language, kept minimal so the vulnerability is unambiguous. Then each pattern was expanded
@@ -287,7 +289,8 @@ data flow through the function, which a sequence encoder can't do."
 **Problem:** Real-world F1 = 0.410 despite synthetic F1 = 0.931
 → Real functions are longer, noisier, and stylistically different from synthetic examples
 
-**Fix:** Added 1,000 DiverseVul C/C++ samples (real CVE-labelled functions) to training
+**Fix:** Added 1,000 DiverseVul C/C++ samples from the **training split** to training
+*(The 200-sample test split remained fully quarantined throughout — zero overlap)*
 
 | Training stage | Synthetic F1 | Real-world F1 | Gap |
 |---|---|---|---|
