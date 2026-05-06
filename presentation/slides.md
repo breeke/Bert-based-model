@@ -101,21 +101,22 @@ the gap between training conditions and what real code looks like."
 **ON SLIDE:**
 
 **Step 1 — Write base patterns**
-Each CWE type was hand-written as a minimal code pattern in C and/or Python — 14 C types, 11 Python types, 8 shared across both languages. Each pattern represents the core dangerous operation in its simplest form.
+*Why:* No large Python vulnerability dataset exists, so the data had to be created from scratch. Hand-writing each pattern ensures the label is unambiguous — there is no noise about whether the example is actually vulnerable.
+Each CWE type was written as a minimal function in C and/or Python — 14 C types, 11 Python types, 8 shared across both languages.
 
 **Step 2 — Expand with variations**
-Each base pattern was replicated 40 times with small random changes — variable names, spacing, minor structural differences — so the model sees variety rather than identical strings.
+*Why:* A model trained on 17 identical functions would memorise the exact strings rather than learning the pattern. Replicating each base pattern 40 times with small random changes — different variable names, spacing, minor structural differences — forces the model to generalise.
 
 **Step 3 — Wrap in realistic context**
-Rather than training on bare snippets, each function was wrapped in realistic surrounding code: prologue lines like mutex locks or null checks, epilogue lines like return statements, and occasional conditional wrappers around the core body. This was done to close the gap between a clean synthetic snippet and what a real function looks like.
+*Why:* Real functions are not bare 5-line snippets. They have null checks, logging calls, mutex locks, and return statements around the core logic. Without this, the model learns to expect clean minimal code and fails on anything longer. Wrapping each example in realistic surrounding code reduces this distribution gap.
 
 **Step 4 — Add hard negatives**
-Safe functions were written that use the same APIs as dangerous ones — for example, `hashlib.sha256` in the same position as a vulnerable `hashlib.md5` call. These force the model to learn the discriminating feature rather than just associating an API name with danger.
+*Why:* Early training showed the model associating entire API names with danger rather than the specific dangerous usage — it flagged `hashlib.sha256` as vulnerable just because it had seen `hashlib.md5` in vulnerable examples. Hard negatives are safe functions using the same APIs in safe ways, forcing the model to learn the discriminating detail rather than a surface association.
 
-**Step 5 — Split**
-70% training · 15% validation · 15% test. The held-out validation set is 1,230 samples (660 C + 570 Python). A completely separate real-world test set of 200 DiverseVul samples was never touched during training.
+**Step 5 — Split and quarantine**
+*Why:* Mixing test data into training, even accidentally, inflates results and makes evaluation meaningless. The 70/15/15 split was fixed before any training began. The 200 DiverseVul real-world test samples were quarantined entirely — never used for training, validation, or any hyperparameter decision.
 
-> ⚠️ **All 200 real-world test cases were fully quarantined** — no sample from the DiverseVul test split was exposed to the model at any point during training, validation, or hyperparameter tuning.
+> ⚠️ **All 200 real-world test cases were fully quarantined** — no sample from the DiverseVul test split was exposed to the model at any point.
 
 **SAY:**
 "The dataset was built in five steps. First, hand-written base patterns — one per CWE per
