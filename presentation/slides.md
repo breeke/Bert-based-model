@@ -300,47 +300,55 @@ to eval() or exec(), which runs it as Python code."
 **ON SLIDE:**
 
 ```c
-// CWE-416: Use-After-Free (C)
-free(req);
-log_request(req->method);  // req already freed
+// CWE-78: Command Injection (C)
+void run_command(char *user_input) {
+    char cmd[256];
+    sprintf(cmd, "ls %s", user_input);
+    system(cmd);          // user_input injected into shell
+}
+```
+
+```c
+// CWE-367: TOCTOU Race Condition (C)
+if (access(path, R_OK) == 0) {  // check
+    fd = open(path, O_RDONLY);  // use — file may have changed
+}
+```
+
+```python
+# CWE-89: SQL Injection (Python)
+def get_user(username):
+    query = "SELECT * FROM users WHERE name = '" + username + "'"
+    return db.execute(query)   # unsanitised input in query
 ```
 
 ```c
 // CWE-190: Integer Overflow (C)
 unsigned short new_size = old_size + extra;  // wraps to 0
-buf = malloc(new_size);
-```
-
-```c
-// CWE-732: Insecure Permissions (C)
-chmod(path, 0666);  // world-writable credentials file
-```
-
-```python
-# CWE-502: Unsafe Deserialization (Python)
-def load_session(data):
-    return pickle.loads(data)  # executes arbitrary code
+buf = malloc(new_size);   // undersized allocation
 ```
 
 **SAY:**
 
-"These are four real examples from the training set — actual code generated to represent
-the vulnerability class.
+"These are four examples from the training set — each one represents a different
+vulnerability class.
 
-CWE-416 is a use-after-free: the request struct is freed on the first line, then
-dereferenced on the next. In C, the memory is now invalid but the pointer still holds
-the old address, so this can silently corrupt state or be exploited.
+CWE-78 is command injection: user_input is formatted directly into a shell command string
+and passed to system(). An attacker can append a semicolon and run arbitrary commands.
+This is cross-language — the same pattern appears in Python via os.system().
+
+CWE-367 is a time-of-check to time-of-use race condition: the program checks whether the
+file is readable with access(), then opens it a moment later. In a concurrent environment
+an attacker can swap the file between those two calls — the check passes but the wrong
+file gets opened.
+
+CWE-89 is SQL injection: the username is concatenated directly into a query string. An
+attacker who passes something like ' OR '1'='1 can bypass authentication or dump the
+entire table. The fix is a parameterised query.
 
 CWE-190 is an integer overflow: new_size is an unsigned short, so if old_size plus extra
-exceeds 65535 it wraps back to a small number. The buffer gets allocated too small and
-a later write overflows it.
-
-CWE-732 sets file permissions to 0666, which is world-readable and world-writable. For a
-credentials file that's a serious misconfiguration.
-
-CWE-502 is pickle.loads on untrusted input. The pickle format can encode arbitrary Python
-objects, and unpickling executes code — so an attacker who controls the input bytes can
-run any command on the server.
+exceeds 65535 it wraps to a small number. The buffer is allocated too small and a later
+write overflows it.
 
 These are all function-level snippets — the model sees the whole function and predicts
 vulnerable or safe."
