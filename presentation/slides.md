@@ -216,7 +216,85 @@ separate as a second test set."
 
 ---
 
-## Slide 7 — Baseline Results (1.5 min)
+## Slide 7 — CWE Types Covered (1 min)
+
+**SLIDE TITLE:** Vulnerability Classes in the Dataset
+
+**ON SLIDE:**
+
+| CWE | Name | In |
+|---|---|---|
+| CWE-78 | Command Injection | C + Python |
+| CWE-89 | SQL Injection | C + Python |
+| CWE-22 | Path Traversal | C + Python |
+| CWE-798 | Hardcoded Credentials | C + Python |
+| CWE-327 | Weak Cryptography (MD5) | C + Python |
+| CWE-134 | Format / Template Injection | C + Python |
+| CWE-732 | Insecure File Permissions | C + Python |
+| CWE-367 | TOCTOU Race Condition | C + Python |
+| CWE-120 | Buffer Overflow | C only |
+| CWE-190 | Integer Overflow | C only |
+| CWE-416 | Use After Free | C only |
+| CWE-415 | Double Free | C only |
+| CWE-476 | Null Pointer Dereference | C only |
+| CWE-193 | Off-by-One Error | C only |
+| CWE-457 | Uninitialized Variable | C only |
+| CWE-502 | Unsafe Deserialization | Python only |
+| CWE-918 | Server-Side Request Forgery | Python only |
+| CWE-95 | Eval Injection | Python only |
+
+**SAY:**
+
+*[Shared CWEs — top 8 rows]*
+"The 8 shared CWEs are the ones that appear in both C and Python training examples and
+are the basis of the cross-language transfer experiments. These are vulnerability classes
+where the same conceptual flaw can be expressed in both languages, even if the specific
+API looks different.
+
+CWE-78 command injection is where user input gets passed into a shell command without
+sanitisation — in C that's system() with a user-controlled buffer, in Python that's
+os.system() or subprocess.call().
+
+CWE-89 SQL injection is where user input is concatenated directly into a query string
+instead of using parameterised queries.
+
+CWE-22 path traversal is where user input containing dot-dot-slash sequences is used
+to construct a file path, letting an attacker escape the intended directory.
+
+CWE-798 hardcoded credentials means a password or API key is written directly in the
+source code rather than loaded from an environment variable or secrets manager.
+
+CWE-327 is using a broken cryptographic algorithm — in our case MD5 for password hashing,
+which is both too fast and cryptographically broken.
+
+CWE-134 is format string or template injection — passing user input directly as a format
+argument to printf in C, or into a template engine in Python without escaping.
+
+CWE-732 is setting file permissions too broadly, like chmod 0777, making sensitive files
+readable or writable by anyone on the system.
+
+CWE-367 is a time-of-check to time-of-use race condition — the program checks a condition
+like whether a file is safe, and an attacker swaps the file between the check and the use."
+
+*[C-only CWEs]*
+"The C-only classes are mostly memory safety issues that don't exist in Python because
+Python manages memory automatically. Buffer overflow is writing past the end of an array.
+Integer overflow is arithmetic wrapping around to a small number, often causing an
+undersized allocation. Use after free and double free are heap corruption bugs from
+mismanaging manually allocated memory. Null pointer dereference is using a pointer without
+checking whether it's null. Off-by-one and uninitialized variable are classic C mistakes
+with subtle but exploitable consequences."
+
+*[Python-only CWEs]*
+"The Python-only classes are higher-level. Unsafe deserialization means using Python's
+pickle library on untrusted input, which can execute arbitrary code during unpickling.
+SSRF is where the server makes an HTTP request to a URL constructed from user input,
+letting attackers probe internal services. Eval injection is passing user input directly
+to eval() or exec(), which runs it as Python code."
+
+---
+
+## Slide 8 — Baseline Results (1.5 min)
 
 **SLIDE TITLE:** Experiment 1: How Well Does the Joint Model Perform?
 
@@ -250,7 +328,7 @@ comes down to Python's vulnerability patterns tending to be more syntactically c
 
 ---
 
-## Slide 8 — Cross-Language Ablation (1.5 min)
+## Slide 9 — Cross-Language Ablation (1.5 min)
 
 **SLIDE TITLE:** Experiment 2: Does Cross-Language Transfer Actually Work?
 
@@ -294,7 +372,7 @@ model essentially refuses to flag C functions — very high precision but very l
 
 ---
 
-## Slide 9 — CWE Transfer Profiles (1 min)
+## Slide 10 — CWE Transfer Profiles (1 min)
 
 **SLIDE TITLE:** Why Some CWEs Transfer and Others Don't
 
@@ -327,7 +405,7 @@ is about surface token overlap, not semantic equivalence."
 
 ---
 
-## Slide 10 — Hard Negative Mining (1 min)
+## Slide 11 — Hard Negative Mining (1 min)
 
 **SLIDE TITLE:** Fixing Failure Mode 1: Hard Negatives
 
@@ -360,7 +438,7 @@ data flow through the function, which a sequence encoder can't do."
 
 ---
 
-## Slide 11 — Real-World Augmentation (1.5 min)
+## Slide 12 — Real-World Augmentation (1.5 min)
 
 **SLIDE TITLE:** Fixing Failure Mode 2: Real-World Augmentation
 
@@ -398,7 +476,7 @@ of synthetic tuning."
 
 ---
 
-## Slide 12 — Semantic Understanding Tests (1.5 min)
+## Slide 13 — Semantic Understanding Tests (1.5 min)
 
 **SLIDE TITLE:** Experiment 4: What Has the Model Actually Learned?
 
@@ -475,7 +553,7 @@ the branch was unreachable."
 
 ---
 
-## Slide 13 — What the Tests Reveal (1 min)
+## Slide 14 — What the Tests Reveal (1 min)
 
 **SLIDE TITLE:** The Ceiling of Sequence-Based Models
 
@@ -509,7 +587,7 @@ entirely, so the model correctly predicted safe."
 
 ---
 
-## Slide 14 — Calibration (45 sec)
+## Slide 15 — Calibration (45 sec)
 
 **SLIDE TITLE:** Are the Confidence Scores Trustworthy?
 
@@ -537,7 +615,7 @@ trained on."
 
 ---
 
-## Slide 15 — Limitations and Future Work (1 min)
+## Slide 16 — Limitations and Future Work (1 min)
 
 **SLIDE TITLE:** Where This Falls Short and What Comes Next
 
@@ -568,7 +646,7 @@ component, which would let the model follow values from input sources to dangero
 
 ---
 
-## Slide 16 — Summary (1 min)
+## Slide 17 — Summary (1 min)
 
 **SLIDE TITLE:** Summary
 
@@ -598,7 +676,7 @@ but also draw a clear line at what sequence-based models can and can't do."
 
 ---
 
-## Slide 17 — Questions
+## Slide 18 — Questions
 
 **ON SLIDE:**
 > Thank you
