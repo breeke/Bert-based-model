@@ -222,26 +222,25 @@ separate as a second test set."
 
 **ON SLIDE:**
 
-| CWE | Name | In |
-|---|---|---|
-| CWE-78 | Command Injection | C + Python |
-| CWE-89 | SQL Injection | C + Python |
-| CWE-22 | Path Traversal | C + Python |
-| CWE-798 | Hardcoded Credentials | C + Python |
-| CWE-327 | Weak Cryptography (MD5) | C + Python |
-| CWE-134 | Format / Template Injection | C + Python |
-| CWE-732 | Insecure File Permissions | C + Python |
-| CWE-367 | TOCTOU Race Condition | C + Python |
-| CWE-120 | Buffer Overflow | C only |
-| CWE-190 | Integer Overflow | C only |
-| CWE-416 | Use After Free | C only |
-| CWE-415 | Double Free | C only |
-| CWE-476 | Null Pointer Dereference | C only |
-| CWE-193 | Off-by-One Error | C only |
-| CWE-457 | Uninitialized Variable | C only |
-| CWE-502 | Unsafe Deserialization | Python only |
-| CWE-918 | Server-Side Request Forgery | Python only |
-| CWE-95 | Eval Injection | Python only |
+**Shared — C + Python**
+CWE-78 = User input passed into a shell command
+CWE-89 = User input concatenated into a SQL query
+CWE-22 = File path built from user input, allowing directory escape
+CWE-798 = Password or API key hardcoded in source code
+CWE-327 = Weak algorithm (MD5) used for password hashing
+CWE-134 = User input passed directly as a format string or template
+CWE-732 = File created with overly broad permissions (e.g. 0777)
+CWE-367 = Resource checked then changed before it is used
+
+**C only**
+CWE-120 = Write past end of buffer  · CWE-190 = Arithmetic wraps to small number
+CWE-416 = Memory accessed after freed  · CWE-415 = Same memory freed twice
+CWE-476 = Pointer used without null check  · CWE-193 = Off-by-one index error
+CWE-457 = Variable read before assigned
+
+**Python only**
+CWE-502 = Untrusted data passed to pickle  · CWE-918 = Server fetches attacker-controlled URL
+CWE-95 = User input passed to eval()
 
 **SAY:**
 
