@@ -120,31 +120,45 @@ Source function (C or Python)
 
 **ON SLIDE:**
 
-| | Before fine-tuning | After fine-tuning |
-|---|---|---|
-| CLS token | General code meaning | Vulnerability-relevant summary |
-| Classification | None | F1 = 0.931 |
-| Attention | General code patterns | Dangerous APIs, data flows |
+**What we fine-tuned:**
+- All 12 transformer layers — weights adjusted to make the model vulnerability-aware
+- New classification head — trained from scratch on top of the encoder
 
-*Full model fine-tuned — all 12 layers + new classification head*
-*Low learning rate (2×10⁻⁵) preserves pre-trained knowledge*
+**Effect:**
+- CLS token: general code meaning → vulnerability-relevant summary
+- Attention: general code patterns → dangerous APIs and data flows
 
 **SAY:**
-"The diagram shows what happens step by step. The function is broken into small subword
-tokens, a special CLS token is added at the front, and everything passes through 12
-transformer layers. The important thing about transformers is self-attention — every token
-can look at every other token simultaneously, so the model sees the whole function at once
-rather than reading it left to right. After all 12 layers, the CLS token has absorbed
-information from the entire function — think of it as a fixed-size summary of the whole
-input. That summary goes into the classification head to produce the final probability.
 
-Fine-tuning updated the weights across all 12 layers plus the new head. Before fine-tuning,
-the CLS summary captures general code meaning — what the function does. After fine-tuning
-on our labelled dataset, it captures vulnerability-relevant patterns specifically — things
-like whether user input flows into a dangerous call, or whether a weak algorithm is being
-used. We used a low learning rate to nudge the weights rather than overwrite the
-pre-trained knowledge, so the model keeps its general understanding of code structure
-while gaining the ability to flag dangerous patterns."
+*[Point to: Source function → tokenise]*
+"The input is a raw source function in C or Python. The first thing that happens is
+tokenisation — the function is broken into small subword pieces that the model was
+trained on. A special CLS token is added at the very front."
+
+*[Point to: 12 transformer layers]*
+"All tokens then pass through 12 transformer layers. The key thing here is self-attention —
+every token can look at every other token at the same time. So the model isn't reading
+left to right; it sees the whole function at once and learns which parts relate to which
+other parts. A token like system() can directly attend to where user_input came from,
+several lines earlier."
+
+*[Point to: CLS → summary]*
+"After all 12 layers, the CLS token has absorbed information from the entire function.
+Think of it as a fixed-size summary of the whole input — everything the model learned
+about the function is compressed into this one vector."
+
+*[Point to: Dropout → Linear → Sigmoid → score]*
+"That summary is passed to the classification head — a dropout layer, a single linear
+layer, and a sigmoid — which produces a probability between 0 and 1. Above 0.5 means
+VULNERABLE."
+
+*[Point to the before/after effect]*
+"Fine-tuning updated all 12 layers plus the new head using our labelled data. Before
+fine-tuning, the CLS summary captures general code meaning. After fine-tuning, it
+captures vulnerability-specific patterns — whether user input reaches a dangerous sink,
+whether a weak algorithm is used. We used a low learning rate so the model keeps its
+pre-trained knowledge of code structure and we only nudge it toward vulnerability
+detection rather than starting from scratch."
 
 ---
 
