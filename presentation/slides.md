@@ -111,7 +111,7 @@ Source function (C or Python)
         ↓  12 transformer layers (self-attention)
         each token attends to every other token
         ↓
-[CLS]  ← now contains a summary of the whole function
+[CLS]  ← summary of the whole function
         ↓  classification head
    Dropout → Linear → Sigmoid
         ↓
@@ -120,33 +120,31 @@ Source function (C or Python)
 
 **ON SLIDE:**
 
-1. The function is split into subword tokens — small pieces the model was trained on
-2. A special **[CLS]** token is added at the front
-3. All tokens pass through **12 transformer layers** — each token can attend to every other token in the function simultaneously
-4. After all layers, the **[CLS] token holds a summary representation** of the whole function
-5. That summary is passed to the classification head to produce a single probability score
+| | Before fine-tuning | After fine-tuning |
+|---|---|---|
+| CLS token | General code meaning | Vulnerability-relevant summary |
+| Classification | None | F1 = 0.931 |
+| Attention | General code patterns | Dangerous APIs, data flows |
 
-**What fine-tuning changed:**
-Before fine-tuning, the CLS representation captures general code meaning.
-After fine-tuning on our labelled data, it specifically captures *vulnerability-relevant* patterns — the model has learned to weight the features that distinguish dangerous code from safe code.
+*Full model fine-tuned — all 12 layers + new classification head*
+*Low learning rate (2×10⁻⁵) preserves pre-trained knowledge*
 
 **SAY:**
-"A quick picture of what's happening inside the model. The source function is first
-broken into tokens — small subword pieces. A special CLS token is prepended at the front.
-All of these tokens then pass through 12 transformer layers. The key property of a
-transformer is self-attention: every token can look at every other token at the same time,
-so the model isn't reading the code left to right like a sequence — it's looking at the
-whole function at once and learning which parts relate to which other parts.
+"The diagram shows what happens step by step. The function is broken into small subword
+tokens, a special CLS token is added at the front, and everything passes through 12
+transformer layers. The important thing about transformers is self-attention — every token
+can look at every other token simultaneously, so the model sees the whole function at once
+rather than reading it left to right. After all 12 layers, the CLS token has absorbed
+information from the entire function — think of it as a fixed-size summary of the whole
+input. That summary goes into the classification head to produce the final probability.
 
-After all 12 layers, the CLS token has absorbed information from the entire function.
-Think of it as a fixed-size summary of the whole input. That summary vector is what gets
-passed to the classification head.
-
-What fine-tuning does is adjust the model's weights so that the CLS summary it produces
-emphasises the features that matter for vulnerability detection — things like whether
-user-controlled data flows into a dangerous call, or whether a weak algorithm is being
-used. Before fine-tuning it's a general code understanding. After fine-tuning it's a
-vulnerability-specific one."
+Fine-tuning updated the weights across all 12 layers plus the new head. Before fine-tuning,
+the CLS summary captures general code meaning — what the function does. After fine-tuning
+on our labelled dataset, it captures vulnerability-relevant patterns specifically — things
+like whether user input flows into a dangerous call, or whether a weak algorithm is being
+used. We used a low learning rate to nudge the weights rather than overwrite the
+pre-trained knowledge, so the model keeps its general understanding of code structure
+while gaining the ability to flag dangerous patterns."
 
 ---
 
