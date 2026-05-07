@@ -293,7 +293,61 @@ to eval() or exec(), which runs it as Python code."
 
 ---
 
-## Slide 8 — Baseline Results (1.5 min)
+## Slide 8 — Dataset Examples: What the Vulnerable Code Looks Like (1 min)
+
+**SLIDE TITLE:** Examples from the Training Data
+
+**ON SLIDE:**
+
+```c
+// CWE-416: Use-After-Free (C)
+free(req);
+log_request(req->method);  // req already freed
+```
+
+```c
+// CWE-190: Integer Overflow (C)
+unsigned short new_size = old_size + extra;  // wraps to 0
+buf = malloc(new_size);
+```
+
+```c
+// CWE-732: Insecure Permissions (C)
+chmod(path, 0666);  // world-writable credentials file
+```
+
+```python
+# CWE-502: Unsafe Deserialization (Python)
+def load_session(data):
+    return pickle.loads(data)  # executes arbitrary code
+```
+
+**SAY:**
+
+"These are four real examples from the training set — actual code generated to represent
+the vulnerability class.
+
+CWE-416 is a use-after-free: the request struct is freed on the first line, then
+dereferenced on the next. In C, the memory is now invalid but the pointer still holds
+the old address, so this can silently corrupt state or be exploited.
+
+CWE-190 is an integer overflow: new_size is an unsigned short, so if old_size plus extra
+exceeds 65535 it wraps back to a small number. The buffer gets allocated too small and
+a later write overflows it.
+
+CWE-732 sets file permissions to 0666, which is world-readable and world-writable. For a
+credentials file that's a serious misconfiguration.
+
+CWE-502 is pickle.loads on untrusted input. The pickle format can encode arbitrary Python
+objects, and unpickling executes code — so an attacker who controls the input bytes can
+run any command on the server.
+
+These are all function-level snippets — the model sees the whole function and predicts
+vulnerable or safe."
+
+---
+
+## Slide 9 — Baseline Results (1.5 min)
 
 **SLIDE TITLE:** Experiment 1: How Well Does the Joint Model Perform?
 
@@ -327,7 +381,7 @@ comes down to Python's vulnerability patterns tending to be more syntactically c
 
 ---
 
-## Slide 9 — Cross-Language Ablation (1.5 min)
+## Slide 10 — Cross-Language Ablation (1.5 min)
 
 **SLIDE TITLE:** Experiment 2: Does Cross-Language Transfer Actually Work?
 
@@ -371,7 +425,7 @@ model essentially refuses to flag C functions — very high precision but very l
 
 ---
 
-## Slide 10 — CWE Transfer Profiles (1 min)
+## Slide 11 — CWE Transfer Profiles (1 min)
 
 **SLIDE TITLE:** Why Some CWEs Transfer and Others Don't
 
@@ -404,7 +458,7 @@ is about surface token overlap, not semantic equivalence."
 
 ---
 
-## Slide 11 — Hard Negative Mining (1 min)
+## Slide 12 — Hard Negative Mining (1 min)
 
 **SLIDE TITLE:** Fixing Failure Mode 1: Hard Negatives
 
@@ -437,7 +491,7 @@ data flow through the function, which a sequence encoder can't do."
 
 ---
 
-## Slide 12 — Real-World Augmentation (1.5 min)
+## Slide 13 — Real-World Augmentation (1.5 min)
 
 **SLIDE TITLE:** Fixing Failure Mode 2: Real-World Augmentation
 
@@ -475,7 +529,7 @@ of synthetic tuning."
 
 ---
 
-## Slide 13 — Semantic Understanding Tests (1.5 min)
+## Slide 14 — Semantic Understanding Tests (1.5 min)
 
 **SLIDE TITLE:** Experiment 4: What Has the Model Actually Learned?
 
@@ -552,7 +606,7 @@ the branch was unreachable."
 
 ---
 
-## Slide 14 — What the Tests Reveal (1 min)
+## Slide 15 — What the Tests Reveal (1 min)
 
 **SLIDE TITLE:** The Ceiling of Sequence-Based Models
 
@@ -586,7 +640,7 @@ entirely, so the model correctly predicted safe."
 
 ---
 
-## Slide 15 — Calibration (45 sec)
+## Slide 16 — Calibration (45 sec)
 
 **SLIDE TITLE:** Are the Confidence Scores Trustworthy?
 
@@ -614,7 +668,7 @@ trained on."
 
 ---
 
-## Slide 16 — Limitations and Future Work (1 min)
+## Slide 17 — Limitations and Future Work (1 min)
 
 **SLIDE TITLE:** Where This Falls Short and What Comes Next
 
@@ -645,7 +699,7 @@ component, which would let the model follow values from input sources to dangero
 
 ---
 
-## Slide 17 — Summary (1 min)
+## Slide 18 — Summary (1 min)
 
 **SLIDE TITLE:** Summary
 
@@ -675,7 +729,7 @@ but also draw a clear line at what sequence-based models can and can't do."
 
 ---
 
-## Slide 18 — Questions
+## Slide 19 — Questions
 
 **ON SLIDE:**
 > Thank you
