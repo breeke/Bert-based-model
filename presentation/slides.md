@@ -78,23 +78,79 @@ whether the outputs can be trusted in practice."
 
 **ON SLIDE:**
 
-The base model is **UniXcoder**, a transformer pre-trained on large amounts of code across multiple languages, which means it already has a general understanding of code structure before any fine-tuning.
+**Step 1 — Pre-trained base model**
+UniXcoder — a transformer pre-trained on large amounts of code across multiple languages. It already has a general understanding of code structure before we touch it.
 
-On top of it sits a small classification head — the CLS token from the encoder is passed through a dropout layer and a single linear layer to produce a probability score between 0 and 1, where above 0.5 means VULNERABLE.
+**Step 2 — Fine-tuning**
+The model is trained on our labelled vulnerable/safe dataset. A small classification head is added on top: CLS token → Dropout → Linear → score (>0.5 = VULNERABLE). The model's weights are adjusted to learn what distinguishes dangerous code from safe code.
 
-The training data has three parts. First, a synthetic dataset of 17 vulnerability types written in both C and Python. Second, hard negatives — safe functions that look similar to dangerous ones, to stop the model from flagging the wrong things. Third, 1,000 real CVE-labelled C functions from DiverseVul to bring the model closer to real-world code.
+**Step 3 — Training data (three parts)**
+Synthetic examples across 17 CWE types · Hard negatives · 1,000 real CVE-labelled functions from DiverseVul
 
 **SAY:**
-"The model itself is straightforward — UniXcoder is a pre-trained encoder that already
-understands code structure from large-scale pre-training. On top of it sits a very small
-classification head. The interesting parts are the training data: a synthetic dataset
-covering 17 vulnerability classes in two languages, deliberately constructed contrastive
-pairs to fix specific failure modes, and a small injection of real-world C code to reduce
-the gap between training conditions and what real code looks like."
+"The approach has two main parts. First, we start with UniXcoder — a model that has already
+seen millions of lines of code and learned how code is structured. We don't train from
+scratch; we build on that existing knowledge. Second, we fine-tune it on our own labelled
+data by adding a small classification head on top and adjusting the weights to distinguish
+vulnerable from safe code. The training data has three ingredients: synthetic examples we
+built ourselves, hard negatives to stop the model from learning the wrong patterns, and a
+small set of real CVE-labelled functions to bridge the gap to real-world code."
 
 ---
 
-## Slide 5 — Dataset (1 min)
+## Slide 5 — How UniXcoder Processes Code (1 min)
+
+**SLIDE TITLE:** How the Model Reads Code
+
+**RECOMMENDED DIAGRAM — draw this as a left-to-right flow:**
+
+```
+Source function (C or Python)
+        ↓  tokenise
+[CLS] [void] [run_] [command] [(] [char] [*] [input] [)] [{] ... [}]
+        ↓  12 transformer layers (self-attention)
+        each token attends to every other token
+        ↓
+[CLS]  ← now contains a summary of the whole function
+        ↓  classification head
+   Dropout → Linear → Sigmoid
+        ↓
+   0.93  →  VULNERABLE
+```
+
+**ON SLIDE:**
+
+1. The function is split into subword tokens — small pieces the model was trained on
+2. A special **[CLS]** token is added at the front
+3. All tokens pass through **12 transformer layers** — each token can attend to every other token in the function simultaneously
+4. After all layers, the **[CLS] token holds a summary representation** of the whole function
+5. That summary is passed to the classification head to produce a single probability score
+
+**What fine-tuning changed:**
+Before fine-tuning, the CLS representation captures general code meaning.
+After fine-tuning on our labelled data, it specifically captures *vulnerability-relevant* patterns — the model has learned to weight the features that distinguish dangerous code from safe code.
+
+**SAY:**
+"A quick picture of what's happening inside the model. The source function is first
+broken into tokens — small subword pieces. A special CLS token is prepended at the front.
+All of these tokens then pass through 12 transformer layers. The key property of a
+transformer is self-attention: every token can look at every other token at the same time,
+so the model isn't reading the code left to right like a sequence — it's looking at the
+whole function at once and learning which parts relate to which other parts.
+
+After all 12 layers, the CLS token has absorbed information from the entire function.
+Think of it as a fixed-size summary of the whole input. That summary vector is what gets
+passed to the classification head.
+
+What fine-tuning does is adjust the model's weights so that the CLS summary it produces
+emphasises the features that matter for vulnerability detection — things like whether
+user-controlled data flows into a dangerous call, or whether a weak algorithm is being
+used. Before fine-tuning it's a general code understanding. After fine-tuning it's a
+vulnerability-specific one."
+
+---
+
+## Slide 6 — Dataset (1 min)
 
 **SLIDE TITLE:** Dataset Construction
 
@@ -132,7 +188,7 @@ separate as a second test set."
 
 ---
 
-## Slide 6 — Baseline Results (1.5 min)
+## Slide 7 — Baseline Results (1.5 min)
 
 **SLIDE TITLE:** Experiment 1: How Well Does the Joint Model Perform?
 
@@ -166,7 +222,7 @@ comes down to Python's vulnerability patterns tending to be more syntactically c
 
 ---
 
-## Slide 7 — Cross-Language Ablation (1.5 min)
+## Slide 8 — Cross-Language Ablation (1.5 min)
 
 **SLIDE TITLE:** Experiment 2: Does Cross-Language Transfer Actually Work?
 
@@ -210,7 +266,7 @@ model essentially refuses to flag C functions — very high precision but very l
 
 ---
 
-## Slide 8 — CWE Transfer Profiles (1 min)
+## Slide 9 — CWE Transfer Profiles (1 min)
 
 **SLIDE TITLE:** Why Some CWEs Transfer and Others Don't
 
@@ -243,7 +299,7 @@ is about surface token overlap, not semantic equivalence."
 
 ---
 
-## Slide 9 — Hard Negative Mining (1 min)
+## Slide 10 — Hard Negative Mining (1 min)
 
 **SLIDE TITLE:** Fixing Failure Mode 1: Hard Negatives
 
@@ -276,7 +332,7 @@ data flow through the function, which a sequence encoder can't do."
 
 ---
 
-## Slide 10 — Real-World Augmentation (1.5 min)
+## Slide 11 — Real-World Augmentation (1.5 min)
 
 **SLIDE TITLE:** Fixing Failure Mode 2: Real-World Augmentation
 
@@ -314,7 +370,7 @@ of synthetic tuning."
 
 ---
 
-## Slide 11 — Semantic Understanding Tests (1.5 min)
+## Slide 12 — Semantic Understanding Tests (1.5 min)
 
 **SLIDE TITLE:** Experiment 4: What Has the Model Actually Learned?
 
@@ -391,7 +447,7 @@ the branch was unreachable."
 
 ---
 
-## Slide 12 — What the Tests Reveal (1 min)
+## Slide 13 — What the Tests Reveal (1 min)
 
 **SLIDE TITLE:** The Ceiling of Sequence-Based Models
 
@@ -425,7 +481,7 @@ entirely, so the model correctly predicted safe."
 
 ---
 
-## Slide 13 — Calibration (45 sec)
+## Slide 14 — Calibration (45 sec)
 
 **SLIDE TITLE:** Are the Confidence Scores Trustworthy?
 
