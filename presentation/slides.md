@@ -153,12 +153,28 @@ layer, and a sigmoid — which produces a probability between 0 and 1. Above 0.5
 VULNERABLE."
 
 *[Point to the before/after effect]*
-"Fine-tuning updated all 12 layers plus the new head using our labelled data. Before
-fine-tuning, the CLS summary captures general code meaning. After fine-tuning, it
-captures vulnerability-specific patterns — whether user input reaches a dangerous sink,
-whether a weak algorithm is used. We used a low learning rate so the model keeps its
-pre-trained knowledge of code structure and we only nudge it toward vulnerability
-detection rather than starting from scratch."
+"Fine-tuning is where we actually teach the model what we want it to do. UniXcoder
+arrives pre-trained — it has already seen millions of lines of code and learned how
+functions are structured, what common API calls look like, and how tokens relate to
+each other. But it has no concept of vulnerable versus safe. It has never seen a label
+that says this function is dangerous.
+
+Fine-tuning changes that. We pass our labelled examples through the model, compare its
+output to the correct label, compute the error, and use that error to update the weights
+— not just in the classification head, but across all 12 transformer layers. So the
+internal representations themselves change. The attention patterns that were previously
+tuned to understand general code structure get shifted toward patterns that matter for
+security — things like user-controlled data reaching a dangerous function call, a weak
+hashing algorithm being used for a password, or a buffer being written to without a
+bounds check.
+
+The reason we use a very low learning rate — 2 times 10 to the power of negative 5 —
+is that we don't want to erase the pre-trained knowledge. If we used a large learning
+rate, we would overwrite everything the model already knows about code and essentially
+start from scratch, which would need far more data and training time. The low rate means
+each update is a small nudge — the model shifts toward vulnerability detection while
+keeping its existing understanding of code structure intact. That's what makes
+fine-tuning on a relatively small synthetic dataset practical."
 
 ---
 
