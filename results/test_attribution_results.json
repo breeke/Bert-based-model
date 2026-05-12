@@ -1,0 +1,378 @@
+[
+  {
+    "name": "CWE-78 \u2014 Command Injection (C) [VULNERABLE]",
+    "prediction": "VULNERABLE",
+    "probability": 0.9568,
+    "top_tokens": [
+      {
+        "token": "ls",
+        "position": 28,
+        "score": 0.0027
+      },
+      {
+        "token": "\u0120\u0120\u0120",
+        "position": 22,
+        "score": 0.0012
+      },
+      {
+        "token": "s",
+        "position": 30,
+        "score": 0.0009
+      },
+      {
+        "token": "\u0120*",
+        "position": 8,
+        "score": 0.0008
+      },
+      {
+        "token": "\u0120sprintf",
+        "position": 23,
+        "score": 0.0007
+      },
+      {
+        "token": ");",
+        "position": 35,
+        "score": 0.0006
+      },
+      {
+        "token": "\u010a",
+        "position": 21,
+        "score": 0.0005
+      },
+      {
+        "token": "\u010a",
+        "position": 36,
+        "score": 0.0005
+      }
+    ]
+  },
+  {
+    "name": "CWE-78 \u2014 Hardcoded path, no user input (C) [SAFE]",
+    "prediction": "VULNERABLE",
+    "probability": 0.9514,
+    "top_tokens": [
+      {
+        "token": "\u0120sprintf",
+        "position": 23,
+        "score": 0.0115
+      },
+      {
+        "token": "ls",
+        "position": 28,
+        "score": 0.0032
+      },
+      {
+        "token": "\u0120/",
+        "position": 29,
+        "score": 0.0018
+      },
+      {
+        "token": "\u0120*",
+        "position": 8,
+        "score": 0.0013
+      },
+      {
+        "token": "\u0120system",
+        "position": 36,
+        "score": 0.0013
+      },
+      {
+        "token": "path",
+        "position": 32,
+        "score": 0.0011
+      },
+      {
+        "token": "\u010a",
+        "position": 21,
+        "score": 0.0009
+      },
+      {
+        "token": "\u010a",
+        "position": 34,
+        "score": 0.0009
+      }
+    ]
+  },
+  {
+    "name": "CWE-327 \u2014 MD5 password hash (Python) [VULNERABLE]",
+    "prediction": "VULNERABLE",
+    "probability": 0.956,
+    "top_tokens": [
+      {
+        "token": "5",
+        "position": 18,
+        "score": 0.008
+      },
+      {
+        "token": "md",
+        "position": 17,
+        "score": 0.0072
+      },
+      {
+        "token": "(",
+        "position": 19,
+        "score": 0.0029
+      },
+      {
+        "token": "\u0120return",
+        "position": 14,
+        "score": 0.0022
+      },
+      {
+        "token": "\u0120hashlib",
+        "position": 3,
+        "score": 0.0015
+      },
+      {
+        "token": "def",
+        "position": 5,
+        "score": 0.0014
+      },
+      {
+        "token": "\u010a",
+        "position": 12,
+        "score": 0.0014
+      },
+      {
+        "token": "\u010a",
+        "position": 1,
+        "score": 0.0013
+      }
+    ]
+  },
+  {
+    "name": "CWE-327 \u2014 SHA256 password hash (Python) [SAFE]",
+    "prediction": "VULNERABLE",
+    "probability": 0.9062,
+    "top_tokens": [
+      {
+        "token": "sha",
+        "position": 17,
+        "score": 0.0755
+      },
+      {
+        "token": "password",
+        "position": 20,
+        "score": 0.0235
+      },
+      {
+        "token": ".",
+        "position": 16,
+        "score": 0.0225
+      },
+      {
+        "token": "hexdigest",
+        "position": 24,
+        "score": 0.0186
+      },
+      {
+        "token": ".",
+        "position": 21,
+        "score": 0.0183
+      },
+      {
+        "token": "_",
+        "position": 7,
+        "score": 0.0102
+      },
+      {
+        "token": "\u010a",
+        "position": 4,
+        "score": 0.0095
+      },
+      {
+        "token": "password",
+        "position": 10,
+        "score": 0.0093
+      }
+    ]
+  },
+  {
+    "name": "CWE-327 \u2014 md5 replaced with hash_fn (Python) [ABLATED \u2014 expect VULNERABLE]",
+    "prediction": "VULNERABLE",
+    "probability": 0.9444,
+    "top_tokens": [
+      {
+        "token": ".",
+        "position": 16,
+        "score": 0.014
+      },
+      {
+        "token": "\u0120hashlib",
+        "position": 15,
+        "score": 0.0098
+      },
+      {
+        "token": "\u010a",
+        "position": 4,
+        "score": 0.0054
+      },
+      {
+        "token": "password",
+        "position": 21,
+        "score": 0.0042
+      },
+      {
+        "token": "\u0120hash",
+        "position": 6,
+        "score": 0.0035
+      },
+      {
+        "token": "()).",
+        "position": 24,
+        "score": 0.0029
+      },
+      {
+        "token": "password",
+        "position": 10,
+        "score": 0.0024
+      },
+      {
+        "token": "hexdigest",
+        "position": 25,
+        "score": 0.0021
+      }
+    ]
+  },
+  {
+    "name": "CWE-89 \u2014 SQL Injection (Python) [VULNERABLE]",
+    "prediction": "VULNERABLE",
+    "probability": 0.9587,
+    "top_tokens": [
+      {
+        "token": "\u0120username",
+        "position": 23,
+        "score": 0.0085
+      },
+      {
+        "token": "\u0120'\"",
+        "position": 21,
+        "score": 0.0047
+      },
+      {
+        "token": "\u0120WHERE",
+        "position": 18,
+        "score": 0.004
+      },
+      {
+        "token": "\u0120users",
+        "position": 17,
+        "score": 0.0023
+      },
+      {
+        "token": "user",
+        "position": 5,
+        "score": 0.0017
+      },
+      {
+        "token": "\u0120+",
+        "position": 24,
+        "score": 0.0016
+      },
+      {
+        "token": "username",
+        "position": 7,
+        "score": 0.0014
+      },
+      {
+        "token": "\u0120name",
+        "position": 19,
+        "score": 0.0013
+      }
+    ]
+  },
+  {
+    "name": "CWE-798 \u2014 Hardcoded credentials (Python) [VULNERABLE]",
+    "prediction": "VULNERABLE",
+    "probability": 0.9586,
+    "top_tokens": [
+      {
+        "token": "admin",
+        "position": 12,
+        "score": 0.0065
+      },
+      {
+        "token": "123",
+        "position": 13,
+        "score": 0.0062
+      },
+      {
+        "token": "admin",
+        "position": 23,
+        "score": 0.0048
+      },
+      {
+        "token": "localhost",
+        "position": 20,
+        "score": 0.0023
+      },
+      {
+        "token": "():",
+        "position": 6,
+        "score": 0.002
+      },
+      {
+        "token": "\u010a",
+        "position": 1,
+        "score": 0.0017
+      },
+      {
+        "token": "\u0120password",
+        "position": 9,
+        "score": 0.0013
+      },
+      {
+        "token": "def",
+        "position": 2,
+        "score": 0.001
+      }
+    ]
+  },
+  {
+    "name": "CWE-416 \u2014 Use-After-Free (C) [VULNERABLE]",
+    "prediction": "VULNERABLE",
+    "probability": 0.9315,
+    "top_tokens": [
+      {
+        "token": "\u0120log",
+        "position": 20,
+        "score": 0.1798
+      },
+      {
+        "token": "req",
+        "position": 16,
+        "score": 0.1084
+      },
+      {
+        "token": "\u0120free",
+        "position": 14,
+        "score": 0.0701
+      },
+      {
+        "token": "(",
+        "position": 15,
+        "score": 0.0259
+      },
+      {
+        "token": "(",
+        "position": 23,
+        "score": 0.0245
+      },
+      {
+        "token": ");",
+        "position": 17,
+        "score": 0.0196
+      },
+      {
+        "token": "void",
+        "position": 2,
+        "score": 0.018
+      },
+      {
+        "token": "request",
+        "position": 22,
+        "score": 0.0163
+      }
+    ]
+  }
+]
