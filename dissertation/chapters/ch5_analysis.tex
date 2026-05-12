@@ -256,3 +256,106 @@ patterns in training.
 The overall pattern across all four insights is coherent: CWEs expressed through compact,
 canonical, language-consistent API calls generalise well; CWEs requiring inter-statement
 reasoning or expressed differently across code corpora show the largest gaps.
+
+\section{Insight 5 --- Token Attribution Analysis}
+\label{sec:insight5}
+
+The semantic understanding tests in Section~\ref{sec:understanding} established
+\textit{whether} predictions are correct; token attribution analysis addresses
+\textit{why} by quantifying the contribution of individual tokens to the model's output.
+
+\subsection{Method}
+
+Occlusion-based attribution replaces each non-special token in the input sequence with
+the tokeniser's \texttt{[PAD]} token and records the resulting change in predicted
+probability.
+The attribution score for token $t_i$ is defined as:
+\[
+  s_i = p_{\text{baseline}} - p_{\text{ablated}(i)}
+\]
+where $p_{\text{baseline}}$ is the model's predicted vulnerability probability on the
+original sequence and $p_{\text{ablated}(i)}$ is the probability after replacing $t_i$
+with \texttt{[PAD]}.
+A positive score indicates the token pushes the prediction toward VULNERABLE; a negative
+score indicates it pushes toward SAFE.
+The method is model-agnostic and makes no assumptions about the internal attention
+structure; a high score proves the model relies on that token, but a near-zero score
+does not prove the token is ignored --- it may indicate that the prediction is
+distributed across many tokens simultaneously.
+
+\subsection{Results by CWE Class}
+
+Three qualitatively distinct attribution patterns emerge across the test cases.
+
+\textbf{Correct attribution (CWE-416).}
+For the use-after-free example, \texttt{free} receives the highest attribution score
+(0.506), \texttt{req} --- the pointer that is subsequently dereferenced --- scores
+second (0.060), and the \texttt{->} dereference operator also registers (0.003).
+The model has assigned the largest weights to the semantically correct tokens: the
+deallocation call and the identifier that connects the freed memory to its illegal
+subsequent access.
+This is the strongest evidence in the attribution analysis that the model has learned a
+structural pattern rather than an incidental surface association.
+
+\textbf{Shallow attribution (CWE-327, CWE-798).}
+For the MD5 password hash case, the tokeniser splits \texttt{md5} into two subword
+tokens \texttt{md} and \texttt{5}; both appear at the top of the attribution ranking
+(scores 0.0086 and approximately 0.008 respectively), with all other tokens an order of
+magnitude lower.
+The prediction is effectively determined by a single algorithm-name pattern.
+For hardcoded credentials (CWE-798), \texttt{123} (score 0.0141) and the variable name
+\texttt{password} (0.005) dominate: the model identifies the numeric literal assigned to
+a security-relevant variable, which is the correct surface signal even if it does not
+constitute deep semantic understanding.
+
+Both classes are correctly classified, but for a reason that is fragile: any reformulation
+that preserves the vulnerability while removing the identifying token or literal would
+likely fool the model.
+The ablated CWE-327 case (where \texttt{md5} is replaced with \texttt{hash\_fn})
+provides direct evidence of the fallback mechanism: the top tokens shift to
+\texttt{password} (0.009), \texttt{encode} (0.008), and \texttt{hexdigest} (0.001),
+showing the model can recover a more structural reading of the pattern when the primary
+keyword is absent.
+This explains why the token ablation test in Section~\ref{sec:understanding} passed:
+the model carries a secondary structural representation alongside the primary keyword signal.
+
+\textbf{Incorrect attribution (CWE-78).}
+The command injection false positive is the most analytically important result.
+On the vulnerable version (user-controlled input reaching \texttt{system()}), attribution
+scores are uniformly near zero across all tokens --- the highest is \texttt{ls} at 0.0024,
+and \texttt{system} does not appear in the top eight.
+The model is confident (p\,=\,0.959) but cannot be said to have identified the
+vulnerability; the prediction is too diffuse to attribute to any specific token or
+relationship.
+
+On the structurally identical but safe version (hardcoded path, no user input),
+\texttt{sprintf} scores 0.671 --- an order of magnitude above every other score
+in the entire attribution experiment --- and the model again predicts VULNERABLE (p\,=\,0.929).
+This directly explains the persistent minimal-fix failure from Section~\ref{sec:understanding}:
+the model learned \texttt{sprintf} as a near-sufficient predictor of the CWE-78 class
+during training, because in the synthetic training distribution \texttt{sprintf} appeared
+in virtually every vulnerable command injection example.
+The model therefore cannot be taught by counterexample to distinguish user-controlled from
+hardcoded \texttt{sprintf} arguments without an architectural change that can represent
+where a value came from.
+
+\subsection{Relationship to Training Data Co-occurrence}
+
+The attribution pattern across all five CWEs reflects a consistent underlying cause:
+the model learns whichever feature in the training data most reliably co-occurs with
+the vulnerability label.
+When that feature is the true cause of the vulnerability --- as with \texttt{free} in
+CWE-416 --- attribution is semantically correct.
+When a correlated surface token is a more consistent predictor across training examples
+--- as with \texttt{md5} for CWE-327 or \texttt{sprintf} for CWE-78 --- the model
+learns the surface token instead, and the attribution exposes that substitution.
+
+This has a direct implication for training data design: hard negatives are necessary
+precisely because they break surface co-occurrences that are not causal.
+The success of the CWE-327 sha256 fix (now correctly classified as SAFE after hard
+negative augmentation) confirms this: introducing safe examples that share the
+\texttt{hashlib} token structure but lack the dangerous algorithm name forced the model
+to abandon the library-level co-occurrence in favour of the algorithm-level distinction.
+The CWE-78 false positive cannot be resolved by the same approach because the
+distinguishing feature --- data flow from parameter to buffer --- is not representable
+as a token or token combination visible to a sequence encoder.
