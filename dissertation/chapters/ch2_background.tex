@@ -36,6 +36,10 @@ Static analysis tools such as Flawfinder~\citep{wheeler2004flawfinder} address i
 languages but do not transfer, and empirical studies of practitioner experience report
 that the overhead of managing multiple tools is a primary barrier to adoption in
 industrial workflows~\citep{johnson2013don}.
+Recent empirical work confirms this gap remains largely unaddressed:
+\citet{shu2026multilingual} find that the majority of automated vulnerability detection
+studies are restricted to C and C++ using datasets such as CVEfixes and Big-Vul, leaving
+the multilingual challenge systematically underexplored.
 The goal of cross-language vulnerability detection addresses this barrier directly.
 
 \section{Motivation}
@@ -56,6 +60,10 @@ the same time.
 
 Pre-trained transformer models offer a more straightforward path to multi-language
 detection.
+However, \citet{nguyen2025mulvuln} demonstrate that even models pre-trained on
+multilingual corpora struggle to capture language-specific nuances --- subtle syntax
+rules, idiomatic coding patterns, and unique API conventions --- that are essential for
+distinguishing vulnerability realisations across languages.
 Because they are pre-trained on code from several languages, their representations carry
 some cross-language signal without requiring separate preprocessing pipelines, and
 fine-tuning with a lightweight classification head is relatively low-cost in terms of
@@ -114,6 +122,11 @@ and is selected as the base model for this dissertation.
 Its ability to incorporate AST structure at pre-training time, combined with its
 single-architecture flexibility, makes it well-suited to fine-tuning for binary
 vulnerability classification.
+In a recent large-scale multilingual evaluation, UniXcoder achieved accuracy 0.5814 and
+F1-score 0.6822 on function-level detection across seven programming languages,
+outperforming CodeBERT and LineVul but falling below CodeT5P (accuracy 0.6037)
+\citep{shu2026multilingual}; this dissertation investigates whether targeted fine-tuning
+on a focused two-language setting can improve on this generalised multilingual baseline.
 
 \textbf{LineVul}~\citep{fu2022linevul} applies a transformer encoder with a
 classification head to function-level vulnerability prediction and introduces an
@@ -221,6 +234,10 @@ joint multi-language training rather than independent monolingual models.
 Second, pre-trained transformer models offer the strongest general-purpose code
 representations available, with UniXcoder providing the best combination of structural
 awareness and architectural flexibility for fine-tuning as a vulnerability classifier.
+Recent multilingual benchmarking \citep{shu2026multilingual} and architecture proposals
+\citep{nguyen2025mulvuln} confirm that PLMs have not yet solved cross-language
+vulnerability detection, and that language-specific knowledge remains a meaningful gap
+even for models pre-trained on multi-language corpora.
 Third, sequence models hit a predictable ceiling on CWE classes requiring inter-statement
 reasoning, while graph-based models address that ceiling at the cost of language-specific
 tooling; the two paradigms are complementary rather than competing, and precisely locating
