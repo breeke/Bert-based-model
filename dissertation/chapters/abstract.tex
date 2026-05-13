@@ -18,6 +18,10 @@ or genuine pattern recognition. The model is found to be robust to variable rena
 keyword ablation, detecting most vulnerability patterns from structural context alone,
 but it cannot reason about control-flow reachability or cross-statement data flow ---
 an inherent limitation of sequence-level encoding.
+Token-level attribution analysis confirms this boundary: for CWE classes with locally
+visible signals (CWE-416, CWE-798) the model attends to semantically correct tokens,
+while for data-flow-dependent classes (CWE-78) attribution reveals reliance on
+co-occurring surface tokens rather than the causal vulnerability pattern.
 
 Two targeted interventions address the model's principal failure modes.
 Hard negative mining resolves systematic false positives on safe cryptographic functions

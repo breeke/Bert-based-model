@@ -39,11 +39,16 @@ Real-world data augmentation with 1{,}000 DiverseVul samples reduced the
 synthetic-to-real generalisation gap from $-0.522$ to $-0.182$ F1 points,
 raising real-world F1 from 0.410 to 0.749.
 
-\textbf{A semantic understanding test suite.}
+\textbf{A semantic understanding test suite and token attribution analysis.}
 Four probing tests distinguish pattern-matching from semantic understanding.
 The model passes all renaming and token-ablation tests (12/12), passes 7/8 minimal-fix
 cases, and fails 4/5 dead-code cases --- directly demonstrating the architectural
 ceiling of sequence encoders in a principled, interpretable way.
+Occlusion-based token attribution complements these tests by quantifying which tokens
+drive each prediction: confirming correct structural attribution for CWE-416 (\texttt{free}
+at score 0.506), identifying surface co-occurrence as the failure mechanism for CWE-78
+(\texttt{sprintf} at 0.671 on a safe function), and explaining why token ablation passes
+despite keyword matching being the primary signal for CWE-327.
 
 \section{Principal Findings}
 
@@ -55,6 +60,9 @@ keyword association.
 But the dead-code and data-flow failures locate the ceiling precisely: anything requiring
 inter-statement reasoning lies outside what a sequence encoder can represent.
 This ceiling is an inherent property of the architecture, not a fixable training artefact.
+Token attribution analysis makes the mechanism explicit: CWE classes with locally visible
+signals produce correct attributions, while data-flow-dependent classes produce diffuse or
+surface-anchored attributions that explain exactly why the architectural failures occur.
 
 \textbf{Cross-language transfer quality is determined by surface representation, not semantic equivalence.}
 CWE-798 transfers perfectly in both directions because a string literal assigned to a

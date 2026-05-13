@@ -27,6 +27,14 @@ A transformer encoder operating on a token sequence can learn that certain patte
 tokens co-occur in dangerous code, but it cannot determine whether a code path is
 reachable, whether a variable's value at a given point is user-controlled, or whether
 a pointer freed at one location is dereferenced at another.
+Token attribution analysis (Section~\ref{sec:insight5}) makes this concrete:
+for CWE-78, \texttt{sprintf} receives an attribution score of 0.671 on a structurally
+safe function --- the highest score recorded across all test cases --- demonstrating that
+the model has learned \texttt{sprintf} as an unconditional signal of danger rather than
+attending to whether user-controlled data flows into the buffer.
+By contrast, CWE-416 attribution correctly identifies \texttt{free} (score 0.506) and the
+subsequently dereferenced pointer as the primary signals, consistent with a model that
+has learned the use-after-free pattern structurally.
 These are properties that require an explicit representation of program structure:
 a control-flow graph for reachability, a data-dependence graph for taint analysis,
 a points-to graph for alias resolution.

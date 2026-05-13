@@ -89,6 +89,8 @@ The main contributions are:
         identifying the structural conditions for successful transfer.
   \item A semantic understanding test suite with four probing tests that locate the model's
         architectural ceiling precisely.
+  \item Token-level attribution analysis via occlusion, quantifying which tokens drive each
+        prediction and confirming the mechanistic basis of the model's successes and failures.
   \item Empirical evaluation of hard negative mining and real-world augmentation as targeted
         interventions, with before-and-after comparison.
 \end{itemize}
@@ -103,7 +105,7 @@ training procedure, and evaluation framework.
 Chapter~\ref{ch:experiments} presents results from all four experiments and the
 semantic understanding tests.
 Chapter~\ref{ch:analysis} analyses cross-language transfer, real-world error patterns,
-calibration, and the per-CWE generalisation gap.
+calibration, the per-CWE generalisation gap, and token-level attribution.
 Chapter~\ref{ch:improvements} describes the two training interventions and quantifies
 their effect.
 Chapter~\ref{ch:discussion} discusses limitations and future directions.

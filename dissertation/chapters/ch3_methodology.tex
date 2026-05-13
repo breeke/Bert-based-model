@@ -49,11 +49,11 @@ which is desirable in security applications where calibrated uncertainty is valu
 \subsection{Vulnerability Classes}
 
 The dataset covers 17 CWE types across C and Python.
-C-specific classes include: buffer overflow (CWE-120), format string (CWE-134),
-use-after-free (CWE-416), double free (CWE-415), integer overflow (CWE-190),
-null pointer dereference (CWE-476), and off-by-one error (CWE-193).
-Python-specific classes include: insecure deserialisation (CWE-502), prototype pollution
-(CWE-1321), and regex denial-of-service (CWE-1333).
+C-specific classes include: buffer overflow (CWE-120), use-after-free (CWE-416),
+double free (CWE-415), integer overflow (CWE-190), null pointer dereference (CWE-476),
+off-by-one error (CWE-193), and uninitialized variable read (CWE-457).
+Python-specific classes include: insecure deserialisation (CWE-502),
+server-side request forgery (CWE-918), and eval injection (CWE-95).
 Eight classes are shared across both languages: command injection (CWE-78),
 TOCTOU race condition (CWE-367), hardcoded credentials (CWE-798), path traversal (CWE-22),
 insecure file permissions (CWE-732), weak cryptography (CWE-327), SQL injection (CWE-89),
