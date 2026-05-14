@@ -59,6 +59,20 @@ TOCTOU race condition (CWE-367), hardcoded credentials (CWE-798), path traversal
 insecure file permissions (CWE-732), weak cryptography (CWE-327), SQL injection (CWE-89),
 and format string or template injection (CWE-134).
 
+These 17 classes were chosen to balance three criteria.
+First, industrial prevalence: all selected classes appear in the CWE Top 25 Most Dangerous
+Software Weaknesses or are frequently represented in real-world CVE disclosures.
+Second, structural diversity: the set deliberately spans locally detectable patterns
+(CWE-798 hardcoded credentials, CWE-327 weak cryptography) and multi-statement patterns
+(CWE-416 use-after-free, CWE-367 TOCTOU), so the evaluation distinguishes what
+sequence models handle well from where they fail.
+Third, cross-language coverage: eight classes are shared between C and Python, enabling
+the ablation study to measure transfer quality directly rather than inferring it from
+aggregate scores.
+This selection is not exhaustive --- the CWE landscape contains over 900 entries --- but
+it is representative of the classes most likely to appear in production codebases and most
+informative for evaluating a sequence-based detector.
+
 Each vulnerable example is a short self-contained function illustrating the pattern precisely.
 Each safe counterpart uses the same structural template but applies the correct mitigation:
 parameterised queries instead of string concatenation for CWE-89, environment-variable lookup
