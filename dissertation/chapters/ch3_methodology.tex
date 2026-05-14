@@ -73,6 +73,102 @@ This selection is not exhaustive --- the CWE landscape contains over 900 entries
 it is representative of the classes most likely to appear in production codebases and most
 informative for evaluating a sequence-based detector.
 
+Tables~\ref{tab:cwe_c}, \ref{tab:cwe_python}, and~\ref{tab:cwe_shared} summarise each
+class with a brief rationale and a real-world CVE that illustrates the pattern.
+
+\begin{table}[H]
+  \centering
+  \small
+  \caption{C-specific CWE classes used in the dataset.}
+  \label{tab:cwe_c}
+  \begin{tabular}{llp{5.2cm}l}
+    \toprule
+    CWE & Name & Selected because & CVE example \\
+    \midrule
+    CWE-120 & Buffer overflow &
+      CWE Top~25 \#2; unsafe memory copy is the dominant C memory error; locally detectable via unsafe API calls &
+      CVE-2021-3156 \\
+    CWE-416 & Use-after-free &
+      CWE Top~25 \#7; requires tracking pointer lifetime across statements; tests the sequence-model ceiling directly &
+      CVE-2020-1054 \\
+    CWE-415 & Double free &
+      Closely related to CWE-416 but simpler; two \texttt{free()} calls on the same pointer within one function &
+      CVE-2019-5736 \\
+    CWE-190 & Integer overflow &
+      CWE Top~25 \#12; arithmetic expression is locally visible; provides contrast with multi-statement classes &
+      CVE-2021-43527 \\
+    CWE-476 & Null ptr dereference &
+      CWE Top~25 \#14; missing null-check before dereference; single-statement, locally detectable &
+      CVE-2019-11477 \\
+    CWE-193 & Off-by-one error &
+      Frequent in low-level C; boundary condition errors (\texttt{<=} vs \texttt{<}) are subtle surface changes &
+      CVE-2018-1000517 \\
+    CWE-457 & Uninitialised variable &
+      Use of stack memory before assignment; tests whether model detects missing initialisation &
+      CVE-2017-1000251 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \small
+  \caption{Python-specific CWE classes used in the dataset.}
+  \label{tab:cwe_python}
+  \begin{tabular}{llp{5.2cm}l}
+    \toprule
+    CWE & Name & Selected because & CVE example \\
+    \midrule
+    CWE-502 & Insecure deserialisation &
+      CWE Top~25 \#20; \texttt{pickle.loads()} and \texttt{yaml.load()} are notorious Python-specific attack vectors &
+      CVE-2017-18342 \\
+    CWE-918 & SSRF &
+      CWE Top~25 \#10; Python web frameworks frequently expose user-controlled URL fetch calls &
+      CVE-2021-26855 \\
+    CWE-95  & Eval injection &
+      Python-specific risk from \texttt{eval()}/\texttt{exec()} on unsanitised input; compact one-line pattern &
+      CVE-2019-7609 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \small
+  \caption{CWE classes shared across C and Python.}
+  \label{tab:cwe_shared}
+  \begin{tabular}{llp{5.2cm}l}
+    \toprule
+    CWE & Name & Selected because & CVE example \\
+    \midrule
+    CWE-78  & Command injection &
+      CWE Top~25 \#5; high prevalence; tests data-flow tracking from user input to execution sink &
+      CVE-2014-6271 \\
+    CWE-367 & TOCTOU race &
+      CWE Top~25 \#22; temporal gap between check and use; requires non-local reasoning to detect &
+      CVE-2017-7533 \\
+    CWE-798 & Hardcoded credentials &
+      CWE Top~25 \#18; compact, single-line pattern; subject of the hard-negative mining intervention &
+      CVE-2022-24706 \\
+    CWE-22  & Path traversal &
+      CWE Top~25 \#8; user-controlled file path; surface token pattern is similar in both languages &
+      CVE-2021-41773 \\
+    CWE-732 & Insecure file permissions &
+      Overly permissive mode bits (\texttt{0o777}); tests detection of dangerous constant values &
+      CVE-2019-3462 \\
+    CWE-327 & Weak cryptography &
+      CWE Top~25 \#29; algorithm name locally visible (\texttt{md5} vs \texttt{sha256}); subject of hard-negative mining &
+      CVE-2022-21449 \\
+    CWE-89  & SQL injection &
+      CWE Top~25 \#3; string concatenation vs parameterised query; clear safe/unsafe surface contrast &
+      CVE-2021-26085 \\
+    CWE-134 & Format string &
+      High historical prevalence in C; user-controlled format argument; tests uncontrolled format specifier detection &
+      CVE-2012-0809 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
 Each vulnerable example is a short self-contained function illustrating the pattern precisely.
 Each safe counterpart uses the same structural template but applies the correct mitigation:
 parameterised queries instead of string concatenation for CWE-89, environment-variable lookup
