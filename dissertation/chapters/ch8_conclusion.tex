@@ -1,55 +1,6 @@
 \chapter{Conclusion}
 \label{ch:conclusion}
 
-\section{Summary of Contributions}
-
-This dissertation set out to investigate whether a pre-trained code model could be
-fine-tuned to detect software vulnerabilities across multiple programming languages,
-and to understand the conditions under which such a model generalises from clean training
-data to real-world code.
-The work produced a complete system --- from dataset construction through training,
-evaluation, iterative improvement, and diagnostic analysis --- and the results answer
-the central questions with specificity.
-
-\textbf{A multi-language synthetic vulnerability dataset.}
-A hand-crafted dataset covering 17 CWE types across C and Python was constructed,
-with eight shared cross-language vulnerability classes.
-The dataset includes contextually wrapped examples, hard negative contrastive pairs,
-and a held-out validation set of 1{,}230 samples.
-The generation pipeline is parameterised and extensible, allowing new CWE types and
-languages to be added without changes to the training infrastructure.
-
-\textbf{A fine-tuned UniXcoder vulnerability classifier.}
-UniXcoder was fine-tuned as a binary classifier with a lightweight CLS-head, label
-smoothing ($\varepsilon = 0.1$), and AdamW optimisation.
-The resulting joint model achieves F1\,=\,0.931, AUC-ROC\,=\,0.964, and
-precision\,=\,0.961 on the synthetic held-out set.
-Eleven of seventeen CWE classes reach perfect recall.
-
-\textbf{A cross-language ablation study.}
-Three model variants were evaluated in a 3$\times$3 matrix, revealing that joint training
-consistently outperforms single-language training, that C-to-Python transfer is
-substantially more effective than Python-to-C transfer, and that transfer quality is
-determined by the structural similarity of a CWE's surface representation across languages.
-
-\textbf{Two targeted training interventions.}
-Hard negative mining resolved systematic false positives on safe strong-cryptography
-functions.
-Real-world data augmentation with 1{,}000 DiverseVul samples reduced the
-synthetic-to-real generalisation gap from $-0.522$ to $-0.182$ F1 points,
-raising real-world F1 from 0.410 to 0.749.
-
-\textbf{A semantic understanding test suite and token attribution analysis.}
-Four probing tests distinguish pattern-matching from semantic understanding.
-The model passes all renaming and token-ablation tests (12/12), passes 7/8 minimal-fix
-cases, and fails 4/5 dead-code cases --- directly demonstrating the architectural
-ceiling of sequence encoders in a principled, interpretable way.
-Occlusion-based token attribution complements these tests by quantifying which tokens
-drive each prediction: confirming correct structural attribution for CWE-416 (\texttt{free}
-at score 0.506), identifying surface co-occurrence as the failure mechanism for CWE-78
-(\texttt{sprintf} at 0.671 on a safe function), and explaining why token ablation passes
-despite keyword matching being the primary signal for CWE-327.
-
 \section{Principal Findings}
 
 Three findings stand out as the most broadly informative.
