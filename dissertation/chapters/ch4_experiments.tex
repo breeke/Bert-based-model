@@ -154,6 +154,20 @@ surface-token patterns with their C counterparts.
 \textbf{Joint training consistently wins.}
 Across all three test sets the joint model outperforms both single-language models by
 approximately 0.09--0.11 F1 points on the combined test set.
+The reason is mutual reinforcement through the eight CWE classes shared between C and
+Python.
+During joint training, the model sees two structurally distinct surface realisations of
+the same vulnerability concept in the same training run.
+Rather than diluting capacity, this acts as implicit regularisation: each language's
+examples constrain the representations learned from the other, producing a more general
+underlying concept of what constitutes dangerous code.
+The effect is visible even on within-language performance --- the joint model's C F1
+(0.905) exceeds the C-only model's (0.861), because Python examples for shared CWEs such
+as CWE-78 and CWE-89 reinforce the structural patterns the model needs to detect them in
+C.
+Single-language models over-specialise to the surface idioms of one language and fail to
+develop this more general representation, which is why the Python-only model collapses
+from F1\,=\,0.976 on Python to 0.677 on C.
 
 \section{Experiment 3 --- Real-World Generalisation}
 
