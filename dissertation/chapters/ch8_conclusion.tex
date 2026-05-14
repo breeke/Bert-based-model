@@ -95,3 +95,52 @@ ultimately --- architectural advances that bring data-flow and control-flow reas
 into the model's representational vocabulary.
 The results reported here establish a clear baseline, locate the ceiling of sequence-based
 approaches precisely, and map a concrete path forward.
+
+\section{Future Directions}
+
+Five directions would most directly address the identified limitations and extend the
+scope of this work.
+
+\textbf{Graph-augmented encoding.}
+Replacing or augmenting the sequence encoder with a graph neural network operating on the
+program's data-flow graph would enable the model to track taint directly --- following
+user-controlled values from input sources through assignments and function calls to
+execution sinks.
+This would be the most impactful single architectural change, directly addressing the
+CWE-78 data-flow failure and likely improving CWE-416 (use-after-free) and CWE-476
+(null dereference).
+
+\textbf{Multi-class CWE classification.}
+The current system is a binary classifier that predicts whether a function is vulnerable
+or safe.
+A natural extension is a multi-class classifier that simultaneously predicts which CWE
+class a vulnerable function belongs to.
+This would be considerably more useful in practice: a tool that reports ``this function
+contains a use-after-free (CWE-416)'' provides immediately actionable information,
+whereas a binary VULNERABLE verdict requires a follow-up manual triage step.
+The fine-tuned model's CLS-token embeddings already encode CWE-discriminative
+information --- the per-CWE F1 variation across classes demonstrates this --- and a
+lightweight multi-class head trained on top of those embeddings is a direct next step.
+The main challenge is label quality: real-world datasets such as DiverseVul provide
+CWE annotations for only a subset of samples, and synthetic data would need to be
+extended to cover a wider range of classes at sufficient volume per class to train a
+reliable multi-class head.
+
+\textbf{Larger real-world training corpus.}
+Using more of the DiverseVul training split --- or combining DiverseVul with BigVul and
+additional CVE-labelled repositories --- would reduce the generalisation gap further.
+The 0.278 F1 improvement from 1{,}000 real samples suggests a favourable response to
+real data volume; a 10{,}000-sample augmentation might plausibly close the remaining gap
+substantially.
+
+\textbf{CWE class expansion.}
+Adding synthetic training examples for CWE-787 (out-of-bounds write), CWE-400 (uncontrolled
+resource consumption), and CWE-703 (improper exception handling) would cover the three most
+common false-negative classes in the real-world test.
+Template-based synthetic generation for these classes follows the same methodology used
+for the existing 17 CWEs.
+
+\textbf{Multi-language real-world evaluation.}
+Constructing or obtaining a Python-language real-world vulnerability evaluation set ---
+sourced from PyPI security advisories or OSV database entries --- would allow the same
+synthetic-to-real gap analysis for Python that Experiment~3 provides for C.
