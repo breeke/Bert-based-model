@@ -1,33 +1,32 @@
-Software vulnerabilities continue to pose a significant threat to the security of modern systems,
-with thousands of new Common Vulnerabilities and Exposures (CVEs) published each year.
-Manual code review is costly and does not scale; automated static analysers produce high false-positive
-rates and lack cross-language portability. This dissertation investigates whether a pre-trained
-code model can be fine-tuned to detect vulnerabilities reliably across multiple programming languages,
-and examines the gap between performance on clean synthetic data and performance on real-world code.
+Software vulnerabilities continues to develop with thousands of new Common Vulnerabilities
+and Exposures (CVEs) published each year. Manual code review doesn't scale and existing
+approaches lack cross-language portability. This dissertation investigates whether a pre-trained
+code model can be fine-tuned to detect vulnerabilities reliably across multiple programming
+languages, and examines the gap between performance on clean synthetic data and performance
+on real-world code.
 
 A multi-language synthetic dataset covering 17 CWE types across C and Python is constructed,
-including eight shared cross-language vulnerability classes.
-UniXcoder is fine-tuned as a binary classifier on this dataset, achieving F1\,=\,0.931 and
-AUC-ROC\,=\,0.964 on a held-out synthetic validation set of 1{,}230 samples.
-A cross-language ablation study reveals that joint training consistently outperforms
-single-language training, and that transfer quality depends on the structural similarity
-of a vulnerability's surface representation across languages rather than its conceptual equivalence.
+including eight shared cross-language vulnerability classes. UniXcoder is fine-tuned as a
+binary classifier on this dataset, achieving F1\,=\,0.931 and AUC-ROC\,=\,0.964 on a
+held-out synthetic validation set of 1{,}230 samples. A cross-language ablation study reveals
+that joint training consistently outperforms single-language training, and that transfer
+quality depends on the structural similarity of a vulnerability's surface representation
+across languages rather than its conceptual equivalence.
 
 A semantic understanding test suite probes whether the model is performing keyword matching
 or genuine pattern recognition. The model is found to be robust to variable renaming and
 keyword ablation, detecting most vulnerability patterns from structural context alone,
-but it cannot reason about control-flow reachability or cross-statement data flow ---
-an inherent limitation of sequence-level encoding.
-Token-level attribution analysis confirms this boundary: for CWE classes with locally
-visible signals (CWE-416, CWE-798) the model attends to semantically correct tokens,
-while for data-flow-dependent classes (CWE-78) attribution reveals reliance on
-co-occurring surface tokens rather than the causal vulnerability pattern.
+but it cannot reason about control-flow reachability or cross-statement data flow,
+which is a limitation of sequence-level encoding. Token-level attribution analysis confirms
+this boundary: for CWE classes with locally visible signals (CWE-416, CWE-798) the model
+attends to semantically correct tokens, while for data-flow-dependent classes (CWE-78)
+attribution reveals reliance on co-occurring surface tokens rather than the causal
+vulnerability pattern.
 
-Two targeted interventions address the model's principal failure modes.
-Hard negative mining resolves systematic false positives on safe cryptographic functions
-by adding contrastive training pairs.
-Real-world data augmentation with 1{,}000 DiverseVul samples reduces the
-synthetic-to-real F1 gap from $-0.522$ to $-0.182$, raising real-world performance
-from 0.410 to 0.749.
-The results establish a clear baseline, identify the architectural ceiling of sequence-based
-approaches, and motivate graph-augmented architectures as the primary direction for future work.
+Two targeted interventions address the model's failure modes. Hard negative mining resolves
+systematic false positives on safe cryptographic functions by adding contrastive training
+pairs. Real-world data augmentation with 1{,}000 DiverseVul samples reduces the
+synthetic-to-real F1 gap from $-0.522$ to $-0.182$, raising real-world performance from
+0.410 to 0.749. The results establish a clear baseline, identify the architectural ceiling of
+sequence-based approaches, and motivate graph-augmented architectures as the primary
+direction for future work.
