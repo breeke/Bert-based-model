@@ -52,6 +52,57 @@ The semantic understanding tests move the evaluation beyond accuracy figures to 
 qualitative characterisation of what the model has actually learned, which is a
 precondition for trusting any machine learning system in a security-critical context.
 
+\textbf{CWE selection rationale.}
+The 17 CWE types covered by the dataset were chosen to balance three criteria.
+First, industrial prevalence: all selected classes appear in the CWE Top 25 Most Dangerous
+Software Weaknesses or are frequently represented in real-world CVE disclosures.
+Second, structural diversity: the set deliberately spans locally detectable patterns
+(CWE-798 hardcoded credentials, CWE-327 weak cryptography) and multi-statement patterns
+(CWE-416 use-after-free, CWE-367 TOCTOU), so the evaluation distinguishes what
+sequence models handle well from where they fail.
+Third, cross-language coverage: eight classes are shared between C and Python, enabling
+the ablation study to measure transfer quality directly rather than inferring it from
+aggregate scores.
+This selection is not exhaustive --- the CWE landscape contains over 900 entries --- but
+it is representative of the classes most likely to appear in production codebases and most
+informative for evaluating a sequence-based detector.
+
+\textbf{Limitations on complex vulnerability detection.}
+The results make clear that the model handles locally visible patterns reliably but
+struggles as vulnerability complexity increases.
+CWE classes whose exploitability depends on a single self-contained expression ---
+hardcoded credentials, weak algorithm selection, integer overflow in an arithmetic
+expression --- reach perfect or near-perfect F1.
+Classes that require reasoning across multiple statements degrade substantially: CWE-416
+(use-after-free) requires tracking a pointer from its allocation through its
+deallocation to a subsequent dereference; CWE-367 (TOCTOU) requires recognising a
+temporal gap between a check and its use.
+The dead-code test failures confirm this directly: the model cannot determine whether a
+dangerous code path is reachable, so it flags unreachable vulnerable blocks as if they
+were live.
+Extending this approach to more complex vulnerability classes --- inter-procedural
+taint tracking, concurrency bugs, logic flaws spanning multiple files --- would
+require architectural changes that bring explicit program structure into the
+model's representational vocabulary, such as graph-augmented encoding over data-flow
+and control-flow graphs.
+
+\textbf{Positioning within the broader research landscape.}
+This work sits within a rapidly evolving field.
+Recent multilingual benchmarking by Shu et al.~\cite{shu2026multilingual} confirms that
+cross-language vulnerability detection remains unsolved even for the largest pre-trained
+models, with accuracy dropping substantially outside the C/C++ domain.
+Nguyen et al.~\cite{nguyen2025mulvuln} similarly demonstrate that language-specific
+nuances persist as a meaningful gap for multilingual transformer models.
+The contributions here --- a focused two-language fine-tuning study, a diagnostic
+semantic test suite, and token-level attribution analysis --- complement that body of
+work by providing a principled characterisation of \emph{why} sequence models fail on
+specific classes, rather than only reporting where they fail.
+As the field moves towards graph-augmented architectures, LLM-assisted code repair, and
+automated vulnerability patching, the baseline and diagnostic framework established
+here provide a reference point for measuring genuine progress: a new architecture that
+solves the dead-code and data-flow cases identified in this work would represent a
+qualitative advance, not merely a benchmark improvement.
+
 The gap between synthetic and real-world performance is not a failure of the approach
 but a measurement of the problem's difficulty.
 Closing it further requires more real-world training data, broader CWE coverage, and ---
