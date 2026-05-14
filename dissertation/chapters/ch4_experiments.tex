@@ -282,6 +282,30 @@ the model's predicted probability changes by at most 0.001
 The model is not keying on identifier names; it responds to the structural operation
 pattern regardless of what the variables are called.
 
+\begin{figure}[H]
+\begin{minipage}[t]{0.48\textwidth}
+\begin{lstlisting}[language=C, caption={CWE-78 original (prob 0.9585).}]
+void run_command(char *user_input) {
+    char cmd[256];
+    sprintf(cmd, "ls %s", user_input);
+    system(cmd);
+}
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{lstlisting}[language=C, caption={CWE-78 renamed (prob 0.9575).}]
+void execute_action(char *data) {
+    char buffer[256];
+    sprintf(buffer, "ls %s", data);
+    system(buffer);
+}
+\end{lstlisting}
+\end{minipage}
+\caption{Test 1: renaming all identifiers leaves the prediction unchanged.}
+\label{fig:test1_rename}
+\end{figure}
+
 \subsection{Test 2 --- Minimal Fix (7/8 pass)}
 
 Seven of eight cases correctly flip from VULNERABLE to SAFE after applying the targeted fix.
@@ -313,6 +337,46 @@ This requires the model to recognise that \texttt{user\_input} no longer flows i
 \texttt{system()}, which demands data-flow tracking that a sequence classifier cannot
 perform directly.
 
+\begin{figure}[H]
+\begin{minipage}[t]{0.48\textwidth}
+\begin{lstlisting}[language=Python, caption={CWE-327 vulnerable (prob 0.960) $\to$ fixed (prob 0.048). PASS.}]
+# Vulnerable
+def hash_password(password):
+    return hashlib.md5(
+        password.encode()
+    ).hexdigest()
+
+# Fixed (sha256 only change)
+def hash_password(password):
+    return hashlib.sha256(
+        password.encode()
+    ).hexdigest()
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{lstlisting}[language=C, caption={CWE-78 vulnerable (prob 0.959) $\to$ ``fixed'' (prob 0.929). FAIL.}]
+// Vulnerable
+void run_command(char *user_input) {
+    char cmd[256];
+    sprintf(cmd, "ls %s", user_input);
+    system(cmd);
+}
+
+// "Fixed" (hardcoded path only)
+void run_command(char *user_input) {
+    char cmd[256];
+    sprintf(cmd, "ls /safe/path");
+    system(cmd);
+}
+\end{lstlisting}
+\end{minipage}
+\caption{Test 2: CWE-327 correctly flips on algorithm change; CWE-78 does not flip
+because the model cannot track that \texttt{user\_input} no longer reaches
+\texttt{system()}.}
+\label{fig:test2_fix}
+\end{figure}
+
 \subsection{Test 3 --- Dead Code Injection (1/5 pass)}
 
 Four of five cases fail: the model predicts VULNERABLE for safe functions containing
@@ -328,6 +392,33 @@ signals are absent.
 The single passing case is a Python function with a dead \texttt{if False:} block,
 where the overall structural context is clearly safe (probability 0.058).
 
+\begin{figure}[H]
+\begin{minipage}[t]{0.48\textwidth}
+\begin{lstlisting}[language=C, caption={C: safe logger + dead \texttt{system()} call. Model predicts VULNERABLE (prob 0.920). FAIL.}]
+void safe_logger(char *message) {
+    printf("Log: %s\n", message);
+    if (0) {
+        system(message); // unreachable
+    }
+}
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{lstlisting}[language=Python, caption={Python: safe greeter + dead \texttt{md5} block. Model predicts SAFE (prob 0.058). PASS.}]
+import hashlib
+def greet_user(name):
+    if False:
+        hashlib.md5(  # unreachable
+            name.encode()).hexdigest()
+    return "Hello, " + name
+\end{lstlisting}
+\end{minipage}
+\caption{Test 3: the C model is fooled by unreachable \texttt{system()} tokens;
+the Python model correctly ignores the dead \texttt{if False:} block.}
+\label{fig:test3_dead}
+\end{figure}
+
 \subsection{Test 4 --- Token Ablation (6/6 pass)}
 
 All six cases pass.
@@ -338,6 +429,32 @@ The model maintains its VULNERABLE classification from context alone, demonstrat
 the data-flow pattern --- user input entering an execution sink, or unchecked data entering
 a cryptographic operation --- is sufficient to trigger the prediction without the specific
 keyword present.
+
+\begin{figure}[H]
+\begin{minipage}[t]{0.48\textwidth}
+\begin{lstlisting}[language=C, caption={CWE-78 with \texttt{system} (prob 0.959).}]
+void run_command(char *user_input) {
+    char cmd[256];
+    sprintf(cmd, "ls %s", user_input);
+    system(cmd);
+}
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{lstlisting}[language=C, caption={CWE-78 with \texttt{safe\_exec} (prob 0.950).}]
+void run_command(char *user_input) {
+    char cmd[256];
+    sprintf(cmd, "ls %s", user_input);
+    safe_exec(cmd);
+}
+\end{lstlisting}
+\end{minipage}
+\caption{Test 4: replacing \texttt{system} with a neutral name changes the
+probability by only 0.009 --- the model detects the vulnerability from the
+user-input-to-sink data-flow pattern, not the keyword.}
+\label{fig:test4_ablation}
+\end{figure}
 
 \subsection{Summary}
 
