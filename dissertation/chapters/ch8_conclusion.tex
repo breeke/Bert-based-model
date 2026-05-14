@@ -23,6 +23,19 @@ different API sequences.
 This clarifies what ``cross-language vulnerability detection'' means in practice:
 detecting shared surface patterns, not shared semantics.
 
+\textbf{Joint training consistently outperforms single-language training.}
+Across all three test sets the joint model outperforms both single-language variants.
+The reason is mutual reinforcement: the eight CWE classes shared between C and Python
+provide the model with two structurally distinct surface realisations of the same
+vulnerability concept during training, which strengthens the underlying representation
+rather than diluting it.
+Single-language models over-specialise --- the Python-only model achieves F1\,=\,0.976
+on Python but collapses to 0.677 on C, having never seen C memory-management idioms.
+The joint model avoids this by using each language's examples as implicit regularisation
+for the other, producing representations that generalise better even within each language
+individually: the joint model's C F1 (0.905) exceeds the C-only model's (0.861) because
+Python examples for shared CWEs reinforce the corresponding C patterns during training.
+
 \textbf{Real-world augmentation is the highest-leverage single intervention.}
 The 0.278 F1 point improvement from adding 1{,}000 real-world samples dwarfs all other
 single changes.
