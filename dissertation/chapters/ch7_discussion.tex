@@ -9,7 +9,7 @@ future improvement.
 
 The joint model achieves F1\,=\,0.931 on the synthetic held-out set --- a strong result
 that places it in the range reported for fine-tuned CodeBERT and GraphCodeBERT baselines
-on comparable binary classification benchmarks~\citep{fu2022linevul,ni2023diversevul}.
+on comparable binary classification benchmarks~\cite{fu2022linevul,ni2023diversevul}.
 The semantic understanding tests nuance this headline figure.
 The model passes all six variable-renaming cases and all six token-ablation cases,
 demonstrating that its representations are not anchored to specific identifier strings
@@ -39,8 +39,8 @@ These are properties that require an explicit representation of program structur
 a control-flow graph for reachability, a data-dependence graph for taint analysis,
 a points-to graph for alias resolution.
 Pre-trained models that incorporate these structures --- such as
-GraphCodeBERT~\citep{guo2021graphcodebert} and graph-augmented vulnerability detectors
-such as Devign~\citep{zhou2019devign} and Reveal~\citep{chakraborty2022reveal} --- have
+GraphCodeBERT~\cite{guo2021graphcodebert} and graph-augmented vulnerability detectors
+such as Devign~\cite{zhou2019devign} and Reveal~\cite{chakraborty2022reveal} --- have
 demonstrated gains on exactly the CWE classes where sequence models fail.
 The results of this work motivate rather than undermine that line of research:
 they show precisely which vulnerability classes would benefit from richer structural

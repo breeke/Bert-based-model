@@ -5,10 +5,10 @@
 Software vulnerabilities are a persistent and growing challenge in computer security.
 The National Vulnerability Database recorded over 28{,}000 new CVE entries in 2023 alone,
 spanning memory safety errors, injection flaws, cryptographic weaknesses, and access control failures
-across virtually every class of software system~\citep{cvedetails2023}.
+across virtually every class of software system~\cite{cvedetails2023}.
 The consequences of undetected vulnerabilities range from data breaches and service outages
 to compromised infrastructure, with the economic cost of software vulnerabilities estimated
-in the hundreds of billions of dollars annually~\citep{mcafee2020cybercrime}.
+in the hundreds of billions of dollars annually~\cite{mcafee2020cybercrime}.
 
 Despite this scale, the primary method by which organisations detect vulnerabilities before
 deployment remains manual code review --- a process that is slow, expensive, and dependent on
@@ -54,7 +54,7 @@ This dissertation addresses these problems through a set of concrete research qu
 
 \section{Approach and Contributions}
 
-The system developed in this dissertation fine-tunes UniXcoder~\citep{guo2022unixcoder},
+The system developed in this dissertation fine-tunes UniXcoder~\cite{guo2022unixcoder},
 a 125-million-parameter encoder pre-trained on code and natural language across multiple
 programming languages, as a binary vulnerability classifier.
 A lightweight classification head --- a dropout layer followed by a linear projection
@@ -70,7 +70,7 @@ mitigation while preserving the surrounding code structure.
 Four quantitative experiments evaluate the system: a baseline performance evaluation on
 a held-out synthetic set (Experiment 1), a cross-language ablation comparing C-only,
 Python-only, and joint models in a 3$\times$3 matrix (Experiment 2), a real-world
-generalisation test on 200 DiverseVul~\citep{ni2023diversevul} C functions
+generalisation test on 200 DiverseVul~\cite{ni2023diversevul} C functions
 (Experiment 3), and a decision threshold sweep (Experiment 4).
 A qualitative semantic understanding test suite with four probing tests distinguishes
 pattern-matching from structural reasoning.

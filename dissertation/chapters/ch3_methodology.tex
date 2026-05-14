@@ -10,7 +10,7 @@ data augmentation strategies, and the evaluation framework.
 
 The base model is UniXcoder (\texttt{microsoft/unixcoder-base}), a 125-million-parameter
 encoder-only transformer pre-trained jointly on code and natural language across multiple
-programming languages~\citep{guo2022unixcoder}.
+programming languages~\cite{guo2022unixcoder}.
 UniXcoder extends the RoBERTa architecture with cross-modal pre-training objectives including
 masked language modelling over code tokens, natural language descriptions, and abstract
 syntax tree linearisations.
@@ -85,7 +85,7 @@ The held-out validation set (\texttt{multi\_lang\_valid.jsonl}) contains 1{,}230
 This split is used for all quantitative evaluation in Experiments 1--4 and is never used
 during training or hyperparameter selection.
 The real-world evaluation in Experiment~3 uses \texttt{sample\_test.jsonl} from
-DiverseVul~\citep{ni2023diversevul}, which contains 200 real-world C functions and is
+DiverseVul~\cite{ni2023diversevul}, which contains 200 real-world C functions and is
 never exposed to training.
 
 \section{Training Procedure}

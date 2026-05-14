@@ -14,11 +14,11 @@ Modern software projects are routinely written in multiple programming languages
 Surveys of professional developers consistently report that the majority of teams maintain
 codebases spanning four or more languages simultaneously, with system-level logic in C or
 C++, application logic in Python or Java, and scripting or infrastructure components in
-shell or YAML~\citep{mayer2017multilanguage}.
+shell or YAML~\cite{mayer2017multilanguage}.
 An empirical study of open-source repositories found that approximately 80\% of
 non-trivial projects contain at least seven distinct languages when configuration, build,
-and documentation artefacts are included~\citep{yang2023demystifying}.
-The trend is accelerating: \citet{mussbacher2024polyglot} characterise polyglot
+and documentation artefacts are included~\cite{yang2023demystifying}.
+The trend is accelerating: Mussbacher et al.~\cite{mussbacher2024polyglot} characterise polyglot
 development as the default mode of contemporary software engineering rather than an
 exceptional practice.
 
@@ -28,16 +28,16 @@ defects (buffer overflows, use-after-free, null dereference) are predominantly
 C/C++ phenomena; injection vulnerabilities (SQL injection, command injection, path
 traversal) manifest in every language but through language-specific APIs; and logic
 errors such as race conditions present structurally different surface forms depending on
-the concurrency model the language provides~\citep{sakharkar2023systematic}.
+the concurrency model the language provides~\cite{sakharkar2023systematic}.
 A vulnerability management framework must therefore either operate language by language
 --- requiring separate tools and separate expertise --- or provide a unified detection
-capability that generalises across languages~\citep{syed2020cybersecurity}.
-Static analysis tools such as Flawfinder~\citep{wheeler2004flawfinder} address individual
+capability that generalises across languages~\cite{syed2020cybersecurity}.
+Static analysis tools such as Flawfinder~\cite{wheeler2004flawfinder} address individual
 languages but do not transfer, and empirical studies of practitioner experience report
 that the overhead of managing multiple tools is a primary barrier to adoption in
-industrial workflows~\citep{johnson2013don}.
+industrial workflows~\cite{johnson2013don}.
 Recent empirical work confirms this gap remains largely unaddressed:
-\citet{shu2026multilingual} find that the majority of automated vulnerability detection
+Shu et al.~\cite{shu2026multilingual} find that the majority of automated vulnerability detection
 studies are restricted to C and C++ using datasets such as CVEfixes and Big-Vul, leaving
 the multilingual challenge systematically underexplored.
 The goal of cross-language vulnerability detection addresses this barrier directly.
@@ -48,47 +48,47 @@ Existing vulnerability detection tools each address part of the problem but leav
 practical gaps when applied to polyglot codebases.
 Rule-based static analysers such as Flawfinder are language-specific and require ongoing
 expert maintenance to cover new vulnerability classes; their false-positive rates are
-high enough to reduce analyst trust over time~\citep{johnson2013don}.
-Early machine learning approaches --- VulDeePecker~\citep{li2018vuldeepecker} and
-SySeVR~\citep{li2022sysevr} --- showed that learned representations can reduce reliance
+high enough to reduce analyst trust over time~\cite{johnson2013don}.
+Early machine learning approaches --- VulDeePecker~\cite{li2018vuldeepecker} and
+SySeVR~\cite{li2022sysevr} --- showed that learned representations can reduce reliance
 on hand-crafted rules, but were built and evaluated on C/C++ and depend on
 language-specific program slicing that does not transfer directly to other languages.
-Graph-based detectors~\citep{zhou2019devign,chakraborty2022reveal} improve accuracy on
+Graph-based detectors~\cite{zhou2019devign,chakraborty2022reveal} improve accuracy on
 vulnerability classes that span multiple statements, but require a separate compiler
 toolchain per language, which adds complexity when supporting more than one language at
 the same time.
 
 Pre-trained transformer models offer a more straightforward path to multi-language
 detection.
-However, \citet{nguyen2025mulvuln} demonstrate that even models pre-trained on
+However, Nguyen et al.~\cite{nguyen2025mulvuln} demonstrate that even models pre-trained on
 multilingual corpora struggle to capture language-specific nuances --- subtle syntax
 rules, idiomatic coding patterns, and unique API conventions --- that are essential for
 distinguishing vulnerability realisations across languages.
 Because they are pre-trained on code from several languages, their representations carry
 some cross-language signal without requiring separate preprocessing pipelines, and
 fine-tuning with a lightweight classification head is relatively low-cost in terms of
-labelled data~\citep{xu2022detecting}.
+labelled data~\cite{xu2022detecting}.
 Whether this cross-language signal holds at the level of individual CWE classes --- and
 which classes benefit most --- is an open question that this work investigates on a
 modest scale.
 A practical constraint shaping the experimental design is the absence of a large
 Python-specific real-world vulnerability dataset comparable to
-DiverseVul~\citep{ni2023diversevul}; this motivates the use of a synthetic Python
+DiverseVul~\cite{ni2023diversevul}; this motivates the use of a synthetic Python
 training set supplemented by real-world C/C++ augmentation.
 
 \section{Pre-Trained Transformer Models for Code}
 
-The introduction of BERT~\citep{devlin2019bert} established masked language modelling as
+The introduction of BERT~\cite{devlin2019bert} established masked language modelling as
 an effective self-supervised pre-training objective, yielding representations that transfer
 to downstream tasks with minimal fine-tuning.
-\citet{rogers2020bertology} provide a comprehensive empirical survey of what BERT-family
-models learn, confirming that the attention mechanism~\citep{vaswani2017attention}
+Rogers et al.~\cite{rogers2020bertology} provide a comprehensive empirical survey of what BERT-family
+models learn, confirming that the attention mechanism~\cite{vaswani2017attention}
 acquires structured knowledge --- syntactic dependencies, co-reference chains, semantic
 roles --- during pre-training rather than from fine-tuning supervision alone.
 The success of BERT prompted the development of code-specific pre-trained models that
 apply the same approach to programming language corpora.
 
-\textbf{CodeBERT}~\citep{feng2020codebert} was the first large-scale code pre-trained
+\textbf{CodeBERT}~\cite{feng2020codebert} was the first large-scale code pre-trained
 model, trained on a bimodal objective over code--docstring pairs from GitHub across six
 programming languages.
 Its pre-training on a multi-language corpus gave it representations that transfer across
@@ -96,7 +96,7 @@ language boundaries, and fine-tuning on vulnerability detection tasks produces c
 results that substantially outperform sequence-based RNN models on BigVul and Devign
 benchmarks.
 
-\textbf{GraphCodeBERT}~\citep{guo2021graphcodebert} augments the token-level transformer
+\textbf{GraphCodeBERT}~\cite{guo2021graphcodebert} augments the token-level transformer
 with data-flow edges derived from program analysis.
 During pre-training, additional attention heads learn to attend over data-flow
 relationships, producing representations that encode which variables a token depends on.
@@ -104,14 +104,14 @@ This architectural modification improves performance on tasks requiring understa
 value propagation, including clone detection and vulnerability detection on
 data-flow-sensitive CWE classes.
 
-\textbf{CodeT5}~\citep{wang2021codet5} adopts an encoder-decoder architecture and
+\textbf{CodeT5}~\cite{wang2021codet5} adopts an encoder-decoder architecture and
 introduces an identifier-aware pre-training objective that trains the model to predict
 masked identifier tokens using knowledge of their structural role.
 The encoder-decoder design supports both understanding tasks (classification, retrieval)
 and generation tasks (summarisation, repair), achieving state-of-the-art results across a
 broad task suite.
 
-\textbf{UniXcoder}~\citep{guo2022unixcoder} unifies encoder-only, decoder-only, and
+\textbf{UniXcoder}~\cite{guo2022unixcoder} unifies encoder-only, decoder-only, and
 encoder-decoder modes in a single architecture by conditioning the attention mask pattern
 on the task at inference time.
 Pre-training incorporates abstract syntax tree information serialised as a prefix sequence,
@@ -125,10 +125,10 @@ vulnerability classification.
 In a recent large-scale multilingual evaluation, UniXcoder achieved accuracy 0.5814 and
 F1-score 0.6822 on function-level detection across seven programming languages,
 outperforming CodeBERT and LineVul but falling below CodeT5P (accuracy 0.6037)
-\citep{shu2026multilingual}; this dissertation investigates whether targeted fine-tuning
+\cite{shu2026multilingual}; this dissertation investigates whether targeted fine-tuning
 on a focused two-language setting can improve on this generalised multilingual baseline.
 
-\textbf{LineVul}~\citep{fu2022linevul} applies a transformer encoder with a
+\textbf{LineVul}~\cite{fu2022linevul} applies a transformer encoder with a
 classification head to function-level vulnerability prediction and introduces an
 attention-based line-level attribution method that highlights which lines contributed most
 to the prediction.
@@ -140,17 +140,17 @@ for practical tool integration.
 
 Graph neural networks provide an alternative to sequence-based encoding by operating
 directly on graph representations of program structure.
-\citet{zhou2020gnn} survey GNN architectures and demonstrate that message-passing over
+Zhou et al.~\cite{zhou2020gnn} survey GNN architectures and demonstrate that message-passing over
 structural edges produces representations that are qualitatively different from sequential
 attention over token streams.
 
-\textbf{LineVD}~\citep{hin2022linevd} applies graph neural networks at the statement
+\textbf{LineVD}~\cite{hin2022linevd} applies graph neural networks at the statement
 level, constructing a program dependence graph and classifying individual statements rather
 than whole functions.
 Statement-level classification is more precise for audit support but requires line-level
 ground truth labels, which are absent from most function-level vulnerability datasets.
 
-\textbf{BGNN4VD}~\citep{cao2021bgnn4vd} constructs a bidirectional graph encoding both
+\textbf{BGNN4VD}~\cite{cao2021bgnn4vd} constructs a bidirectional graph encoding both
 forward and backward data-flow edges, allowing the model to propagate information from a
 vulnerable sink backwards to its taint source and forwards from a taint source to its
 dangerous sinks.
@@ -174,13 +174,13 @@ The quality of vulnerability detection research is constrained by the quality of
 benchmark datasets.
 Four datasets are relevant to this work.
 
-\textbf{BigVul}~\citep{fan2020bigvul} is a C/C++ dataset of 3{,}754 vulnerabilities
+\textbf{BigVul}~\cite{fan2020bigvul} is a C/C++ dataset of 3{,}754 vulnerabilities
 sourced from real-world CVE fixes in open-source repositories, paired with the pre-fix
 (vulnerable) and post-fix (safe) function versions.
 The paired structure makes BigVul suitable for minimal-fix testing and for learning the
 specific changes that resolve a vulnerability.
 
-\textbf{DiverseVul}~\citep{ni2023diversevul,chen2023diversevul} extends BigVul in both
+\textbf{DiverseVul}~\cite{ni2023diversevul,chen2023diversevul} extends BigVul in both
 scale and CWE diversity, providing approximately 18{,}000 vulnerable and 330{,}000 safe
 C/C++ functions spanning approximately 150 distinct CWE types.
 DiverseVul includes structured CWE annotations that make it possible to evaluate
@@ -189,11 +189,11 @@ It is used in this dissertation for real-world augmentation (1{,}000 training sa
 from \texttt{sample\_train.jsonl}) and real-world evaluation (200 samples from
 \texttt{sample\_test.jsonl}).
 
-\textbf{Devign}~\citep{zhou2019devign} provides function-level labels for C functions
+\textbf{Devign}~\cite{zhou2019devign} provides function-level labels for C functions
 drawn from QEMU and FFmpeg, with roughly balanced vulnerable and safe classes, and is
 widely used as a benchmark for graph-based vulnerability detectors.
 
-\textbf{DeVAIC}~\citep{cotroneo2025devaic} is a recently introduced benchmark for
+\textbf{DeVAIC}~\cite{cotroneo2025devaic} is a recently introduced benchmark for
 evaluating the security of AI-generated code.
 DeVAIC provides ground-truth labels for code snippets produced by large language models,
 addressing the emerging challenge of detecting vulnerabilities in LLM-assisted development
@@ -208,12 +208,12 @@ This gap directly motivates the synthetic data approach used in this dissertatio
 
 A vulnerability detector's practical value depends not only on classification accuracy
 but on the trustworthiness of its confidence outputs.
-\citet{guo2017calibration} demonstrated that modern neural networks are systematically
+Guo et al.~\cite{guo2017calibration} demonstrated that modern neural networks are systematically
 over-confident and introduced temperature scaling as a simple post-hoc recalibration
 method: dividing logits by a learned scalar $T > 1$ before applying the sigmoid flattens
 the output distribution, reducing over-confidence without retraining.
 
-\citet{muller2019label} showed that label smoothing achieves a similar calibration effect
+M\"{u}ller et al.~\cite{muller2019label} showed that label smoothing achieves a similar calibration effect
 during training itself, by replacing one-hot training targets with soft targets that assign
 small probability mass to non-target classes.
 For binary classification with smoothing parameter $\varepsilon$, hard targets
@@ -234,8 +234,8 @@ joint multi-language training rather than independent monolingual models.
 Second, pre-trained transformer models offer the strongest general-purpose code
 representations available, with UniXcoder providing the best combination of structural
 awareness and architectural flexibility for fine-tuning as a vulnerability classifier.
-Recent multilingual benchmarking \citep{shu2026multilingual} and architecture proposals
-\citep{nguyen2025mulvuln} confirm that PLMs have not yet solved cross-language
+Recent multilingual benchmarking \cite{shu2026multilingual} and architecture proposals
+\cite{nguyen2025mulvuln} confirm that PLMs have not yet solved cross-language
 vulnerability detection, and that language-specific knowledge remains a meaningful gap
 even for models pre-trained on multi-language corpora.
 Third, sequence models hit a predictable ceiling on CWE classes requiring inter-statement
