@@ -101,12 +101,20 @@ CWE annotations for only a subset of samples, and synthetic data would need to b
 extended to cover a wider range of classes at sufficient volume per class to train a
 reliable multi-class head.
 
-\textbf{Larger real-world training corpus.}
-Using more of the DiverseVul training split --- or combining DiverseVul with BigVul and
-additional CVE-labelled repositories --- would reduce the generalisation gap further.
-The 0.278 F1 improvement from 1{,}000 real samples suggests a favourable response to
-real data volume; a 10{,}000-sample augmentation might plausibly close the remaining gap
-substantially.
+\textbf{Multi-language real-world data.}
+The most significant practical gap is the absence of a large-scale, function-level
+real-world vulnerability dataset beyond C/C++.
+DiverseVul provides approximately 18{,}000 labelled C functions; no comparable resource
+exists for Python.
+This forces synthetic training for Python and limits real-world evaluation to C, meaning
+the synthetic-to-real gap measured in Experiment~3 cannot currently be replicated for
+Python.
+Constructing such a dataset --- sourced from PyPI security advisories, OSV database
+entries, or GitHub advisory data --- and scaling the DiverseVul augmentation from
+1{,}000 to 10{,}000 samples are the two highest-value data investments for future work.
+The 0.278 F1 improvement from 1{,}000 real samples suggests the model responds
+favourably to real data volume; closing the remaining gap is likely a data problem
+as much as an architectural one.
 
 \textbf{CWE class expansion.}
 Adding synthetic training examples for CWE-787 (out-of-bounds write), CWE-400 (uncontrolled
@@ -114,8 +122,3 @@ resource consumption), and CWE-703 (improper exception handling) would cover the
 common false-negative classes in the real-world test.
 Template-based synthetic generation for these classes follows the same methodology used
 for the existing 17 CWEs.
-
-\textbf{Multi-language real-world evaluation.}
-Constructing or obtaining a Python-language real-world vulnerability evaluation set ---
-sourced from PyPI security advisories or OSV database entries --- would allow the same
-synthetic-to-real gap analysis for Python that Experiment~3 provides for C.
