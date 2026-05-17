@@ -56,12 +56,60 @@ These safe examples use identical code structure to the vulnerable ones, differi
 the algorithm name --- a minimal contrastive pair that forces the model to attend to the
 specific algorithm token and its security implication.
 
+\begin{figure}[H]
+\begin{minipage}[t]{0.48\textwidth}
+\begin{lstlisting}[language=Python, caption={Vulnerable (CWE-327): \texttt{md5} used as password hash.}]
+import hashlib
+def hash_password(password):
+    return hashlib.md5(
+        password.encode()
+    ).hexdigest()
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{lstlisting}[language=Python, caption={Hard negative (safe): identical structure, secure algorithm.}]
+import hashlib
+def hash_password(password):
+    return hashlib.sha256(
+        password.encode()
+    ).hexdigest()
+\end{lstlisting}
+\end{minipage}
+\caption{Python CWE-327 hard negative pair: the only difference is \texttt{md5}
+vs \texttt{sha256}, forcing the model to discriminate on algorithm name.}
+\label{fig:hn_python}
+\end{figure}
+
 For the command injection failure, four safe examples were added to the C safe set:
 functions calling \texttt{system()} with fully hardcoded string literals as arguments
 and no user-controlled data anywhere in the call chain.
 Additional safe examples cover OpenSSL SHA-256 and SHA-512 usage (\texttt{SHA256\_Update},
 \texttt{SHA512\_Update}).
 In total, seventeen new safe examples were added across both languages.
+
+\begin{figure}[H]
+\begin{minipage}[t]{0.48\textwidth}
+\begin{lstlisting}[language=C, caption={Vulnerable (CWE-78): user input flows into \texttt{system()}.}]
+void run_command(char *user_input) {
+    char cmd[256];
+    sprintf(cmd, "ls %s", user_input);
+    system(cmd);
+}
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\begin{lstlisting}[language=C, caption={Hard negative (safe): \texttt{system()} called with fully hardcoded argument.}]
+void run_cleanup(void) {
+    system("rm -f /tmp/cache.lock");
+}
+\end{lstlisting}
+\end{minipage}
+\caption{C CWE-78 hard negative pair: both call \texttt{system()} but only the
+left version has user-controlled data in the call chain.}
+\label{fig:hn_c}
+\end{figure}
 
 \subsection{Effect}
 
@@ -179,26 +227,12 @@ safe examples.
 \section{Discussion: What Each Intervention Contributes}
 
 The two interventions address structurally different problems.
-
-Hard negative mining addresses \emph{within-distribution confusion}: cases where the model
-cannot discriminate between safe and vulnerable examples sharing the same high-level API
-because the training data only presents the dangerous version.
-This is a data coverage problem --- the test examples are stylistically identical to
-training examples, but the model has no contrastive examples to anchor the decision boundary.
-Adding contrastive pairs directly adjacent to the confusing examples reshapes the local
-decision boundary without requiring architectural or training procedure changes.
-
-Real-world data augmentation addresses \emph{out-of-distribution generalisation}: the gap
-between clean, isolated, purpose-built training examples and the messy, long, context-dependent
-functions that appear in real codebases.
-No amount of carefully constructed hard negatives can teach the model what real-world C code
-looks like if real-world C code has never appeared in training.
-The augmentation directly reduces this covariate shift by exposing the model to the target
-distribution, even with only 1{,}000 samples.
-
-The residual gap of $-0.182$ after both interventions reflects factors that neither
-intervention can address: CWE classes entirely absent from training (CWE-787, CWE-400,
-CWE-703), architectural inability to track data flow for CWE-78 and CWE-416, and the
-irreducible stylistic diversity of production code.
-Closing the remaining gap would require substantially more real-world training data or
-a move to a graph-based architecture --- directions explored in Chapter~\ref{ch:discussion}.
+Hard negative mining resolves \emph{within-distribution confusion} by adding contrastive
+pairs that anchor the decision boundary at the discriminating token (algorithm name,
+argument source), without requiring architectural changes.
+Real-world augmentation addresses \emph{out-of-distribution generalisation} by directly
+exposing the model to the target distribution --- no synthetic construction can substitute
+for real code styles and idioms.
+The residual gap of $-0.182$ reflects what neither intervention can fix: unseen CWE classes
+(CWE-787, CWE-400, CWE-703) and the architectural inability to track data flow, which
+require more training data or a graph-based architecture respectively.

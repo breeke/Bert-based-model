@@ -142,11 +142,22 @@ never exposed to training.
 
 \section{Training Procedure}
 
-Three model variants are trained to support the cross-language ablation study:
+The training approach is fine-tuning: rather than training a model from scratch, the
+pre-trained UniXcoder checkpoint is adapted to the vulnerability detection task by
+continuing training on the synthetic dataset with a task-specific classification head.
+Fine-tuning preserves the rich code representations learned during pre-training on
+hundreds of millions of code tokens across multiple languages, while the task-specific
+training signal steers those representations towards the binary vulnerable/safe distinction.
+This approach is chosen over training from scratch because no large-scale, multi-language,
+function-level vulnerability dataset exists that would support training a transformer from
+random initialisation; the synthetic dataset provides sufficient signal to fine-tune an
+existing representation but not to learn one.
+
+Three model variants are fine-tuned to support the cross-language ablation study:
 \begin{itemize}
-  \item \textbf{C-only model}: trained exclusively on C examples from the synthetic dataset.
-  \item \textbf{Python-only model}: trained exclusively on Python examples from the synthetic dataset.
-  \item \textbf{Joint model}: trained on the combined C and Python dataset, interleaved and shuffled.
+  \item \textbf{C-only model}: fine-tuned exclusively on C examples from the synthetic dataset.
+  \item \textbf{Python-only model}: fine-tuned exclusively on Python examples from the synthetic dataset.
+  \item \textbf{Joint model}: fine-tuned on the combined C and Python dataset, interleaved and shuffled.
 \end{itemize}
 
 All three variants use identical hyperparameters.

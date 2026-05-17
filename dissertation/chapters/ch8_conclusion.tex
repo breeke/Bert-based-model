@@ -43,58 +43,33 @@ For practitioners building on similar approaches, the implication is direct: if 
 performance matters, investing in labelled real-world training data has a higher return
 than architectural experimentation on synthetic benchmarks alone.
 
+\textbf{Sequence models handle locally visible patterns reliably but fail on complex vulnerabilities.}
+CWE classes whose exploitability depends on a single self-contained expression ---
+hardcoded credentials, weak algorithm selection, integer overflow --- reach perfect or
+near-perfect F1.
+Classes that require reasoning across multiple statements degrade substantially: CWE-416
+(use-after-free) requires tracking a pointer from allocation through deallocation to
+dereference; CWE-367 (TOCTOU) requires recognising a temporal gap between a check and
+its use; CWE-78 C fails the minimal-fix test because the model cannot determine whether
+user-controlled data still reaches \texttt{system()}.
+The dead-code failures confirm this directly: the model flags unreachable vulnerable
+blocks as live because it has no representation of control-flow reachability.
+Extending to inter-procedural taint tracking or concurrency bugs requires architectural
+changes, not more training data.
+
 \section{Closing Remarks}
 
-The system demonstrates that a pre-trained code model, with careful dataset design,
+This work demonstrates that a pre-trained code model, with careful dataset design,
 targeted hard negatives, and real-world augmentation, can reach practically useful
 performance on a multi-language vulnerability detection task.
-The semantic understanding tests move the evaluation beyond accuracy figures to a
-qualitative characterisation of what the model has actually learned, which is a
-precondition for trusting any machine learning system in a security-critical context.
-
-\textbf{Limitations on complex vulnerability detection.}
-The results make clear that the model handles locally visible patterns reliably but
-struggles as vulnerability complexity increases.
-CWE classes whose exploitability depends on a single self-contained expression ---
-hardcoded credentials, weak algorithm selection, integer overflow in an arithmetic
-expression --- reach perfect or near-perfect F1.
-Classes that require reasoning across multiple statements degrade substantially: CWE-416
-(use-after-free) requires tracking a pointer from its allocation through its
-deallocation to a subsequent dereference; CWE-367 (TOCTOU) requires recognising a
-temporal gap between a check and its use.
-The dead-code test failures confirm this directly: the model cannot determine whether a
-dangerous code path is reachable, so it flags unreachable vulnerable blocks as if they
-were live.
-Extending this approach to more complex vulnerability classes --- inter-procedural
-taint tracking, concurrency bugs, logic flaws spanning multiple files --- would
-require architectural changes that bring explicit program structure into the
-model's representational vocabulary, such as graph-augmented encoding over data-flow
-and control-flow graphs.
-
-\textbf{Positioning within the broader research landscape.}
-This work sits within a rapidly evolving field.
-Recent multilingual benchmarking by Shu et al.~\cite{shu2026multilingual} confirms that
-cross-language vulnerability detection remains unsolved even for the largest pre-trained
-models, with accuracy dropping substantially outside the C/C++ domain.
-Nguyen et al.~\cite{nguyen2025mulvuln} similarly demonstrate that language-specific
-nuances persist as a meaningful gap for multilingual transformer models.
-The contributions here --- a focused two-language fine-tuning study, a diagnostic
-semantic test suite, and token-level attribution analysis --- complement that body of
-work by providing a principled characterisation of \emph{why} sequence models fail on
-specific classes, rather than only reporting where they fail.
-As the field moves towards graph-augmented architectures, LLM-assisted code repair, and
-automated vulnerability patching, the baseline and diagnostic framework established
-here provide a reference point for measuring genuine progress: a new architecture that
-solves the dead-code and data-flow cases identified in this work would represent a
-qualitative advance, not merely a benchmark improvement.
-
-The gap between synthetic and real-world performance is not a failure of the approach
-but a measurement of the problem's difficulty.
-Closing it further requires more real-world training data, broader CWE coverage, and ---
-ultimately --- architectural advances that bring data-flow and control-flow reasoning
-into the model's representational vocabulary.
-The results reported here establish a clear baseline, locate the ceiling of sequence-based
-approaches precisely, and map a concrete path forward.
+The semantic test suite and token attribution analysis provide a principled
+characterisation of \emph{why} the model succeeds and fails --- complementing recent
+multilingual benchmarking~\cite{shu2026multilingual,nguyen2025mulvuln} by locating the
+exact boundary of sequence-based approaches rather than only reporting aggregate accuracy.
+Closing the residual gap requires more real-world training data, broader CWE coverage,
+and architectural advances that bring data-flow and control-flow reasoning into the
+model's representational vocabulary.
+The results establish a clear baseline and map a concrete path forward.
 
 \section{Future Directions}
 
