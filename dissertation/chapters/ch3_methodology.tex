@@ -140,6 +140,80 @@ The real-world evaluation in Experiment~3 uses \texttt{sample\_test.jsonl} from
 DiverseVul~\cite{ni2023diversevul}, which contains 200 real-world C functions and is
 never exposed to training.
 
+\subsection{Synthetic Data Generation Pipeline}
+
+Each CWE class is represented by a set of hand-crafted base patterns --- short,
+self-contained functions that isolate the exact dangerous operation.
+Both a vulnerable version and a structurally equivalent safe version are written for each
+pattern, differing only at the point of the flaw: the unsafe API call is replaced by its
+safe counterpart, the hardcoded literal is replaced by an environment variable lookup,
+or the unchecked operation is guarded by a bounds check.
+
+Each base pattern is then expanded into 40 syntactically distinct variants by a
+\texttt{make\_variation()} function applied at generation time with a fixed random seed
+(42) for reproducibility.
+The variation pipeline applies four transformations independently, each with its own
+probability:
+
+\begin{itemize}
+  \item \textbf{Variable renaming} (50\% per name): common identifiers such as
+        \texttt{query}, \texttt{cmd}, and \texttt{result} are replaced with semantically
+        equivalent alternatives drawn from a language-specific pool
+        (e.g.\ \texttt{query} $\to$ \texttt{stmt}, \texttt{sql\_buf}, \texttt{db\_query}).
+        Whole-word substitution ensures partial matches are not corrupted.
+
+  \item \textbf{Comment injection} (40\%): a neutral comment drawn from a
+        language-specific pool is inserted at a random position within the function body,
+        adding surface noise that does not affect semantics.
+
+  \item \textbf{Dummy statement injection} (35\%): a benign logging or metrics call
+        (e.g.\ \texttt{log\_debug("entering function");} in C,
+        \texttt{logger.debug('processing request')} in Python) is inserted near the
+        top of the function body.
+
+  \item \textbf{Contextual wrapping} (50\%): the core function body is embedded inside
+        a realistic outer frame that adds setup variables, an optional conditional guard,
+        and a return statement --- simulating the nesting depth and boilerplate found in
+        production functions.
+\end{itemize}
+
+The result is that the model never sees the same token sequence twice for the same
+vulnerability pattern, preventing simple memorisation while keeping the vulnerability
+signal consistent across all variants of a base pattern.
+
+\subsection{Dataset Quality}
+
+Several properties of the generated dataset support reliable model training and
+evaluation.
+
+\textbf{Label balance.}
+Vulnerable and safe examples are produced in roughly equal numbers within each language
+and CWE class.
+The held-out validation set is 59.7\% vulnerable and 40.3\% safe (733 vulnerable,
+497 safe out of 1{,}230), which is close enough to balance that accuracy is a
+meaningful metric alongside F1.
+
+\textbf{Minimal-difference safe/vulnerable pairs.}
+Each safe example uses the same structural template as its vulnerable counterpart,
+with only the dangerous operation changed.
+This is deliberate: a model that can distinguish the pair has learned something about
+the specific vulnerability mechanism rather than about superficial features such as
+function length or variable naming.
+
+\textbf{Intra-class diversity.}
+With 40 variants per base pattern and four stochastic transformations applied
+independently, each CWE class contains substantial surface variation.
+The variable renaming transformation in particular ensures that the model cannot
+associate a single identifier name with a vulnerability class.
+
+\textbf{Limitations.}
+All examples are isolated, single-function snippets; the dataset contains no
+cross-function or cross-file vulnerabilities.
+Vulnerability patterns are presented in their most recognisable form without the
+noise and context of a real codebase.
+These properties make the dataset well-suited for initial training but explain
+the synthetic-to-real performance gap measured in Experiment~3.
+
 \section{Training Procedure}
 
 The training approach is fine-tuning: rather than training a model from scratch, the
