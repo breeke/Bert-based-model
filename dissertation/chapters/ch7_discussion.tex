@@ -46,52 +46,6 @@ The results of this work motivate rather than undermine that line of research:
 they show precisely which vulnerability classes would benefit from richer structural
 representations.
 
-\section{Comparison with Published Baselines}
-
-Direct comparison with published vulnerability detection systems is complicated by the
-fact that no two systems share the same training data, test set, and CWE scope.
-Table~\ref{tab:baseline_comparison} places this work in context by reporting F1 scores
-alongside the benchmark each system was evaluated on and the language scope it covers.
-
-\begin{table}[H]
-  \centering
-  \small
-  \caption{Comparison of this work with published vulnerability detection baselines.
-           Datasets differ; scores are not directly comparable across rows.}
-  \label{tab:baseline_comparison}
-  \begin{tabular}{llllc}
-    \toprule
-    System & Architecture & Dataset & Languages & F1 \\
-    \midrule
-    VulDeePecker~\cite{li2018vuldeepecker}  & BiLSTM (slice-level) & Custom (CVE slices) & C       & 0.781 \\
-    Devign~\cite{zhou2019devign}            & GNN                  & Devign (QEMU/FFmpeg) & C      & 0.566$^\dagger$ \\
-    Reveal~\cite{chakraborty2022reveal}     & GNN                  & Devign               & C       & 0.613 \\
-    LineVul~\cite{fu2022linevul}            & Transformer          & BigVul               & C       & 0.916 \\
-    UniXcoder~\cite{shu2026multilingual}    & Transformer          & Multilingual         & 7 lang. & 0.682 \\
-    \midrule
-    \textbf{This work} (synthetic)          & Transformer          & Synthetic (ours)     & C, Python & \textbf{0.931} \\
-    \textbf{This work} (real-world)         & Transformer          & DiverseVul (200)     & C, Python & 0.749 \\
-    \bottomrule
-  \end{tabular}
-  \begin{flushleft}
-    \small $^\dagger$ Accuracy reported in the original paper; F1 not directly available.
-  \end{flushleft}
-\end{table}
-
-Three observations follow from this comparison.
-First, the synthetic F1 of 0.931 is competitive with LineVul's 0.916 on BigVul, but the
-two test sets are not equivalent: the synthetic held-out set uses the same distribution
-as training, while BigVul contains real-world CVE-labelled functions.
-The real-world F1 of 0.749 is the more honest comparison point for practical utility.
-Second, the real-world result of 0.749 exceeds both Devign (0.566) and Reveal (0.613)
-while being evaluated on a substantially harder task --- DiverseVul spans approximately
-150 CWE types, many of which are absent from training, whereas Devign evaluates on the
-same distribution used for training.
-Third, the multilingual UniXcoder result (F1\,=\,0.682 across seven languages without
-task-specific fine-tuning) confirms that targeted fine-tuning on a focused two-language
-dataset can substantially improve on the generalised multilingual baseline,
-even when the fine-tuning data is entirely synthetic.
-
 \section{Cross-Language Transfer: Limits and Potential}
 
 The ablation results and the per-CWE transfer analysis show that cross-language transfer

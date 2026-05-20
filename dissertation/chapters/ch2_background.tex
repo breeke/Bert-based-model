@@ -179,6 +179,8 @@ sourced from real-world CVE fixes in open-source repositories, paired with the p
 (vulnerable) and post-fix (safe) function versions.
 The paired structure makes BigVul suitable for minimal-fix testing and for learning the
 specific changes that resolve a vulnerability.
+LineVul~\cite{fu2022linevul} achieves F1\,=\,0.916 on BigVul, representing the
+current state of the art for transformer-based function-level detection on this benchmark.
 
 \textbf{DiverseVul}~\cite{ni2023diversevul,chen2023diversevul} extends BigVul in both
 scale and CWE diversity, providing approximately 18{,}000 vulnerable and 330{,}000 safe
@@ -192,6 +194,9 @@ from \texttt{sample\_train.jsonl}) and real-world evaluation (200 samples from
 \textbf{Devign}~\cite{zhou2019devign} provides function-level labels for C functions
 drawn from QEMU and FFmpeg, with roughly balanced vulnerable and safe classes, and is
 widely used as a benchmark for graph-based vulnerability detectors.
+Graph-based models such as Reveal~\cite{chakraborty2022reveal} report F1\,=\,0.613 on
+this benchmark, while sequence-based models typically fall below 0.60, reflecting the
+difficulty of multi-statement vulnerability reasoning without explicit program structure.
 
 \textbf{DeVAIC}~\cite{cotroneo2025devaic} is a recently introduced benchmark for
 evaluating the security of AI-generated code.
