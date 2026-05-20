@@ -249,21 +249,12 @@ The checkpoint achieving the lowest validation loss is saved as the best model.
 
 \subsection{Hard Negative Mining}
 
-Hard negatives are safe examples that are deliberately designed to resemble vulnerable ones
-in surface form while being semantically safe.
-The objective is to force the model to learn the \emph{discriminating} feature rather than
-the \emph{correlated} feature.
-
-Six hard negative examples are added to the Python safe set: functions using
-\texttt{hashlib.sha256}, \texttt{hashlib.sha512}, and \texttt{hashlib.pbkdf2\_hmac} in the
-same structural positions where vulnerable examples use \texttt{hashlib.md5}.
-These safe examples use identical code structure to the vulnerable ones, differing only in
-the algorithm name, creating a minimal contrastive pair.
-
-Four safe examples are added to the C safe set: functions calling \texttt{system()} with
-fully hardcoded string literals as arguments, with no user-controlled data in the call chain.
-Additional safe examples are added for OpenSSL SHA-256 and SHA-512 usage.
-In total, seventeen new safe examples are added across both languages.
+Hard negatives are safe examples deliberately designed to resemble vulnerable ones in
+surface form while being semantically safe, forcing the model to learn the discriminating
+feature rather than a surface co-occurrence.
+Seventeen new safe examples were added across C and Python targeting two systematic false
+positive patterns identified during training; the full design and measured effect are
+described in Chapter~\ref{ch:improvements}.
 
 \subsection{Real-World Data Augmentation}
 
